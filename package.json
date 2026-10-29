@@ -8,8 +8,13 @@
     "drizzle-orm": "^1.0.0-beta.22"
   },
   "devDependencies": {
+    "@algolia/netlify-plugin-crawler": "file:./build-plugins/disabled-algolia-netlify-plugin-crawler",
     "@types/node": "^26.6.6",
     "drizzle-kit": "^1.0.0-beta.22",
+    "netlify-plugin-a11y": "file:./build-plugins/disabled-netlify-plugin-a11y",
+    "netlify-plugin-cloudinary": "file:./build-plugins/disabled-netlify-plugin-cloudinary",
+    "netlify-plugin-cypress": "file:./build-plugins/disabled-netlify-plugin-cypress",
+    "strapi-plugin-netlify-deployments": "file:./build-plugins/disabled-strapi-plugin-netlify-deployments",
     "typescript": "^7.0.2"
   }
 }

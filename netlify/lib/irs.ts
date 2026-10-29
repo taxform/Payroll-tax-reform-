@@ -64,24 +64,29 @@ export function parseReleases(html: string): IrsRelease[] {
   return releases;
 }
 
+// Reads the current list of releases straight from IRS.gov.
+export async function fetchReleases() {
+  const res = await fetch(SOURCE_URL, {
+    headers: { "User-Agent": "PayrollTaxReform.com official-link-monitor (+https://payrolltaxreform.com)" },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) throw new Error(`IRS responded with HTTP ${res.status}`);
+  const releases = parseReleases(await res.text());
+  if (!releases.length) throw new Error("No releases found; the IRS page layout may have changed");
+  return releases;
+}
+
 // Fetches the IRS newsroom and stores any releases not seen before.
 export async function refreshIrsUpdates() {
   try {
-    const res = await fetch(SOURCE_URL, {
-      headers: { "User-Agent": "PayrollTaxReform.com official-link-monitor (+https://payrolltaxreform.com)" },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) throw new Error(`IRS responded with HTTP ${res.status}`);
-    const releases = parseReleases(await res.text());
-    if (!releases.length) throw new Error("No releases found; the IRS page layout may have changed");
-
+    const releases = await fetchReleases();
     await db.insert(irsUpdates).values(releases).onConflictDoNothing({ target: irsUpdates.url });
     await db.insert(feedChecks).values({ status: "ok", itemsFound: releases.length });
     return { ok: true, itemsFound: releases.length };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("IRS refresh failed:", message);
-    await db.insert(feedChecks).values({ status: "error", error: message.slice(0, 500) });
+    await db.insert(feedChecks).values({ status: "error", error: message.slice(0, 500) }).catch(() => {});
     return { ok: false, error: message };
   }
 }

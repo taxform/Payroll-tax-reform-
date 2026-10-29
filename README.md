@@ -29,3 +29,11 @@ Edit `db/schema.ts`, then run `npx drizzle-kit generate --name <what_changed>` a
 
 Headlines link to IRS.gov and are not interpreted tax advice. The IRS page layout can change; if the scheduled
 check starts failing, the function logs show the error and the site keeps showing the releases it already has.
+
+## Disabled build plugins
+
+Five build plugins were installed on this site in the Netlify dashboard without being configured
+(Algolia Crawler, Cloudinary, Cypress, Accessibility/a11y, and strapi-plugin-netlify-deployments), which made builds fail.
+`build-plugins/` holds do-nothing stand-ins with the same package names, listed in `package.json`, so builds skip them.
+Lighthouse still runs. Once those plugins are uninstalled in the dashboard, delete `build-plugins/` and the matching
+`devDependencies` entries.

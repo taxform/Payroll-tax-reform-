@@ -1,0 +1,1 @@
+{ "name": "strapi-plugin-netlify-deployments", "version": "0.0.0-disabled", "private": true, "main": "index.js", "type": "commonjs" }
