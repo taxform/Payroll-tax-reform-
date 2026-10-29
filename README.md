@@ -1,48 +1,31 @@
-name: Daily IRS Tax Updates
+# PayrollTaxReform.com
 
-on:
-  schedule:
-    - cron: '0 11 * * *'
-  workflow_dispatch:
+Independent payroll tax and tax reform information site, hosted on Netlify at https://payrolltaxreform.com.
 
-permissions:
-  contents: read
+## Layout
 
-jobs:
-  check-tax-updates:
-    runs-on: ubuntu-latest
+- `public/` — the static site (HTML pages, `app.js`, `style.css`). This is the only folder published.
+- `public/__forms.html` — hidden copies of the JavaScript-rendered forms so Netlify Forms registers them at deploy time.
+- `netlify/functions/refresh-irs-updates.mts` — scheduled function (11:00 UTC daily) that reads the official
+  IRS "News releases for current month" page and stores new releases.
+- `netlify/functions/official-updates.mts` — `GET /api/official-updates`, used by the Latest Updates page.
+  It also refreshes the data itself if the last check is more than 26 hours old.
+- `db/schema.ts` — Netlify Database (Postgres) schema; migrations live in `netlify/database/migrations/`
+  and are applied automatically on deploy.
 
-    steps:
-      - name: Download website files
-        uses: actions/checkout@v4
+## Forms
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+- `tax-alerts` — email list signup shown in the sidebar on most pages.
+- `advertiser-inquiry` — advertising inquiry form on the Advertise page.
 
-      - name: Check official IRS newsroom
-        run: |
-          python - <<'PY'
-          import urllib.request
+Submissions appear in the Netlify dashboard under **Forms**. Add email or Slack notifications there under
+**Forms → Form notifications**.
 
-          url = "https://www.irs.gov/newsroom"
+## Changing the database schema
 
-          req = urllib.request.Request(
-              url,
-              headers={
-                  "User-Agent": "Mozilla/5.0"
-              }
-          )
+Edit `db/schema.ts`, then run `npx drizzle-kit generate --name <what_changed>` and commit the generated migration.
 
-          with urllib.request.urlopen(req, timeout=30) as response:
-              content = response.read().decode(
-                  "utf-8", errors="replace"
-              )
+## Notes
 
-          if "Internal Revenue Service" not in content:
-              raise RuntimeError("Unexpected IRS page content")
-
-          print("SUCCESS: IRS Newsroom is accessible.")
-          print("Downloaded", len(content), "characters.")
-          PY
+Headlines link to IRS.gov and are not interpreted tax advice. The IRS page layout can change; if the scheduled
+check starts failing, the function logs show the error and the site keeps showing the releases it already has.

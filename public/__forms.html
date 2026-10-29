@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Forms</title></head>
+<body>
+<!-- Static copies of the JavaScript-rendered forms so Netlify Forms can register them at deploy time. -->
+<form name="tax-alerts" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="tax-alerts">
+  <input type="hidden" name="subject" value="New tax alert signup">
+  <input name="bot-field">
+  <input type="email" name="email">
+  <input name="page">
+</form>
+<form name="advertiser-inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="advertiser-inquiry">
+  <input type="hidden" name="subject" value="New advertising inquiry">
+  <input name="bot-field">
+  <input name="company">
+  <input name="name">
+  <input type="email" name="email">
+  <select name="interest"><option>Homepage banner</option><option>Sponsored content</option><option>Newsletter sponsorship</option><option>Category sponsorship</option><option>Other</option></select>
+  <textarea name="message"></textarea>
+</form>
+</body>
+</html>
