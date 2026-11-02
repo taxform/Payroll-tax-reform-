@@ -1,4 +1,4 @@
-const pages={home:'Home',updates:'Latest Updates',payroll:'Payroll Taxes',states:'State Taxes',resources:'Resources',advertise:'Advertise With Us',about:'About',privacy:'Privacy Policy',contact:'Contact'};
+const pages={home:'Home',updates:'Latest Updates',payroll:'Payroll Taxes',states:'State Taxes',resources:'Resources',advertise:'Advertise With Us',about:'About',privacy:'Privacy Policy',contact:'Contact',partners:'Partners'};
 const file=location.pathname.split('/').pop()||'index.html';
 const current=file==='index.html'?'home':file.replace('.html','');
 
@@ -189,6 +189,9 @@ const views={
 
   privacy:()=>`${head('Privacy policy','How we handle information on PayrollTaxReform.com.')}
     <section class="section"><div class="wrap"><div class="content-card"><p>We may collect email signups and website analytics for operational purposes. We do not sell personal information. We may use third-party tools for analytics, advertising, and affiliate tracking.</p><p>Affiliate links may earn a commission at no extra cost to you. We disclose this where applicable.</p><p>For questions, contact us at <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a>.</p></div></div></section>`,
+
+  partners:()=>`${head('Partners','Third-party partner links shared by PayrollTaxReform.com.')}
+    <section class="section"><div class="wrap"><div class="affiliate-box"><div class="eyebrow">Partner link</div><p class="affiliate-disclosure">Disclosure: We may earn a commission if you buy through this link, at no extra cost to you. We do not review, test, or endorse these products, and nothing here is medical advice.</p><div class="affiliate-grid"><article class="affiliate-card"><div class="affiliate-tag">Partner</div><h3>Sparta Labs</h3><p>Online store for research peptides.</p><a href="https://spartalabs.net/us/store?aff=SL7M9RJN" target="_blank" rel="nofollow sponsored noopener">Visit Sparta Labs →</a></article></div></div></div></section>`,
 
   contact:()=>`${head('Contact us','Send a message about advertising, partnerships, or site feedback.')}
     <section class="section"><div class="wrap layout"><main class="maincol"><div class="content-card"><form class="form" action="mailto:payrolltaxreform@gmail.com" method="post" enctype="text/plain"><label>Name<input type="text" name="name" placeholder="Your name" /></label><label>Email<input type="email" name="email" placeholder="Your email" /></label><label>Message<textarea name="message" rows="6" placeholder="How can we help?"></textarea></label><button type="submit" class="button primary">Send message</button></form></div></main><aside class="sidecol"><div class="sidebox"><h3>Contact details</h3><p>Email: <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a></p><p>Website: <a href="index.html">PayrollTaxReform.com</a></p></div></aside></div></section>`
