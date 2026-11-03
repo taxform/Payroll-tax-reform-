@@ -4,9 +4,6 @@
 
 google.com, pub-5889154162791392, DIRECT, f08c47fec0942fa0
 
-# Impact.com site verification
-Impact-Site-Verification: 8381cb88-ed3f-4b3d-b001-0e211c4b3ef3
-
 # Variables
 OWNERDOMAIN=payrolltaxreform.com
 CONTACT=payrolltaxreform@gmail.com
