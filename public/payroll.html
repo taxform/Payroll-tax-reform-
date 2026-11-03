@@ -462,7 +462,8 @@
           Deeper dives on the topics in this guide.
         </p>
 
-        <div class="grid">
+        <!-- Automatic listing: shows the 3 newest posts from /blog/posts.json. -->
+        <div class="grid" data-blog-list data-blog-list-count="3">
 
           <article class="card">
             <h3>The True Cost of an Employee</h3>
@@ -560,6 +561,7 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+  <script src="/blog-list.js" defer></script>
 
 </body>
 </html>

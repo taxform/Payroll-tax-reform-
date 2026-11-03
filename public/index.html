@@ -542,7 +542,8 @@
           linked to the guides and tools that back them up.
         </p>
 
-        <div class="grid">
+        <!-- Automatic listing: shows the 3 newest posts from /blog/posts.json. -->
+        <div class="grid" data-blog-list data-blog-list-count="3">
 
           <article class="card">
             <h3>2026 Payroll Tax Changes</h3>
@@ -679,6 +680,7 @@
     document.getElementById("year").textContent =
       new Date().getFullYear();
   </script>
+  <script src="/blog-list.js" defer></script>
 
 </body>
 </html>
