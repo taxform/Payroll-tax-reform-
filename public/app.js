@@ -63,7 +63,8 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
     {name:'Gusto', text:'Payroll, benefits, and HR for small businesses.', url:'https://www.gusto.com/'},
     {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/'},
     {name:'Patriot Software', text:'Affordable payroll and accounting software for small businesses.', url:'https://www.patriotsoftware.com/'},
-    {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'}
+    {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
+    {name:'Google Workspace', text:'Professional email, shared calendars, and cloud storage for your business.', url:'https://sharegoogleworkspace.advocate.impact.com/mzZdRvc'}
   ];
 
   return `
