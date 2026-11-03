@@ -65,7 +65,9 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
     {name:'Patriot Software', text:'Affordable payroll and accounting software for small businesses.', url:'https://www.patriotsoftware.com/'},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
     {name:'Google Workspace', text:'Professional email, shared calendars, and cloud storage for your business.', url:'https://sharegoogleworkspace.advocate.impact.com/mzZdRvc'},
-    {name:'Carmel Car & Limo', text:'Best service and lowest prices on car and limo rides for business travel.', url:'https://www.dpbolvw.net/click-101916404-10553845', img:'https://www.awltovhc.com/image-101916404-10553845', imgAlt:'Carmel Car & Limo- Best Service – Lowest Prices'}
+    {name:'Carmel Car & Limo', text:'Best service and lowest prices on car and limo rides for business travel.', url:'https://www.dpbolvw.net/click-101916404-10553845', img:'https://www.awltovhc.com/image-101916404-10553845', imgAlt:'Carmel Car & Limo- Best Service – Lowest Prices'},
+    // Keeper Tax affiliate ID: c9c5459635ee2aa883d306d3a242554e20ab7ef6871a12fe63667feb3dea41a7 — replace url with the exact link from the Keeper/Tune dashboard if it differs
+    {name:'Keeper Tax', text:'Automatically find tax write-offs and file taxes with help from a dedicated tax pro — built for freelancers and the self-employed.', url:'https://www.keepertax.com/?ref=c9c5459635ee2aa883d306d3a242554e20ab7ef6871a12fe63667feb3dea41a7'}
   ];
 
   return `
