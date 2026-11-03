@@ -62,7 +62,7 @@ function footer(){
 function affiliateSection(title='Recommended payroll and tax tools', intro='Disclosure: We may earn a commission if you click through and make a purchase, at no extra cost to you.') {
   const items=[
     {name:'Gusto', text:'Payroll, benefits, and HR for small businesses.', url:'https://www.gusto.com/'},
-    {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/'},
+    {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/partners/affiliates?cid=par_pim_xwpoB4IIUFeI'},
     {name:'Sponsored Partner', text:'A featured offer from one of our partners.', url:'https://www.jdoqocy.com/click-101916404-17133749', img:'https://www.tqlkg.com/image-101916404-17133749', alt:'Sponsored partner offer', w:359, h:240},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
     {name:'Sparta Labs', text:'Browse the Sparta Labs online store through our partner link.', url:'https://spartalabs.net/us/store?aff=SL7M9RJN'},
