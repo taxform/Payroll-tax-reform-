@@ -1,53 +1,320 @@
-const pages={home:'Home',updates:'Latest Updates',payroll:'Payroll Taxes',states:'State Taxes',resources:'Resources',advertise:'Advertise With Us',about:'About',privacy:'Privacy Policy',contact:'Contact'};
-const file=location.pathname.split('/').pop()||'index.html';
-const current=file==='index.html'?'home':file.replace('.html','');
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-function link(p){return p==='home'?'index.html':p+'.html';}
+  <title>Payroll Tax Guides, Calculators & Payroll Software | PayrollTaxReform.com</title>
 
-function header(){
-  return `
-    <div class="top">
-      <div class="wrap">
-        <span>Independent tax & payroll information • United States</span>
-        <span>Information only • Not tax or legal advice</span>
-      </div>
+  <meta name="description" content="Explore U.S. payroll tax guides, employer resources, state payroll requirements, and payroll software comparisons. Independent information for small businesses.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#101d33">
+
+  <link rel="canonical" href="https://payrolltaxreform.com/">
+
+  <!-- Existing verification settings -->
+  <meta name="google-site-verification" content="gc34UKVtHVrEpzO0WsdptNL7lbFMqUnTuKFJz7YmGSs">
+  <meta name="impact-site-verification" content="8cba38de-7a21-48f9-a747-edd8d19f2708">
+
+  <!-- Social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PayrollTaxReform.com">
+  <meta property="og:title" content="Payroll Tax Guides & Software Comparisons">
+  <meta property="og:description" content="Independent payroll tax resources, state guides, and software comparisons for U.S. employers.">
+  <meta property="og:url" content="https://payrolltaxreform.com/">
+
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "PayrollTaxReform.com",
+    "url": "https://payrolltaxreform.com/",
+    "description": "Independent U.S. payroll tax information and employer resources."
+  }
+  </script>
+
+  <!-- Google AdSense -->
+  <script async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
+    crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --navy: #101d33;
+      --navy-dark: #0a1425;
+      --gold: #d5ab56;
+      --text: #e9edf5;
+      --muted: #b8c3d4;
+      --border: rgba(213,171,86,.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--navy-dark);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: var(--gold); }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 36px));
+      margin: auto;
+    }
+
+    .top {
+      background: #07101f;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 9px 0;
+      text-align: center;
+    }
+
+    .site-header {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 19px 0;
+    }
+
+    .brand {
+      color: var(--gold);
+      font-size: 23px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .mainnav {
+      display: flex;
+      gap: 17px;
+      flex-wrap: wrap;
+    }
+
+    .mainnav a {
+      color: var(--text);
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .mainnav a:hover,
+    .mainnav a[aria-current="page"] {
+      color: var(--gold);
+    }
+
+    .hero {
+      padding: 80px 0 65px;
+      background: linear-gradient(135deg, #172b4b, #0a1425);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(35px, 5vw, 58px);
+      line-height: 1.13;
+      max-width: 850px;
+      margin: 18px 0;
+    }
+
+    h2 {
+      font-size: clamp(26px, 3vw, 36px);
+      line-height: 1.25;
+      margin: 0 0 15px;
+    }
+
+    h3 { margin-top: 0; }
+
+    .lead {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 740px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 13px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 22px;
+      border-radius: 7px;
+      font-weight: bold;
+      text-decoration: none;
+      background: var(--gold);
+      color: #111827;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+
+    .section { padding: 65px 0; }
+
+    .section.alt { background: var(--navy); }
+
+    .section-intro {
+      color: var(--muted);
+      max-width: 760px;
+      margin-bottom: 26px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #172944;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 26px;
+    }
+
+    .card p,
+    .muted { color: var(--muted); }
+
+    .card a {
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .card a:hover { text-decoration: underline; }
+
+    .states {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .state-link {
+      display: inline-block;
+      padding: 12px 17px;
+      background: #172944;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .notice {
+      background: #14233b;
+      border-left: 4px solid var(--gold);
+      padding: 22px;
+      border-radius: 5px;
+      margin-top: 28px;
+    }
+
+    .faq {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+
+    .faq h3 { margin-bottom: 7px; }
+
+    .faq p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    footer {
+      background: #07101f;
+      border-top: 1px solid var(--border);
+      padding: 38px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .nav { align-items: flex-start; }
+      .mainnav { gap: 12px; }
+      .hero { padding: 55px 0; }
+      .grid { grid-template-columns: 1fr; }
+      .section { padding: 45px 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top">
+    <div class="wrap">
+      Independent U.S. payroll tax information · Not tax or legal advice
     </div>
-    <header class="site-header">
-      <div class="wrap nav">
-        <a class="brand" href="index.html">PayrollTaxReform.com</a>
-        <nav class="mainnav" aria-label="Main navigation">
-          ${Object.entries(pages).filter(([key])=>['home','updates','payroll','states','resources','about','contact','privacy'].includes(key)).map(([key,label])=>`<a href="${link(key)}" class="${current===key?'active':''}">${label}</a>`).join('')}
-        </nav>
-      </div>
-    </header>
-  `;
-}
+  </div>
 
-function footer(){
-  return `
-    <footer class="site-footer">
-      <div class="wrap footer-grid">
-        <div>
-          <h3>PayrollTaxReform.com</h3>
-          <p>Independent payroll tax and tax reform information for businesses and professionals.</p>
-        </div>
-        <div>
-          <h4>Explore</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="updates.html">Latest Updates</a></li>
-            <li><a href="payroll.html">Payroll Taxes</a></li>
-            <li><a href="resources.html">Resources</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Company</h4>
-          <ul>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="advertise.html">Advertise</a></li>
-          </ul>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/">PayrollTaxReform.com</a>
+
+      <nav class="mainnav" aria-label="Main navigation">
+        <a href="/" aria-current="page">Home</a>
+        <a href="/payroll.html">Payroll Taxes</a>
+        <a href="/states.html">State Guides</a>
+        <a href="/software.html">Software</a>
+        <a href="/calculator.html">Calculator</a>
+        <a href="/resources.html">Resources</a>
+        <a href="/updates.html">Updates</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Payroll tax resources for U.S. employers</div>
+
+        <h1>Understand Payroll Taxes. Compare Software. Run Your Business Smarter.</h1>
+
+        <p class="lead">
+          Explore payroll tax fundamentals, state employer requirements,
+          official filing resources, and payroll software options—all
+          in one place.
+        </p>
+
+        <div class="actions">
+          <a class="btn" href="/software.html">Compare Payroll Software</a>
+          <a class="btn secondary" href="/states.html">Explore State Tax Guides</a>
         </div>
       </div>
       <div class="wrap footer-bottom">
@@ -88,88 +355,212 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
               </article>
             `).join('')}
           </div>
-        </div>
-      </div>
     </section>
-  `;
-}
 
-function head(title,desc){
-  return `<div class="pagehead"><div class="wrap"><div class="eyebrow">PayrollTaxReform.com</div><h1>${title}</h1><p>${desc}</p></div></div>`;
-}
-
-const views={
-  home:()=>`
-    <section class="hero">
+    <section class="section">
       <div class="wrap">
-        <div class="eyebrow">Payroll • Tax reform • Regulatory intelligence</div>
-        <h1>Stay informed.<br>Stay ahead of tax changes.</h1>
-        <p>Clear, practical tax and payroll guidance for employers, founders, and finance teams.</p>
-        <div class="cta-row">
-          <a class="button primary" href="updates.html">Read the latest updates</a>
-          <a class="button secondary" href="resources.html">Browse resources</a>
+        <h2>Payroll Tax Tools & Guides</h2>
+
+        <p class="section-intro">
+          Start with the topic that matches your business needs.
+        </p>
+
+        <div class="grid">
+
+          <article class="card">
+            <h3>Payroll Tax Basics</h3>
+            <p>
+              Learn about federal payroll withholding, Social Security,
+              Medicare, employer responsibilities, and common filing forms.
+            </p>
+            <a href="/payroll.html">Read Payroll Tax Guide →</a>
+          </article>
+
+          <article class="card">
+            <h3>Payroll Software Comparisons</h3>
+            <p>
+              Compare payroll platforms and evaluate features,
+              pricing considerations, and employer needs.
+            </p>
+            <a href="/software.html">Compare Providers →</a>
+          </article>
+
+          <article class="card">
+            <h3>State Payroll Taxes</h3>
+            <p>
+              Find state-specific information about employer
+              withholding, unemployment insurance, and agency resources.
+            </p>
+            <a href="/states.html">Browse State Guides →</a>
+          </article>
+
+          <article class="card">
+            <h3>Payroll Calculator</h3>
+            <p>
+              Explore payroll cost estimates and understand
+              the information employers need when calculating payroll.
+            </p>
+            <a href="/calculator.html">Open Calculator →</a>
+          </article>
+
+          <article class="card">
+            <h3>Tax Updates</h3>
+            <p>
+              Find resources to help you follow payroll tax changes,
+              filing requirements, and employer announcements.
+            </p>
+            <a href="/updates.html">Explore Updates →</a>
+          </article>
+
+          <article class="card">
+            <h3>Official Resources</h3>
+            <p>
+              Access government tax agencies, employer guidance,
+              and additional resources for payroll compliance.
+            </p>
+            <a href="/resources.html">View Resources →</a>
+          </article>
+
         </div>
       </div>
     </section>
-    <section class="section">
-      <div class="wrap three-up">
-        <article class="card"><span class="tag">Payroll</span><h3>Employer payroll tax center</h3><p>Review federal payroll tax rules, withholding updates, and filing essentials.</p><a class="more" href="payroll.html">Explore →</a></article>
-        <article class="card"><span class="tag">News</span><h3>Latest tax updates</h3><p>Track official IRS developments and new federal guidance as they happen.</p><a class="more" href="updates.html">Explore →</a></article>
-        <article class="card"><span class="tag">State</span><h3>State tax resources</h3><p>Find state-specific payroll and employment guidance across the U.S.</p><a class="more" href="states.html">Explore →</a></article>
+
+    <section class="section alt">
+      <div class="wrap">
+        <h2>Explore Payroll Taxes by State</h2>
+
+        <p class="section-intro">
+          Payroll requirements can vary significantly by state.
+          Start with one of these guides or browse the state resource center.
+        </p>
+
+        <div class="states">
+          <a class="state-link" href="/new-york-payroll-taxes.html">New York</a>
+          <a class="state-link" href="/california-payroll-taxes.html">California</a>
+          <a class="state-link" href="/texas-payroll-taxes.html">Texas</a>
+          <a class="state-link" href="/florida-payroll-taxes.html">Florida</a>
+          <a class="state-link" href="/illinois-payroll-taxes.html">Illinois</a>
+          <a class="state-link" href="/states.html">All State Resources →</a>
+        </div>
       </div>
     </section>
-    ${affiliateSection()}
-  `,
 
-  updates:()=>`${head('Latest tax updates','A central hub for federal tax developments, payroll changes, and regulatory announcements.')}
     <section class="section">
-      <div class="wrap layout">
-        <main class="maincol">
-          <div id="official-feed" class="sidebox">
-            <h2>Latest IRS news releases</h2>
-            <p>Loading official IRS updates...</p>
-          </div>
-        </main>
-        <aside class="sidecol">
-          <div class="sidebox">
-            <h3>Featured resources</h3>
-            <ul class="listlinks">
-              <li><a href="payroll.html">Payroll tax center</a></li>
-              <li><a href="resources.html">Resource center</a></li>
-              <li><a href="states.html">State tax resources</a></li>
-            </ul>
-          </div>
-          ${affiliateSection('Recommended payroll software','Disclosure: We may earn a commission if you buy through our links, at no extra cost to you.')}
-        </aside>
-      </div>
-    </section>`,
+      <div class="wrap">
+        <h2>Choosing Payroll Software for Your Business</h2>
 
-  payroll:()=>`${head('Payroll tax center','Explore federal employer payroll tax topics and authoritative guidance.')}
+        <p class="section-intro">
+          The right payroll service depends on employee count,
+          locations, payroll frequency, tax filing needs,
+          integrations, and budget.
+        </p>
+
+        <div class="grid">
+
+          <article class="card">
+            <h3>Small Businesses</h3>
+            <p>
+              Compare software that supports employee payments,
+              payroll tax calculations, and routine filing tasks.
+            </p>
+            <a href="/software.html">See Software Options →</a>
+          </article>
+
+          <article class="card">
+            <h3>Growing Employers</h3>
+            <p>
+              Consider reporting, onboarding, benefits integrations,
+              multi-state support, and scalability.
+            </p>
+            <a href="/software.html">Explore Comparisons →</a>
+          </article>
+
+          <article class="card">
+            <h3>First-Time Employers</h3>
+            <p>
+              Review employer identification, withholding,
+              payroll schedules, and tax reporting basics.
+            </p>
+            <a href="/payroll.html">Start Learning →</a>
+          </article>
+
+        </div>
+
+        <div class="notice">
+          <strong>Affiliate disclosure:</strong>
+          Some links on PayrollTaxReform.com may be affiliate links.
+          We may earn a commission when you purchase through
+          qualifying links, at no additional cost to you.
+          Compensation does not change your obligation to evaluate
+          products based on your business needs.
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="wrap">
+        <h2>Frequently Asked Payroll Tax Questions</h2>
+
+        <div class="faq">
+          <h3>What are employer payroll taxes?</h3>
+          <p>
+            Employer payroll taxes generally include the employer
+            share of Social Security and Medicare taxes, federal
+            unemployment taxes when applicable, and relevant state
+            or local employer taxes.
+          </p>
+        </div>
+
+        <div class="faq">
+          <h3>Do payroll tax requirements differ by state?</h3>
+          <p>
+            Yes. State income tax withholding, unemployment
+            insurance, registration, reporting, and other payroll
+            requirements vary by jurisdiction.
+          </p>
+        </div>
+
+        <div class="faq">
+          <h3>Can payroll software file taxes for employers?</h3>
+          <p>
+            Some payroll services offer payroll tax calculations,
+            filings, and payments. Coverage and responsibilities
+            depend on the provider and selected service plan.
+          </p>
+        </div>
+
+        <div class="faq">
+          <h3>Where can I verify federal payroll tax rules?</h3>
+          <p>
+            Consult official guidance from the
+            <a href="https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes"
+               target="_blank" rel="noopener noreferrer">
+              Internal Revenue Service
+            </a>.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section class="section">
-      <div class="wrap layout">
-        <main class="maincol">
-          <div class="content-card">
-            <h2>Employer payroll tax basics</h2>
-            <p>Payroll taxes affect everything from withholding and reporting to employer obligations and filing deadlines. This section is meant to help you find the right starting points and official guidance.</p>
-            <ul class="listlinks">
-              <li><a href="https://www.irs.gov/businesses/small-businesses-self-employed/employer-tax-guide" target="_blank" rel="noopener">IRS Employer Tax Guide</a></li>
-              <li><a href="https://www.irs.gov/payments" target="_blank" rel="noopener">IRS payment and filing information</a></li>
-              <li><a href="https://www.irs.gov/forms-pubs" target="_blank" rel="noopener">IRS forms and publications</a></li>
-            </ul>
-          </div>
-        </main>
-        <aside class="sidecol">
-          ${affiliateSection('Recommended payroll tools','Disclosure: We may earn a commission if you purchase through our links at no additional cost to you.')}
-        </aside>
+      <div class="wrap">
+        <h2>About PayrollTaxReform.com</h2>
+
+        <p class="section-intro">
+          PayrollTaxReform.com is an independent informational website
+          focused on U.S. payroll taxes, employer resources, and
+          payroll software research. We are not affiliated with the
+          Internal Revenue Service or any government agency.
+        </p>
+
+        <a class="btn secondary" href="/about.html">Learn More About Us</a>
       </div>
-    </section>`,
+    </section>
 
-  states:()=>`${head('State tax resources','Start with official state agencies for payroll withholding, employer obligations, and tax changes.')}
-    <section class="section"><div class="wrap"><div class="cardgrid">${['California','New York','Texas','Florida','Illinois','Georgia'].map(state=>`<article class="card"><span class="tag">State</span><h3>${state}</h3><p>State-specific employer payroll and tax guidance.</p><a class="more" href="resources.html">Browse resources →</a></article>`).join('')}</div></div></section>`,
+  </main>
 
-  resources:()=>`${head('Resource center','Reliable starting points for tax forms, payroll guidance, and legislative research.')}
-    <section class="section"><div class="wrap"><div class="cardgrid">${['IRS guidance','State agencies','Business resources','Tax forms'].map(item=>`<article class="card"><span class="tag">Guide</span><h3>${item}</h3><p>Helpful starting points for payroll, tax, and compliance questions.</p><a class="more" href="about.html">Explore →</a></article>`).join('')}</div></div></section>
-    ${affiliateSection('Recommended business software','Disclosure: We may earn a commission if you buy through our links, at no extra cost to you.')}`,
+  <footer>
+    <div class="wrap">
 
   advertise:()=>`${head('Advertise with us','Put your brand in front of readers interested in payroll, taxes, accounting, and business services.')}
     <section class="section">
@@ -247,3 +638,33 @@ style.textContent=`
   @media (max-width: 760px){.top .wrap,.nav,.footer-bottom{display:block}.mainnav{margin-top:12px}.layout{grid-template-columns:1fr}.site-header{position:static}.hero .wrap,.pagehead .wrap{padding-top:48px}.}
 `;
 document.head.appendChild(style);
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/partners.html">Partners</a>
+        <a href="/advertise.html">Advertise</a>
+        <a href="/resources.html">Resources</a>
+      </nav>
+
+      <p>
+        © <span id="year">2026</span> PayrollTaxReform.com.
+        All rights reserved.
+      </p>
+
+      <p>
+        Independent educational information only.
+        Tax laws and rates can change. Verify requirements
+        with official government agencies or a qualified professional.
+      </p>
+
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+  </script>
+
+</body>
+</html>
