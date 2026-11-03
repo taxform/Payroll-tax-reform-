@@ -1,0 +1,16 @@
+state,has_earned_wage_income_tax,sui_taxable_wage_base_2026,withholding_agency,agency_url,notes
+Alaska,no,"High ($49,000+)",Alaska Department of Labor and Workforce Development,https://labor.alaska.gov/,Employee also contributes to SUI
+Florida,no,"$7,000",Florida Department of Revenue,https://floridarevenue.com/,Florida Reemployment Tax
+Nevada,no,"$40,000+",Nevada Department of Employment Training and Rehabilitation,https://www.dol.gov/agencies/whd,Modified Business Tax (MBT) may also apply
+New Hampshire,dividends-and-interest-only,"$14,000",New Hampshire Employment Security,https://www.nhes.nh.gov/,Voluntary Paid Family Leave program
+South Dakota,no,"$15,000",South Dakota Department of Labor and Regulation,https://dlr.sd.gov/,Standard SUI rules
+Tennessee,no,"$7,000",Tennessee Department of Labor and Workforce Development,https://www.tn.gov/workforce.html,Standard SUI rules
+Texas,no,"$9,000",Texas Workforce Commission,https://www.twc.texas.gov/,No state income tax withholding
+Washington,no (excise on capital gains),"High ($68,000+)",Washington Employment Security Department,https://esd.wa.gov/,Mandatory WA PFML and WA Cares deductions
+Wyoming,no,"$30,000+",Wyoming Department of Workforce Services,https://dws.wyo.gov/,Standard SUI rules
+California,yes-graduated-up-to-13.3%,"$7,000",Employment Development Department (EDD),https://edd.ca.gov/en/payroll_taxes/,Mandatory uncapped State Disability Insurance (SDI)
+New York,yes-graduated,"see agency",NY Department of Taxation and Finance (DTF),https://www.tax.ny.gov/bus/wt/,Plus NYC/Yonkers local withholding; mandatory PFL and disability
+Illinois,yes-flat-4.95%,"see agency",Illinois Department of Revenue (IDOR) and IDES,https://tax.illinois.gov/,Unemployment taxes via IDES
+Pennsylvania,yes-flat-3.07%,"see agency",PA Department of Revenue,https://www.revenue.pa.gov/,Plus mandatory Local Earned Income Tax (EIT)
+Georgia,yes-flat (transitioned),"see agency",Georgia Department of Revenue and GDOL,https://dor.georgia.gov/,Withholding via Georgia Tax Center (GTC)
+Ohio,yes-graduated,"see agency",Ohio Department of Taxation (ODT),https://tax.ohio.gov/,Municipal withholding in 600+ cities plus school district taxes

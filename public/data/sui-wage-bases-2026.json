@@ -1,0 +1,129 @@
+{
+  "title": "State Unemployment Insurance (SUI) Wage Bases 2026 — Selected States",
+  "publisher": "PayrollTaxReform.com",
+  "source_page": "https://payrolltaxreform.com/states.html",
+  "license": "CC-BY-4.0 (credit PayrollTaxReform.com with a link to the source page)",
+  "disclaimer": "Educational reference only. Wage bases change annually — verify current figures with each state agency before filing.",
+  "states": [
+    {
+      "state": "Alaska",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "High ($49,000+)",
+      "withholding_agency": "Alaska Department of Labor and Workforce Development",
+      "agency_url": "https://labor.alaska.gov/",
+      "notes": "Employee also contributes to SUI"
+    },
+    {
+      "state": "Florida",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$7,000",
+      "withholding_agency": "Florida Department of Revenue",
+      "agency_url": "https://floridarevenue.com/",
+      "notes": "Florida Reemployment Tax"
+    },
+    {
+      "state": "Nevada",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$40,000+",
+      "withholding_agency": "Nevada Department of Employment Training and Rehabilitation",
+      "agency_url": "https://www.dol.gov/agencies/whd",
+      "notes": "Modified Business Tax (MBT) may also apply"
+    },
+    {
+      "state": "New Hampshire",
+      "has_earned_wage_income_tax": "dividends-and-interest-only",
+      "sui_taxable_wage_base_2026": "$14,000",
+      "withholding_agency": "New Hampshire Employment Security",
+      "agency_url": "https://www.nhes.nh.gov/",
+      "notes": "Voluntary Paid Family Leave program"
+    },
+    {
+      "state": "South Dakota",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$15,000",
+      "withholding_agency": "South Dakota Department of Labor and Regulation",
+      "agency_url": "https://dlr.sd.gov/",
+      "notes": "Standard SUI rules"
+    },
+    {
+      "state": "Tennessee",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$7,000",
+      "withholding_agency": "Tennessee Department of Labor and Workforce Development",
+      "agency_url": "https://www.tn.gov/workforce.html",
+      "notes": "Standard SUI rules"
+    },
+    {
+      "state": "Texas",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$9,000",
+      "withholding_agency": "Texas Workforce Commission",
+      "agency_url": "https://www.twc.texas.gov/",
+      "notes": "No state income tax withholding"
+    },
+    {
+      "state": "Washington",
+      "has_earned_wage_income_tax": "no (excise on capital gains)",
+      "sui_taxable_wage_base_2026": "High ($68,000+)",
+      "withholding_agency": "Washington Employment Security Department",
+      "agency_url": "https://esd.wa.gov/",
+      "notes": "Mandatory WA PFML and WA Cares deductions"
+    },
+    {
+      "state": "Wyoming",
+      "has_earned_wage_income_tax": false,
+      "sui_taxable_wage_base_2026": "$30,000+",
+      "withholding_agency": "Wyoming Department of Workforce Services",
+      "agency_url": "https://dws.wyo.gov/",
+      "notes": "Standard SUI rules"
+    },
+    {
+      "state": "California",
+      "has_earned_wage_income_tax": "graduated up to 13.3%",
+      "sui_taxable_wage_base_2026": "$7,000",
+      "withholding_agency": "Employment Development Department (EDD)",
+      "agency_url": "https://edd.ca.gov/en/payroll_taxes/",
+      "notes": "Mandatory uncapped State Disability Insurance (SDI)"
+    },
+    {
+      "state": "New York",
+      "has_earned_wage_income_tax": "graduated",
+      "sui_taxable_wage_base_2026": "see agency",
+      "withholding_agency": "NY Department of Taxation and Finance (DTF)",
+      "agency_url": "https://www.tax.ny.gov/bus/wt/",
+      "notes": "Plus NYC/Yonkers local withholding; mandatory PFL and disability"
+    },
+    {
+      "state": "Illinois",
+      "has_earned_wage_income_tax": "flat 4.95%",
+      "sui_taxable_wage_base_2026": "see agency",
+      "withholding_agency": "Illinois Department of Revenue (IDOR) and IDES",
+      "agency_url": "https://tax.illinois.gov/",
+      "notes": "Unemployment taxes via IDES"
+    },
+    {
+      "state": "Pennsylvania",
+      "has_earned_wage_income_tax": "flat 3.07%",
+      "sui_taxable_wage_base_2026": "see agency",
+      "withholding_agency": "PA Department of Revenue",
+      "agency_url": "https://www.revenue.pa.gov/",
+      "notes": "Plus mandatory Local Earned Income Tax (EIT)"
+    },
+    {
+      "state": "Georgia",
+      "has_earned_wage_income_tax": "flat (transitioned)",
+      "sui_taxable_wage_base_2026": "see agency",
+      "withholding_agency": "Georgia Department of Revenue and GDOL",
+      "agency_url": "https://dor.georgia.gov/",
+      "notes": "Withholding via Georgia Tax Center (GTC)"
+    },
+    {
+      "state": "Ohio",
+      "has_earned_wage_income_tax": "graduated",
+      "sui_taxable_wage_base_2026": "see agency",
+      "withholding_agency": "Ohio Department of Taxation (ODT)",
+      "agency_url": "https://tax.ohio.gov/",
+      "notes": "Municipal withholding in 600+ cities plus school district taxes"
+    }
+  ]
+}

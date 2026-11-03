@@ -1,0 +1,45 @@
+{
+  "title": "Federal Payroll Tax Thresholds 2026",
+  "publisher": "PayrollTaxReform.com",
+  "source_page": "https://payrolltaxreform.com/updates.html",
+  "license": "CC-BY-4.0 (credit PayrollTaxReform.com with a link to the source page)",
+  "disclaimer": "Educational reference only. Verify current law with the IRS and SSA before filing.",
+  "thresholds": [
+    {
+      "provision": "Social Security wage base",
+      "value_2026": "$176,100",
+      "prior_year": "$168,600",
+      "impact": "Maximum OASDI tax is $10,918.20 each for employer and employee."
+    },
+    {
+      "provision": "Medicare tax rate",
+      "value_2026": "1.45% (uncapped)",
+      "prior_year": "1.45% (uncapped)",
+      "impact": "No limit on covered wages; matched 50/50 by employer."
+    },
+    {
+      "provision": "Additional Medicare Tax threshold",
+      "value_2026": "$200,000 single / $250,000 joint",
+      "prior_year": "$200,000 / $250,000",
+      "impact": "0.9% employee withholding on excess; no employer match."
+    },
+    {
+      "provision": "FUTA taxable wage base",
+      "value_2026": "$7,000 per employee",
+      "prior_year": "$7,000 per employee",
+      "impact": "Effective rate 0.6% ($42 max per employee) with timely SUTA credit."
+    },
+    {
+      "provision": "401(k) / 403(b) elective deferrals",
+      "value_2026": "$23,500 ($31,000 with age 50+ catch-up)",
+      "prior_year": "$23,000 ($30,500)",
+      "impact": "Pre-tax retirement withholding limit adjusted for inflation."
+    },
+    {
+      "provision": "Health Savings Account (HSA) limit",
+      "value_2026": "$4,300 single / $8,550 family",
+      "prior_year": "$4,150 / $8,300",
+      "impact": "Exempt from federal income tax and FICA when pre-tax."
+    }
+  ]
+}
