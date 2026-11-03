@@ -16,7 +16,7 @@ function header(){
       <div class="wrap nav">
         <a class="brand" href="index.html">PayrollTaxReform.com</a>
         <nav class="mainnav" aria-label="Main navigation">
-          ${Object.entries(pages).filter(([key])=>['home','updates','payroll','states','resources','about','contact','privacy'].includes(key)).map(([key,label])=>`<a href="${link(key)}" class="${current===key?'active':''}">${label}</a>`).join('')}
+          ${Object.entries(pages).filter(([key])=>['home','updates','payroll','states','resources','about','partners','contact','privacy'].includes(key)).map(([key,label])=>`<a href="${link(key)}" class="${current===key?'active':''}">${label}</a>`).join('')}
         </nav>
       </div>
     </header>
@@ -47,6 +47,7 @@ function footer(){
             <li><a href="contact.html">Contact</a></li>
             <li><a href="privacy.html">Privacy Policy</a></li>
             <li><a href="advertise.html">Advertise</a></li>
+            <li><a href="partners.html">Partners</a></li>
           </ul>
         </div>
       </div>
@@ -64,7 +65,8 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
     {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/'},
     {name:'Patriot Software', text:'Affordable payroll and accounting software for small businesses.', url:'https://www.patriotsoftware.com/'},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
-    {name:'Sparta Labs', text:'Browse the Sparta Labs online store through our partner link.', url:'https://spartalabs.net/us/store?aff=SL7M9RJN'}
+    {name:'Sparta Labs', text:'Browse the Sparta Labs online store through our partner link.', url:'https://spartalabs.net/us/store?aff=SL7M9RJN'},
+    {name:'Carmel Car &amp; Limo', text:'Car and limo service.', url:'https://www.anrdoezrs.net/click-101916404-10553845', img:'https://www.tqlkg.com/image-101916404-10553845', alt:'Carmel Car &amp; Limo- Best Service – Lowest Prices'}
   ];
 
   return `
@@ -80,7 +82,7 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
                 <div class="affiliate-tag">Recommended</div>
                 <h3>${item.name}</h3>
                 <p>${item.text}</p>
-                <a href="${item.url}" target="_blank" rel="nofollow sponsored noopener">Visit ${item.name} →</a>
+                <a href="${item.url}" target="_blank" rel="nofollow sponsored noopener">${item.img?`<img src="${item.img}" width="150" height="100" alt="${item.alt}" border="0"/>`:`Visit ${item.name} →`}</a>
               </article>
             `).join('')}
           </div>
@@ -192,13 +194,15 @@ const views={
     <section class="section"><div class="wrap"><div class="content-card"><p>We may collect email signups and website analytics for operational purposes. We do not sell personal information. We may use third-party tools for analytics, advertising, and affiliate tracking.</p><p>Affiliate links may earn a commission at no extra cost to you. We disclose this where applicable.</p><p>For questions, contact us at <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a>.</p></div></div></section>`,
 
   partners:()=>`${head('Partners','Third-party partner links shared by PayrollTaxReform.com.')}
-    <section class="section"><div class="wrap"><div class="affiliate-box"><div class="eyebrow">Partner link</div><p class="affiliate-disclosure">Disclosure: We may earn a commission if you buy through this link, at no extra cost to you. We do not review, test, or endorse these products, and nothing here is medical advice.</p><div class="affiliate-grid"><article class="affiliate-card"><div class="affiliate-tag">Partner</div><h3>Sparta Labs</h3><p>Online store for research peptides.</p><a href="https://spartalabs.net/us/store?aff=SL7M9RJN" target="_blank" rel="nofollow sponsored noopener">Visit Sparta Labs →</a></article><article class="affiliate-card"><div class="affiliate-tag">Partner</div><h3>Carmel Car &amp; Limo</h3><p>Car and limo service.</p><a href="https://www.anrdoezrs.net/click-101916404-10553845" target="_blank" rel="nofollow sponsored noopener"><img src="https://www.tqlkg.com/image-101916404-10553845" width="150" height="100" alt="Carmel Car &amp; Limo- Best Service – Lowest Prices" border="0"/></a></article></div></div></div></section>`,
+    ${affiliateSection('Our partners','Disclosure: We may earn a commission if you buy through these links, at no extra cost to you. We do not review, test, or endorse these products, and nothing here is medical advice.')}`,
 
   contact:()=>`${head('Contact us','Send a message about advertising, partnerships, or site feedback.')}
     <section class="section"><div class="wrap layout"><main class="maincol"><div class="content-card"><form class="form" action="mailto:payrolltaxreform@gmail.com" method="post" enctype="text/plain"><label>Name<input type="text" name="name" placeholder="Your name" /></label><label>Email<input type="email" name="email" placeholder="Your email" /></label><label>Message<textarea name="message" rows="6" placeholder="How can we help?"></textarea></label><button type="submit" class="button primary">Send message</button></form></div></main><aside class="sidecol"><div class="sidebox"><h3>Contact details</h3><p>Email: <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a></p><p>Website: <a href="index.html">PayrollTaxReform.com</a></p></div></aside></div></section>`
 };
 
-document.getElementById('app').innerHTML=header()+(views[current]||views.home)()+footer();
+const view=views[current]?current:'home';
+const hasAffiliates=['home','updates','payroll','resources','partners'].includes(view);
+document.getElementById('app').innerHTML=header()+views[view]()+(hasAffiliates?'':affiliateSection())+footer();
 
 document.querySelectorAll('form[data-netlify]').forEach(form=>{
   form.addEventListener('submit',e=>{
