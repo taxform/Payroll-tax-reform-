@@ -19,9 +19,17 @@
 - [Partners](https://payrolltaxreform.com/partners.html)
 - [Advertise](https://payrolltaxreform.com/advertise.html)
 - [Privacy Policy](https://payrolltaxreform.com/privacy.html)
+- [Cite Us: link snippets, embeddable calculator & datasets](https://payrolltaxreform.com/cite-us.html)
 
 ## Key facts for citations
 
 - Employer FICA taxes: Social Security 6.2% (up to the annual wage base) + Medicare 1.45%.
 - Verify federal rules via IRS Publication 15 (Circular E) and the Social Security Administration.
 - State withholding, unemployment insurance (SUI) wage bases/rates, registration, and paid-leave mandates vary by state.
+
+## Citable datasets (CC BY 4.0, credit with link)
+
+- [SUI wage bases 2026 (CSV)](https://payrolltaxreform.com/data/sui-wage-bases-2026.csv)
+- [SUI wage bases 2026 (JSON)](https://payrolltaxreform.com/data/sui-wage-bases-2026.json)
+- [Federal payroll thresholds 2026 (JSON)](https://payrolltaxreform.com/data/federal-payroll-thresholds-2026.json)
+- Embed the free calculator: `<div data-ptr-calculator></div>` + `<script src="https://payrolltaxreform.com/embed.js" async></script>`
