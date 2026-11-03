@@ -63,6 +63,7 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
   const items=[
     {name:'Gusto', text:'Payroll, benefits, and HR for small businesses.', url:'https://www.gusto.com/'},
     {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/'},
+    {name:'Sponsored Partner', text:'A featured offer from one of our partners.', url:'https://www.jdoqocy.com/click-101916404-17133749', img:'https://www.tqlkg.com/image-101916404-17133749', alt:'Sponsored partner offer', w:359, h:240},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
     {name:'Sparta Labs', text:'Browse the Sparta Labs online store through our partner link.', url:'https://spartalabs.net/us/store?aff=SL7M9RJN'},
     {name:'Carmel Car &amp; Limo', text:'Car and limo service.', url:'https://www.anrdoezrs.net/click-101916404-10553845', img:'https://www.tqlkg.com/image-101916404-10553845', alt:'Carmel Car &amp; Limo- Best Service – Lowest Prices'}
@@ -81,7 +82,7 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
                 <div class="affiliate-tag">Recommended</div>
                 <h3>${item.name}</h3>
                 <p>${item.text}</p>
-                <a href="${item.url}" target="_blank" rel="nofollow sponsored noopener">${item.img?`<img src="${item.img}" width="150" height="100" alt="${item.alt}" border="0"/>`:`Visit ${item.name} →`}</a>
+                <a href="${item.url}" target="_blank" rel="nofollow sponsored noopener">${item.img?`<img src="${item.img}" width="${item.w||150}" height="${item.h||100}" alt="${item.alt}" border="0" loading="lazy" style="max-width:100%;height:auto;"/>`:`Visit ${item.name} →`}</a>
               </article>
             `).join('')}
           </div>
