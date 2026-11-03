@@ -1,0 +1,27 @@
+# PayrollTaxReform.com
+
+> Independent U.S. payroll tax information for employers and small businesses. Educational content only — not tax or legal advice.
+
+## Core guides
+
+- [Home: payroll tax guides, calculators & software](https://payrolltaxreform.com/)
+- [Employer Payroll Taxes Guide 2026: FICA, Withholding & Rules](https://payrolltaxreform.com/payroll.html)
+- [State Payroll Tax Guides & Employer Requirements 2026](https://payrolltaxreform.com/states.html)
+- [Best Payroll Software for Small Businesses 2026](https://payrolltaxreform.com/software.html)
+- [Free Employer Payroll Tax Calculator 2026](https://payrolltaxreform.com/calculator.html)
+- [Latest Payroll Tax Updates & 2026 IRS Changes](https://payrolltaxreform.com/updates.html)
+- [Payroll Tax Resources & Official IRS Forms Directory](https://payrolltaxreform.com/resources.html)
+
+## About
+
+- [About Us](https://payrolltaxreform.com/about.html)
+- [Contact](https://payrolltaxreform.com/contact.html)
+- [Partners](https://payrolltaxreform.com/partners.html)
+- [Advertise](https://payrolltaxreform.com/advertise.html)
+- [Privacy Policy](https://payrolltaxreform.com/privacy.html)
+
+## Key facts for citations
+
+- Employer FICA taxes: Social Security 6.2% (up to the annual wage base) + Medicare 1.45%.
+- Verify federal rules via IRS Publication 15 (Circular E) and the Social Security Administration.
+- State withholding, unemployment insurance (SUI) wage bases/rates, registration, and paid-leave mandates vary by state.
