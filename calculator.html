@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Free Payroll Tax Calculator | PayrollTaxReform.com</title>
+
+<meta name="description" content="Free employer payroll tax calculator. Estimate Social Security and Medicare payroll taxes and compare payroll software for your business.">
+
+<meta name="robots" content="index,follow">
+
+<link rel="canonical" href="https://payrolltaxreform.com/calculator.html">
+
+<meta name="google-site-verification" content="gc34UKVtHVrEpzO0WsdptNL7lbFMqUnTuKFJz7YmGSs">
+
+<meta name="impact-site-verification" content="8cba38de-7a21-48f9-a747-edd8d19f2708">
+
+<script async
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
+crossorigin="anonymous"></script>
+
+<style>
+* {
+box-sizing: border-box;
+}
+
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: #0a1425;
+color: #ffffff;
+line-height: 1.6;
+}
+
+header {
+background: #101d33;
+padding: 20px;
+border-bottom: 2px solid #d5ab56;
+}
+
+nav {
+max-width: 1100px;
+margin: auto;
+display: flex;
+gap: 20px;
+flex-wrap: wrap;
+}
+
+nav a {
+color: #d5ab56;
+text-decoration: none;
+font-weight: bold;
+}
+
+main {
+max-width: 900px;
+margin: auto;
+padding: 40px 20px;
+}
+
+h1 {
+font-size: 38px;
+color: #ffffff;
+}
+
+h2 {
+color: #d5ab56;
+}
+
+.card {
+background: #172944;
+padding: 30px;
+border-radius: 12px;
+margin-top: 25px;
+border: 1px solid #d5ab56;
+}
+
+label {
+display: block;
+margin-top: 20px;
+font-weight: bold;
+}
+
+input {
+width: 100%;
+padding: 14px;
+margin-top: 8px;
+border-radius: 6px;
+border: none;
+font-size: 17px;
+}
+
+button {
+background: #d5ab56;
+color: #101d33;
+padding: 15px 25px;
+border: none;
+border-radius: 6px;
+font-size: 17px;
+font-weight: bold;
+margin-top: 25px;
+cursor: pointer;
+}
+
+button:hover {
+background: #e7c77d;
+}
+
+.results {
+background: #0a1425;
+padding: 20px;
+border-radius: 8px;
+margin-top: 25px;
+}
+
+.result-number {
+font-size: 30px;
+color: #d5ab56;
+font-weight: bold;
+}
+
+a {
+color: #d5ab56;
+}
+
+footer {
+background: #101d33;
+padding: 30px;
+text-align: center;
+margin-top: 50px;
+}
+
+small {
+color: #b8c3d4;
+}
+
+@media(max-width:600px) {
+h1 {
+font-size: 28px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+<a href="/">PayrollTaxReform.com</a>
+<a href="/payroll.html">Payroll Taxes</a>
+<a href="/states.html">State Guides</a>
+<a href="/software.html">Software</a>
+<a href="/calculator.html">Calculator</a>
+<a href="/resources.html">Resources</a>
+</nav>
+</header>
+
+<main>
+
+<h1>Free Employer Payroll Tax Calculator</h1>
+
+<p>
+Estimate the employer portion of Social Security
+and Medicare payroll taxes using our free calculator.
+</p>
+
+<p>
+This calculator is designed for small businesses,
+employers, and payroll administrators.
+</p>
+
+<div class="card">
+
+<h2>Calculate Employer Payroll Taxes</h2>
+
+<label for="wages">Employee Gross Wages for Pay Period ($)</label>
+
+<input
+type="number"
+id="wages"
+placeholder="Example: 2000"
+min="0"
+step="0.01">
+
+<label for="ytd">Social Security Taxable Wages Already Paid This Year ($)</label>
+
+<input
+type="number"
+id="ytd"
+placeholder="Example: 25000"
+min="0"
+step="0.01">
+
+<label for="wagebase">Annual Social Security Wage Base ($)</label>
+
+<input
+type="number"
+id="wagebase"
+placeholder="Enter official wage base for tax year"
+min="1"
+step="1">
+
+<p>
+<small>
+Enter the Social Security wage base for the applicable
+tax year. Verify it with the Social Security Administration.
+</small>
+</p>
+
+<button onclick="calculatePayroll()">
+Calculate Payroll Taxes
+</button>
+
+<div class="results" id="results" role="status" aria-live="polite">
+Enter your payroll information above.
+</div>
+
+</div>
+
+<h2>How Employer Payroll Taxes Work</h2>
+
+<p>
+Employers generally pay Social Security tax
+at 6.2% of covered wages up to the annual wage base.
+</p>
+
+<p>
+Employers also generally pay Medicare tax
+at 1.45% of covered wages.
+</p>
+
+<p>
+These employer taxes are separate from employee
+withholding and other employment taxes.
+</p>
+
+<h2>What's Not Included?</h2>
+
+<p>
+This calculator does not estimate federal unemployment
+tax, state unemployment insurance, state income tax
+withholding, local payroll taxes, or other employer
+obligations.
+</p>
+
+<h2>Compare Payroll Software</h2>
+
+<div class="card">
+
+<p>
+Payroll software can help businesses manage employee
+payments, payroll tax calculations, tax filings,
+and reporting.
+</p>
+
+<p>
+Compare payroll providers to find features that
+match your business needs.
+</p>
+
+<a href="/software.html">
+<strong>Compare Payroll Software →</strong>
+</a>
+
+</div>
+
+<h2>Official Payroll Tax Resources</h2>
+
+<p>
+<a href="https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes"
+target="_blank" rel="noopener noreferrer">
+IRS Employment Tax Information
+</a>
+</p>
+
+<p>
+<a href="https://www.ssa.gov/oact/cola/Benefits.html"
+target="_blank" rel="noopener noreferrer">
+Social Security Wage Base Information
+</a>
+</p>
+
+<p>
+<small>
+Disclaimer: This calculator provides educational estimates
+only. Actual payroll tax obligations depend on applicable
+laws, wage definitions, and employer circumstances.
+</small>
+</p>
+
+</main>
+
+<footer>
+
+<p>
+© <span id="year"></span> PayrollTaxReform.com
+</p>
+
+<p>
+Independent payroll tax education and employer resources.
+</p>
+
+<p>
+<a href="/privacy.html">Privacy Policy</a> |
+<a href="/contact.html">Contact</a>
+</p>
+
+</footer>
+
+<script>
+
+document.getElementById("year").textContent =
+new Date().getFullYear();
+
+function calculatePayroll() {
+
+const wagesInput = document.getElementById("wages").value;
+const ytdInput = document.getElementById("ytd").value;
+const baseInput = document.getElementById("wagebase").value;
+
+const results = document.getElementById("results");
+
+if (
+wagesInput.trim() === "" ||
+ytdInput.trim() === "" ||
+baseInput.trim() === ""
+) {
+results.textContent = "Please complete all three fields.";
+return;
+}
+
+const wages = Number(wagesInput);
+const ytd = Number(ytdInput);
+const wagebase = Number(baseInput);
+
+if (
+!Number.isFinite(wages) ||
+!Number.isFinite(ytd) ||
+!Number.isFinite(wagebase) ||
+wages < 0 ||
+ytd < 0 ||
+wagebase <= 0
+) {
+results.textContent = "Please enter valid payroll amounts.";
+return;
+}
+
+const remainingBase = Math.max(0, wagebase - ytd);
+
+const taxableSocialSecurity =
+Math.min(wages, remainingBase);
+
+const socialSecurity =
+taxableSocialSecurity * 0.062;
+
+const medicare =
+wages * 0.0145;
+
+const total =
+socialSecurity + medicare;
+
+const money = value =>
+value.toLocaleString("en-US", {
+style: "currency",
+currency: "USD"
+});
+
+results.innerHTML = `
+<h3>Estimated Employer Payroll Taxes</h3>
+
+<p>Employer Social Security Tax:</p>
+<strong>${money(socialSecurity)}</strong>
+
+<p>Employer Medicare Tax:</p>
+<strong>${money(medicare)}</strong>
+
+<hr>
+
+<p>Total Estimated Employer Taxes:</p>
+
+<div class="result-number">
+${money(total)}
+</div>
+
+<p>
+<small>
+Excludes unemployment taxes and other
+federal, state, and local obligations.
+</small>
+</p>
+`;
+
+}
+
+</script>
+
+</body>
+</html>
