@@ -64,7 +64,8 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
     {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/'},
     {name:'Patriot Software', text:'Affordable payroll and accounting software for small businesses.', url:'https://www.patriotsoftware.com/'},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
-    {name:'Google Workspace', text:'Professional email, shared calendars, and cloud storage for your business.', url:'https://sharegoogleworkspace.advocate.impact.com/mzZdRvc'}
+    {name:'Google Workspace', text:'Professional email, shared calendars, and cloud storage for your business.', url:'https://sharegoogleworkspace.advocate.impact.com/mzZdRvc'},
+    {name:'Carmel Car & Limo', text:'Best service and lowest prices on car and limo rides for business travel.', url:'https://www.dpbolvw.net/click-101916404-10553845', img:'https://www.awltovhc.com/image-101916404-10553845', imgAlt:'Carmel Car & Limo- Best Service – Lowest Prices'}
   ];
 
   return `
@@ -78,6 +79,7 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
             ${items.map(item=>`
               <article class="affiliate-card">
                 <div class="affiliate-tag">Recommended</div>
+                ${item.img?`<a class="affiliate-banner" href="${item.url}" target="_blank" rel="nofollow sponsored noopener"><img src="${item.img}" width="150" height="100" alt="${item.imgAlt||item.name}" loading="lazy"/></a>`:''}
                 <h3>${item.name}</h3>
                 <p>${item.text}</p>
                 <a href="${item.url}" target="_blank" rel="nofollow sponsored noopener">Visit ${item.name} →</a>
@@ -237,7 +239,7 @@ style.textContent=`
   .more{font-weight:700;color:var(--navy)}.button{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 18px;font-weight:700;border:1px solid var(--line);transition:.2s ease}.button:hover{text-decoration:none}.button.primary{background:var(--navy);color:#fff}.button.secondary{background:#fff;color:var(--navy)}.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
   .layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:28px;align-items:start}.maincol,.sidecol{min-width:0}
   .content-card ul,.sidebox ul,.site-footer ul{margin:0;padding-left:18px}.listlinks{display:grid;gap:10px;padding:0;list-style:none}.listlinks li{padding-left:0}.listlinks a{color:var(--navy);font-weight:600}
-  .affiliate-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}.affiliate-box h2{margin:0 0 10px;font-size:clamp(1.7rem,3vw,2.3rem)}.affiliate-disclosure{margin:0 0 18px;color:var(--muted)}.affiliate-card{display:flex;flex-direction:column;justify-content:space-between}.affiliate-card a{margin-top:auto;font-weight:700;color:var(--navy)}
+  .affiliate-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}.affiliate-box h2{margin:0 0 10px;font-size:clamp(1.7rem,3vw,2.3rem)}.affiliate-disclosure{margin:0 0 18px;color:var(--muted)}.affiliate-card{display:flex;flex-direction:column;justify-content:space-between}.affiliate-card a{margin-top:auto;font-weight:700;color:var(--navy)}.affiliate-card .affiliate-banner{margin:12px 0 0;display:block;line-height:0}.affiliate-banner img{border:0;max-width:100%;height:auto;border-radius:8px}
   .site-footer{margin-top:44px;background:#0d1d35;color:#e9eefc;padding:36px 0 18px}.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px}.site-footer h3,.site-footer h4{margin:0 0 12px;color:#fff}.site-footer p,.site-footer li,.site-footer a,.footer-bottom{color:#dfe7ff}.site-footer ul{list-style:none;padding:0}.site-footer li{margin-bottom:8px}.footer-bottom{display:flex;justify-content:space-between;gap:12px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);margin-top:18px;font-size:.9rem;flex-wrap:wrap}
   label{display:block;margin:0 0 14px;font-weight:600;color:var(--navy)}input,textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:inherit;margin-top:6px;background:#fff}textarea{resize:vertical;min-height:120px}.form .button{border:none;cursor:pointer}
   @media (max-width: 760px){.top .wrap,.nav,.footer-bottom{display:block}.mainnav{margin-top:12px}.layout{grid-template-columns:1fr}.site-header{position:static}.hero .wrap,.pagehead .wrap{padding-top:48px}.}
