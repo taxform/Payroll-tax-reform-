@@ -11,17 +11,28 @@
   <meta name="theme-color" content="#101d33">
 
   <link rel="canonical" href="https://payrolltaxreform.com/">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <!-- Existing verification settings -->
   <meta name="google-site-verification" content="gc34UKVtHVrEpzO0WsdptNL7lbFMqUnTuKFJz7YmGSs">
   <meta name="impact-site-verification" content="8cba38de-7a21-48f9-a747-edd8d19f2708">
 
-  <!-- Social sharing -->
+  <!-- Social sharing / Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PayrollTaxReform.com">
-  <meta property="og:title" content="Payroll Tax Guides & Software Comparisons">
-  <meta property="og:description" content="Independent payroll tax resources, state guides, and software comparisons for U.S. employers.">
+  <meta property="og:title" content="Payroll Tax Guides, Calculators & Software | PayrollTaxReform.com">
+  <meta property="og:description" content="Explore U.S. payroll tax guides, employer resources, state payroll requirements, and payroll software comparisons. Independent information for small businesses.">
   <meta property="og:url" content="https://payrolltaxreform.com/">
+  <meta property="og:image" content="https://payrolltaxreform.com/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="PayrollTaxReform.com Guides and Calculators">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Payroll Tax Guides, Calculators & Software | PayrollTaxReform.com">
+  <meta name="twitter:description" content="Independent U.S. payroll tax resources, state guides, free payroll calculator, and software comparisons for employers.">
+  <meta name="twitter:image" content="https://payrolltaxreform.com/og-image.svg">
 
   <link rel="stylesheet" href="/style.css">
 
@@ -29,10 +40,66 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "PayrollTaxReform.com",
-    "url": "https://payrolltaxreform.com/",
-    "description": "Independent U.S. payroll tax information and employer resources."
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://payrolltaxreform.com/#website",
+        "name": "PayrollTaxReform.com",
+        "url": "https://payrolltaxreform.com/",
+        "description": "Independent U.S. payroll tax information and employer resources.",
+        "publisher": {
+          "@id": "https://payrolltaxreform.com/#organization"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://payrolltaxreform.com/#organization",
+        "name": "PayrollTaxReform.com",
+        "url": "https://payrolltaxreform.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://payrolltaxreform.com/favicon.svg"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://payrolltaxreform.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are employer payroll taxes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Employer payroll taxes generally include the employer share of Social Security (6.2%) and Medicare (1.45%) taxes, federal unemployment taxes (FUTA) when applicable, and relevant state or local employer taxes such as State Unemployment Insurance (SUI)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do payroll tax requirements differ by state?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. State income tax withholding, unemployment insurance (SUI) wage bases and tax rates, employer registration, new hire reporting, and paid family leave or disability mandates vary significantly by jurisdiction."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can payroll software file taxes for employers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Full-service payroll platforms (such as Gusto, QuickBooks Payroll, ADP, and Patriot) automate federal, state, and local payroll tax calculations, quarterly Form 941 filings, and year-end Form W-2 generation."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I verify federal payroll tax rules?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Employers can consult official guidance from the Internal Revenue Service (IRS Publication 15, Circular E, Employer's Tax Guide) and the Social Security Administration (SSA)."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 
