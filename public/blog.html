@@ -117,8 +117,10 @@
       <div class="wrap">
         <h2>Latest articles</h2>
         <p class="section-intro">Start with the topic closest to your business — every article ends with the tools and guides to act on it.</p>
+        <p class="section-intro">Currently featuring <span data-blog-count>6</span> articles — this list updates automatically whenever a post is added.</p>
 
-        <div class="grid">
+        <!-- Automatic listing: cards below are replaced at load time with /blog/posts.json. -->
+        <div class="grid" data-blog-list>
           <article class="card">
             <span class="badge">Federal update</span>
             <h3>2026 Payroll Tax Changes: What Employers Need to Know</h3>
@@ -190,6 +192,7 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+  <script src="/blog-list.js" defer></script>
 
 </body>
 </html>
