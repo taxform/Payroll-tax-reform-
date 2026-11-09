@@ -6,5 +6,5 @@ google.com, pub-5889154162791392, DIRECT, f08c47fec0942fa0
 
 # Variables
 OWNERDOMAIN=payrolltaxreform.com
-CONTACT=payrolltaxreform@gmail.com
+CONTACT=support@payrolltaxreform.com
 CONTACT=https://payrolltaxreform.com/contact.html
