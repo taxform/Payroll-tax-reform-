@@ -63,7 +63,6 @@ function affiliateSection(title='Recommended payroll and tax tools', intro='Disc
   const items=[
     {name:'File Your IRS Taxes', text:'Prepare and e-file your federal tax return online.', url:'https://www.anrdoezrs.net/click-101916404-11917163', pixel:'https://www.ftjcfx.com/image-101916404-11917163'},
     {name:'QuickBooks Online', text:'Accounting and bookkeeping tools built for growing companies.', url:'https://quickbooks.intuit.com/partners/affiliates?cid=par_pim_xwpoB4IIUFeI'},
-    {name:'Sponsored Partner', text:'A featured offer from one of our partners.', url:'https://www.jdoqocy.com/click-101916404-17133749', img:'https://www.tqlkg.com/image-101916404-17133749', alt:'Sponsored partner offer', w:359, h:240},
     {name:'TaxJar', text:'Sales tax automation and compliance workflows for online sellers.', url:'https://www.taxjar.com/'},
     {name:'Sparta Labs', text:'Browse the Sparta Labs online store through our partner link.', url:'https://spartalabs.net/us/store?aff=SL7M9RJN'},
     {name:'Carmel Car &amp; Limo', text:'Car and limo service.', url:'https://www.anrdoezrs.net/click-101916404-10553845', img:'https://www.tqlkg.com/image-101916404-10553845', alt:'Carmel Car &amp; Limo- Best Service – Lowest Prices'}
