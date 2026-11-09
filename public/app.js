@@ -182,7 +182,7 @@ const views={
             </ul>
           </div>
         </main>
-        <aside class="sidecol"><div class="sidebox"><h3>Get in touch</h3><p>Email us to discuss sponsorship and display opportunities.</p><a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a></div></aside>
+        <aside class="sidecol"><div class="sidebox"><h3>Get in touch</h3><p>Email us to discuss sponsorship and display opportunities.</p><a href="mailto:support@payrolltaxreform.com">support@payrolltaxreform.com</a></div></aside>
       </div>
     </section>`,
 
@@ -190,13 +190,13 @@ const views={
     <section class="section"><div class="wrap layout"><main class="maincol"><div class="content-card"><h2>Our mission</h2><p>We aim to deliver clear, practical guidance for payroll and tax decisions, with links to official sources and useful business context.</p><p>We are not a substitute for tax or legal advice.</p></div></main><aside class="sidecol"><div class="sidebox"><h3>Need help?</h3><p>Visit our resource center or contact us.</p><a href="contact.html">Contact us</a></div></aside></div></section>`,
 
   privacy:()=>`${head('Privacy policy','How we handle information on PayrollTaxReform.com.')}
-    <section class="section"><div class="wrap"><div class="content-card"><p>We may collect email signups and website analytics for operational purposes. We do not sell personal information. We may use third-party tools for analytics, advertising, and affiliate tracking.</p><p>Affiliate links may earn a commission at no extra cost to you. We disclose this where applicable.</p><p>For questions, contact us at <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a>.</p></div></div></section>`,
+    <section class="section"><div class="wrap"><div class="content-card"><p>We may collect email signups and website analytics for operational purposes. We do not sell personal information. We may use third-party tools for analytics, advertising, and affiliate tracking.</p><p>Affiliate links may earn a commission at no extra cost to you. We disclose this where applicable.</p><p>For questions, contact us at <a href="mailto:support@payrolltaxreform.com">support@payrolltaxreform.com</a>.</p></div></div></section>`,
 
   partners:()=>`${head('Partners','Third-party partner links shared by PayrollTaxReform.com.')}
     ${affiliateSection('Our partners','Disclosure: We may earn a commission if you buy through these links, at no extra cost to you. We do not review, test, or endorse these products, and nothing here is medical advice.')}`,
 
   contact:()=>`${head('Contact us','Send a message about advertising, partnerships, or site feedback.')}
-    <section class="section"><div class="wrap layout"><main class="maincol"><div class="content-card"><form class="form" action="mailto:payrolltaxreform@gmail.com" method="post" enctype="text/plain"><label>Name<input type="text" name="name" placeholder="Your name" /></label><label>Email<input type="email" name="email" placeholder="Your email" /></label><label>Message<textarea name="message" rows="6" placeholder="How can we help?"></textarea></label><button type="submit" class="button primary">Send message</button></form></div></main><aside class="sidecol"><div class="sidebox"><h3>Contact details</h3><p>Email: <a href="mailto:payrolltaxreform@gmail.com">payrolltaxreform@gmail.com</a></p><p>Website: <a href="index.html">PayrollTaxReform.com</a></p></div></aside></div></section>`
+    <section class="section"><div class="wrap layout"><main class="maincol"><div class="content-card"><form class="form" action="mailto:support@payrolltaxreform.com" method="post" enctype="text/plain"><label>Name<input type="text" name="name" placeholder="Your name" /></label><label>Email<input type="email" name="email" placeholder="Your email" /></label><label>Message<textarea name="message" rows="6" placeholder="How can we help?"></textarea></label><button type="submit" class="button primary">Send message</button></form></div></main><aside class="sidecol"><div class="sidebox"><h3>Contact details</h3><p>Email: <a href="mailto:support@payrolltaxreform.com">support@payrolltaxreform.com</a></p><p>Website: <a href="index.html">PayrollTaxReform.com</a></p></div></aside></div></section>`
 };
 
 const view=views[current]?current:'home';
