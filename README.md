@@ -10,6 +10,9 @@ Independent payroll tax and tax reform information site, hosted on Netlify at ht
   IRS "News releases for current month" page and stores new releases.
 - `netlify/functions/official-updates.mts` — `GET /api/official-updates`, used by the Latest Updates page.
   It also refreshes the data itself if the last check is more than 26 hours old.
+- `netlify/functions/backlinks.mts` — `GET /api/backlinks?domain=…`, used by the Backlink Checker page
+  (`public/backlinks.html`). Calls the Semrush Backlinks API (v4) with `SEMRUSH_API_KEY`, caches each domain for
+  24 hours in Netlify Blobs, and caps fresh lookups at `SEMRUSH_DAILY_LOOKUPS` per day (default 100).
 - `db/schema.ts` — Netlify Database (Postgres) schema; migrations live in `netlify/database/migrations/`
   and are applied automatically on deploy.
 
