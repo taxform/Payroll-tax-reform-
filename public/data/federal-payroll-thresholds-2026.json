@@ -7,9 +7,9 @@
   "thresholds": [
     {
       "provision": "Social Security wage base",
-      "value_2026": "$176,100",
-      "prior_year": "$168,600",
-      "impact": "Maximum OASDI tax is $10,918.20 each for employer and employee."
+      "value_2026": "$184,500",
+      "prior_year": "$176,100",
+      "impact": "Maximum OASDI tax is $11,439.00 each for employer and employee."
     },
     {
       "provision": "Medicare tax rate",
@@ -31,14 +31,14 @@
     },
     {
       "provision": "401(k) / 403(b) elective deferrals",
-      "value_2026": "$23,500 ($31,000 with age 50+ catch-up)",
-      "prior_year": "$23,000 ($30,500)",
+      "value_2026": "$24,500 ($32,500 with age 50+ catch-up)",
+      "prior_year": "$23,500 ($31,000)",
       "impact": "Pre-tax retirement withholding limit adjusted for inflation."
     },
     {
       "provision": "Health Savings Account (HSA) limit",
-      "value_2026": "$4,300 single / $8,550 family",
-      "prior_year": "$4,150 / $8,300",
+      "value_2026": "$4,400 single / $8,750 family",
+      "prior_year": "$4,300 / $8,550",
       "impact": "Exempt from federal income tax and FICA when pre-tax."
     }
   ]

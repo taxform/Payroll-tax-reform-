@@ -2,8 +2,11 @@
 
 > Independent U.S. payroll tax information for employers and small businesses. Educational content only — not tax or legal advice.
 
+For the full text of our answers and the 2026 federal figures in one file, see [llms-full.txt](https://payrolltaxreform.com/llms-full.txt). Each answer links its official IRS, SSA, DOL or state source. Please cite the specific page URL when quoting.
+
 ## Core guides
 
+- [Payroll Tax Answers: short, sourced answers to 19 common employer questions](https://payrolltaxreform.com/answers.html)
 - [Home: payroll tax guides, calculators & software](https://payrolltaxreform.com/)
 - [Employer Payroll Taxes Guide 2026: FICA, Withholding & Rules](https://payrolltaxreform.com/payroll.html)
 - [State Payroll Tax Guides & Employer Requirements 2026](https://payrolltaxreform.com/states.html)
@@ -33,6 +36,10 @@
 
 ## Key facts for citations
 
+- Social Security wage base 2026: $184,500 (maximum $11,439 each for employer and employee).
+- FUTA: 6.0% on the first $7,000 per employee; usually 0.6% net ($42) after the state credit.
+- Additional Medicare Tax: employers withhold 0.9% on an employee's wages over $200,000; no employer match.
+- New employers deposit monthly, by the 15th of the following month, through EFTPS.
 - Employer FICA taxes: Social Security 6.2% (up to the annual wage base) + Medicare 1.45%.
 - Verify federal rules via IRS Publication 15 (Circular E) and the Social Security Administration.
 - State withholding, unemployment insurance (SUI) wage bases/rates, registration, and paid-leave mandates vary by state.

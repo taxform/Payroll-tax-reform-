@@ -799,3 +799,49 @@ textarea.snippet {
 .bl-meta { margin-top: 14px; font-size: 14px; }
 .bl-note { margin-top: 30px; }
 @media (max-width: 640px) { .bl-row { flex-direction: column; } }
+
+/* Answer hub (answers.html) */
+.answer-toc ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  columns: 2;
+}
+
+.answer-toc h2 {
+  font-size: 20px;
+}
+
+.answer-group {
+  margin-top: 34px;
+  scroll-margin-top: 90px;
+}
+
+.answer {
+  margin-bottom: 16px;
+  scroll-margin-top: 90px;
+}
+
+.answer h3 a.answer-anchor {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.answer h3 a.answer-anchor:hover {
+  text-decoration: underline;
+}
+
+.answer .answer-lead {
+  color: var(--text);
+  font-size: 17px;
+}
+
+.answer-meta {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .answer-toc ol {
+    columns: 1;
+  }
+}

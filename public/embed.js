@@ -9,7 +9,7 @@
   "use strict";
 
   var CALC_URL = "https://payrolltaxreform.com/calculator.html";
-  var DEFAULT_WAGE_BASE = 176100;
+  var DEFAULT_WAGE_BASE = 184500;
 
   var FRAME_STYLE =
     "font-family:Arial,Helvetica,sans-serif;background:#172944;color:#e9edf5;" +
