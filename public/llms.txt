@@ -15,6 +15,11 @@ For the full text of our answers and the 2026 federal figures in one file, see [
 - [Latest Payroll Tax Updates & 2026 IRS Changes](https://payrolltaxreform.com/updates.html)
 - [Payroll Tax Resources & Official IRS Forms Directory](https://payrolltaxreform.com/resources.html)
 
+## Original research and press
+
+- [Employer Payroll Tax by Salary (2026): federal employer cost for 25 salaries, Social Security wage base 2016–2026, CSV/JSON data](https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html)
+- [Press Room: fact sheet, story ideas, brand assets and media requests](https://payrolltaxreform.com/press.html)
+
 ## Blog
 
 - [Blog: payroll tax insights for employers](https://payrolltaxreform.com/blog.html)
@@ -37,6 +42,8 @@ For the full text of our answers and the 2026 federal figures in one file, see [
 ## Key facts for citations
 
 - Social Security wage base 2026: $184,500 (maximum $11,439 each for employer and employee).
+- Employer federal payroll tax on a $50,000 salary in 2026: $3,867 (7.73%). On $500,000: $18,731 (3.75%). Source: https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html
+- Social Security wage base rose 55.7% from 2016 ($118,500) to 2026 ($184,500).
 - FUTA: 6.0% on the first $7,000 per employee; usually 0.6% net ($42) after the state credit.
 - Additional Medicare Tax: employers withhold 0.9% on an employee's wages over $200,000; no employer match.
 - New employers deposit monthly, by the 15th of the following month, through EFTPS.

@@ -228,3 +228,14 @@ Related guide: https://payrolltaxreform.com/blog/payroll-software-mistakes.html
 - Official IRS forms directory: https://payrolltaxreform.com/resources.html
 - 2026 SUI wage bases (CSV): https://payrolltaxreform.com/data/sui-wage-bases-2026.csv
 - Citation guidelines: https://payrolltaxreform.com/cite-us.html
+- Press room: https://payrolltaxreform.com/press.html
+
+## Original research: Employer Payroll Tax by Salary (2026)
+
+Source: https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html
+Data: https://payrolltaxreform.com/data/employer-payroll-tax-by-salary-2026.csv
+
+- A $50,000 employee costs the employer $3,867 in federal payroll taxes in 2026 (7.73% of salary).
+- The employer's effective federal rate is 7.86% on a $20,000 salary and 3.75% on a $500,000 salary, because Social Security stops at the $184,500 wage base.
+- The Social Security wage base rose 55.7% from $118,500 in 2016 to $184,500 in 2026; the maximum employer Social Security tax rose $4,092, to $11,439.
+- Method: Social Security 6.2% up to $184,500, Medicare 1.45% on all wages, FUTA $42 net. Excludes state taxes.

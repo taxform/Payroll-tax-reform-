@@ -1,0 +1,78 @@
+{
+  "title": "Social Security Taxable Wage Base History, 2016–2026",
+  "publisher": "PayrollTaxReform.com",
+  "source_page": "https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html#wage-base-history",
+  "license": "CC-BY-4.0 (credit PayrollTaxReform.com with a link to the source page)",
+  "sources": [
+    "https://www.ssa.gov/oact/cola/cbb.html"
+  ],
+  "methodology": "Contribution and benefit base published by the Social Security Administration. Maximum employer tax is 6.2% of the base; employees pay the same amount.",
+  "rows": [
+    {
+      "year": 2016,
+      "wage_base": 118500,
+      "max_employer_social_security_tax": 7347,
+      "change_from_prior_year_pct": null
+    },
+    {
+      "year": 2017,
+      "wage_base": 127200,
+      "max_employer_social_security_tax": 7886.4,
+      "change_from_prior_year_pct": 7.34
+    },
+    {
+      "year": 2018,
+      "wage_base": 128400,
+      "max_employer_social_security_tax": 7960.8,
+      "change_from_prior_year_pct": 0.94
+    },
+    {
+      "year": 2019,
+      "wage_base": 132900,
+      "max_employer_social_security_tax": 8239.8,
+      "change_from_prior_year_pct": 3.5
+    },
+    {
+      "year": 2020,
+      "wage_base": 137700,
+      "max_employer_social_security_tax": 8537.4,
+      "change_from_prior_year_pct": 3.61
+    },
+    {
+      "year": 2021,
+      "wage_base": 142800,
+      "max_employer_social_security_tax": 8853.6,
+      "change_from_prior_year_pct": 3.7
+    },
+    {
+      "year": 2022,
+      "wage_base": 147000,
+      "max_employer_social_security_tax": 9114,
+      "change_from_prior_year_pct": 2.94
+    },
+    {
+      "year": 2023,
+      "wage_base": 160200,
+      "max_employer_social_security_tax": 9932.4,
+      "change_from_prior_year_pct": 8.98
+    },
+    {
+      "year": 2024,
+      "wage_base": 168600,
+      "max_employer_social_security_tax": 10453.2,
+      "change_from_prior_year_pct": 5.24
+    },
+    {
+      "year": 2025,
+      "wage_base": 176100,
+      "max_employer_social_security_tax": 10918.2,
+      "change_from_prior_year_pct": 4.45
+    },
+    {
+      "year": 2026,
+      "wage_base": 184500,
+      "max_employer_social_security_tax": 11439,
+      "change_from_prior_year_pct": 4.77
+    }
+  ]
+}
