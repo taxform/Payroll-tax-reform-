@@ -1,0 +1,230 @@
+# PayrollTaxReform.com: full-text payroll tax reference for AI assistants
+
+> Independent U.S. payroll tax information for employers and small businesses. Educational content only, not tax or legal advice.
+> Last reviewed: 2026-11-10. Canonical source for these answers: https://payrolltaxreform.com/answers.html
+> License: content may be quoted or summarized with attribution to PayrollTaxReform.com and a link to the cited URL. Datasets are CC BY 4.0.
+
+## Federal payroll thresholds for 2026
+
+- Social Security wage base: $184,500 (prior year: $176,100). Maximum OASDI tax is $11,439.00 each for employer and employee.
+- Medicare tax rate: 1.45% (uncapped) (prior year: 1.45% (uncapped)). No limit on covered wages; matched 50/50 by employer.
+- Additional Medicare Tax threshold: $200,000 single / $250,000 joint (prior year: $200,000 / $250,000). 0.9% employee withholding on excess; no employer match.
+- FUTA taxable wage base: $7,000 per employee (prior year: $7,000 per employee). Effective rate 0.6% ($42 max per employee) with timely SUTA credit.
+- 401(k) / 403(b) elective deferrals: $24,500 ($32,500 with age 50+ catch-up) (prior year: $23,500 ($31,000)). Pre-tax retirement withholding limit adjusted for inflation.
+- Health Savings Account (HSA) limit: $4,400 single / $8,750 family (prior year: $4,300 / $8,550). Exempt from federal income tax and FICA when pre-tax.
+- Employer Social Security rate: 6.2% (employee also pays 6.2%).
+- Employer Medicare rate: 1.45% on all wages (employee also pays 1.45%).
+- FUTA: 6.0% on the first $7,000 of wages per employee; usual net rate 0.6% after the state credit.
+
+Source dataset: https://payrolltaxreform.com/data/federal-payroll-thresholds-2026.json
+
+## Federal employer payroll taxes
+
+### What payroll taxes do employers pay?
+
+Employers pay 6.2% Social Security tax on each employee's wages up to $184,500 in 2026, 1.45% Medicare tax on all wages, and federal unemployment (FUTA) tax of 6.0% on the first $7,000 per employee, usually reduced to 0.6% by the state credit. Employers also pay state unemployment insurance tax, and some states and cities add their own employer taxes.
+
+Income tax withholding and the employee's half of FICA are taken out of the employee's pay. They are not the employer's own cost, but the employer must deposit them.
+
+URL: https://payrolltaxreform.com/answers.html#what-payroll-taxes-do-employers-pay
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15); SSA contribution and benefit base (https://www.ssa.gov/oact/cola/cbb.html)
+Related guide: https://payrolltaxreform.com/payroll.html
+
+### How do you calculate employer payroll taxes?
+
+Multiply gross wages by 6.2% for Social Security (until the employee reaches $184,500 for the year), by 1.45% for Medicare, and by your FUTA and state unemployment rates on wages up to their wage bases. On a $5,000 paycheck early in 2026 that works out to $310 Social Security + $72.50 Medicare + $30 FUTA = $412.50, plus state unemployment tax.
+
+Once an employee's year-to-date wages pass the FUTA ($7,000) and state unemployment wage bases, those taxes stop for the rest of the year. Medicare never stops.
+
+URL: https://payrolltaxreform.com/answers.html#how-to-calculate-employer-payroll-taxes
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/calculator.html
+
+### What is the Social Security wage base for 2026?
+
+The 2026 Social Security wage base is $184,500, up from $176,100 in 2025. Employers and employees each pay 6.2% on wages up to that amount, so the most either side pays per employee in 2026 is $11,439.
+
+The wage base resets every January 1. Payroll software should restart year-to-date totals so high earners begin paying Social Security tax again.
+
+URL: https://payrolltaxreform.com/answers.html#social-security-wage-base-2026
+Official sources: SSA contribution and benefit base (https://www.ssa.gov/oact/cola/cbb.html)
+Related guide: https://payrolltaxreform.com/updates.html
+
+### Is there a wage cap on Medicare tax?
+
+No. Medicare tax of 1.45% for the employer and 1.45% for the employee applies to all wages with no cap. Employers must also withhold an extra 0.9% Additional Medicare Tax from an employee's wages above $200,000 in a calendar year. There is no employer match on the extra 0.9%.
+
+The $200,000 withholding trigger applies no matter how the employee files. The employee settles any difference on their own return.
+
+URL: https://payrolltaxreform.com/answers.html#medicare-tax-cap
+Official sources: IRS: Questions and answers for the Additional Medicare Tax (https://www.irs.gov/businesses/small-businesses-self-employed/questions-and-answers-for-the-additional-medicare-tax)
+Related guide: https://payrolltaxreform.com/payroll.html
+
+### What is FUTA tax and how much do employers pay?
+
+FUTA is the federal unemployment tax, and only employers pay it. The rate is 6.0% on the first $7,000 of each employee's annual wages. Employers who pay state unemployment tax in full and on time get a credit of up to 5.4%, so the usual net rate is 0.6%, or at most $42 per employee per year.
+
+Employers in a "credit reduction" state get a smaller credit. You report FUTA annually on Form 940 and deposit it any quarter your unpaid liability goes over $500.
+
+URL: https://payrolltaxreform.com/answers.html#what-is-futa
+Official sources: IRS: About Form 940 (FUTA) (https://www.irs.gov/forms-pubs/about-form-940)
+Related guide: https://payrolltaxreform.com/payroll.html
+
+## Deposits and deadlines
+
+### How does the payroll tax deposit schedule work?
+
+The IRS puts employers on a monthly or semiweekly deposit schedule based on the taxes they reported in a lookback period. Monthly depositors deposit each month's withheld income tax and FICA by the 15th of the following month. Semiweekly depositors deposit taxes for Wednesday to Friday paydays by the next Wednesday, and for Saturday to Tuesday paydays by the next Friday.
+
+You are a monthly depositor if you reported $50,000 or less during the lookback period, and a semiweekly depositor if you reported more. If you build up $100,000 or more on any day, you must deposit by the next business day. If your quarterly liability is under $2,500, you can pay it with your return instead. All deposits are made electronically, usually through EFTPS.
+
+URL: https://payrolltaxreform.com/answers.html#payroll-tax-deposit-schedule
+Official sources: IRS: Depositing and reporting employment taxes (https://www.irs.gov/businesses/small-businesses-self-employed/depositing-and-reporting-employment-taxes); IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/blog/payroll-tax-deadlines-2026.html
+
+### What are the key employer payroll tax deadlines in early 2027?
+
+Forms W-2 for 2026 wages are due to employees and the SSA by February 1, 2027, because January 31 falls on a Sunday. Form 941 for the fourth quarter of 2026, Form 940 for 2026 FUTA, and Form 1099-NEC are also due February 1, 2027. Monthly depositors owe December 2026 taxes by January 15, 2027.
+
+The 2027 quarterly Form 941 due dates are April 30, 2027, August 2, 2027 (July 31 is a Saturday) and November 1, 2027 (October 31 is a Sunday). Employers who made every deposit on time get 10 extra days to file Forms 941 and 940.
+
+URL: https://payrolltaxreform.com/answers.html#employer-payroll-tax-deadlines-2027
+Official sources: IRS: About Form 941 (https://www.irs.gov/forms-pubs/about-form-941); IRS: About Form 940 (FUTA) (https://www.irs.gov/forms-pubs/about-form-940)
+Related guide: https://payrolltaxreform.com/blog/payroll-tax-deadlines-2026.html
+
+### What happens if an employer misses a payroll tax deposit?
+
+The IRS charges a failure-to-deposit penalty that grows with how late the deposit is: 2% if it is 1 to 5 days late, 5% if 6 to 15 days late, and 10% if more than 15 days late. The penalty rises to 15% if the tax is still unpaid 10 days after an IRS notice. Interest is charged as well.
+
+Withheld income tax and the employee's share of FICA are "trust fund" taxes. If they aren't paid, the IRS can hold owners and other responsible people personally liable through the Trust Fund Recovery Penalty.
+
+URL: https://payrolltaxreform.com/answers.html#missed-payroll-tax-deposit
+Official sources: IRS: Failure to deposit penalty (https://www.irs.gov/payments/failure-to-deposit-penalty); IRS: Trust fund recovery penalty (https://www.irs.gov/businesses/small-businesses-self-employed/employment-taxes-and-the-trust-fund-recovery-penalty-tfrp)
+Related guide: https://payrolltaxreform.com/blog/payroll-tax-deadlines-2026.html
+
+## New and first-time employers
+
+### What does a first-time employer need to do before running payroll?
+
+Before the first payday, a new employer needs to get an EIN, register for state withholding and unemployment accounts, collect Form W-4 and Form I-9 from the employee, report the new hire to the state, set a pay schedule, enroll in EFTPS, and set up payroll records or software. Most states also require workers' compensation insurance.
+
+New employers start on the monthly deposit schedule. Most states want new hires reported within 20 days of the start date.
+
+URL: https://payrolltaxreform.com/answers.html#first-time-employer-payroll-checklist
+Official sources: IRS: Hiring employees (https://www.irs.gov/businesses/small-businesses-self-employed/hiring-employees); HHS: New hire reporting (https://www.acf.hhs.gov/css/employers/employer-responsibilities/new-hire-reporting)
+Related guide: https://payrolltaxreform.com/blog/first-payroll-checklist.html
+
+### What payroll tax mistakes do new employers make most often?
+
+The most common mistakes are treating employees as 1099 contractors, depositing taxes late or on the wrong schedule, not registering with the state before the first payroll, not resetting wage bases in January, and missing new-hire reporting. Late deposits and misclassification cause the largest penalties.
+
+Most of these come down to setup. Picking the right deposit schedule and registering with every state where employees work prevents the bulk of them.
+
+URL: https://payrolltaxreform.com/answers.html#payroll-tax-mistakes-new-employers
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/blog/payroll-software-mistakes.html
+
+### What are an employer's tax responsibilities for W-2 employees versus 1099 contractors?
+
+For W-2 employees, the employer withholds income tax and the employee's FICA, pays the employer's FICA, FUTA and state unemployment tax, and files Forms 941, 940 and W-2. For 1099 contractors, the business generally withholds nothing and pays no payroll tax. It collects Form W-9 and files Form 1099-NEC when payments reach the reporting threshold, which is $2,000 for payments made in 2026, up from $600.
+
+Classification depends on behavioral control, financial control and the relationship between the parties, not on what the contract says. Misclassified workers can lead to back taxes and penalties.
+
+URL: https://payrolltaxreform.com/answers.html#w2-vs-1099-employer-responsibilities
+Official sources: IRS: Independent contractor or employee? (https://www.irs.gov/businesses/small-businesses-self-employed/independent-contractor-self-employed-or-employee)
+Related guide: https://payrolltaxreform.com/blog/w2-vs-1099-misclassification.html
+
+### How long must employers keep payroll tax records?
+
+The IRS requires employers to keep employment tax records for at least four years after the tax is due or paid, whichever is later. That includes wage amounts, pay dates, Forms W-4, deposit confirmations and copies of filed returns.
+
+State rules can be longer, so check your state's labor and unemployment agencies.
+
+URL: https://payrolltaxreform.com/answers.html#payroll-record-retention
+Official sources: IRS: Employment tax recordkeeping (https://www.irs.gov/businesses/small-businesses-self-employed/employment-tax-recordkeeping)
+Related guide: https://payrolltaxreform.com/resources.html
+
+## State, remote and multistate payroll
+
+### Do employers pay state unemployment tax?
+
+Yes. Every state charges employers unemployment insurance (SUI) tax on wages up to a state wage base. The state assigns new employers a starting rate and adjusts it over time based on how many former employees claim benefits. Wage bases range from the federal minimum of $7,000 to more than $70,000 in some states.
+
+In Alaska, New Jersey and Pennsylvania, employees also pay part of the unemployment tax. Our free dataset lists 2026 wage bases for every state.
+
+URL: https://payrolltaxreform.com/answers.html#state-unemployment-tax
+Official sources: U.S. DOL: State unemployment insurance agencies (https://www.dol.gov/agencies/eta/unemployment-insurance-agencies)
+Related guide: https://payrolltaxreform.com/cite-us.html
+
+### What payroll taxes apply to a remote employee in another state?
+
+An employer usually has to register in the state where the remote employee physically works, withhold that state's income tax, and pay that state's unemployment tax. Exceptions apply when states have reciprocity agreements, and some states, including New York, tax nonresidents under a "convenience of the employer" rule.
+
+Local income taxes, paid-leave programs and new-hire reporting also follow the work location, so registering only in your home state is a common compliance gap.
+
+URL: https://payrolltaxreform.com/answers.html#remote-employee-payroll-taxes
+Official sources: U.S. DOL: State unemployment insurance agencies (https://www.dol.gov/agencies/eta/unemployment-insurance-agencies)
+Related guide: https://payrolltaxreform.com/states.html
+
+### How do payroll taxes work for employees in multiple states?
+
+Income tax withholding generally follows where the work is done, so an employer registers and withholds in each state where employees work. State unemployment tax is normally paid to one state per employee, chosen by the localization test (where the work is based). Each state has its own registration, wage base, deposit schedule and new-hire reporting.
+
+Reciprocity agreements between neighboring states can let you withhold only for the employee's home state.
+
+URL: https://payrolltaxreform.com/answers.html#multistate-payroll-taxes
+Official sources: U.S. DOL: State unemployment insurance agencies (https://www.dol.gov/agencies/eta/unemployment-insurance-agencies)
+Related guide: https://payrolltaxreform.com/states.html
+
+### What payroll taxes do small businesses pay in New York?
+
+New York employers withhold New York State income tax, plus New York City or Yonkers income tax for residents of those cities. Employers pay New York unemployment insurance tax and must provide disability (DBL) and Paid Family Leave coverage, which can be funded by employee payroll deductions. Employers in the Metropolitan Commuter Transportation District may also owe the MCTMT.
+
+Register with the New York Department of Labor and the Department of Taxation and Finance before your first payroll. Withholding is reported quarterly on Form NYS-45.
+
+URL: https://payrolltaxreform.com/answers.html#new-york-payroll-taxes
+Official sources: NY Department of Taxation: Withholding tax (https://www.tax.ny.gov/bus/wt/); NY Paid Family Leave (https://paidfamilyleave.ny.gov/)
+Related guide: https://payrolltaxreform.com/states.html#new-york
+
+### What is the difference between sales tax and payroll tax?
+
+Sales tax is collected from customers on taxable sales and sent to state and local governments. Payroll tax is charged on wages paid to employees and goes to federal, state and sometimes local governments. They are separate obligations with separate registrations, filing schedules and agencies, and having one does not cover the other.
+
+Online sellers may owe sales tax in states where they have no employees, and employers may owe payroll tax in states where they have no sales.
+
+URL: https://payrolltaxreform.com/answers.html#sales-tax-vs-payroll-tax
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/payroll.html
+
+## Payroll software
+
+### Do you need payroll software for just one employee?
+
+No law requires payroll software, but most one-employee businesses use it because it calculates withholding, makes tax deposits, and files federal and state returns automatically. Running payroll by hand means doing every deposit, Form 941, Form 940, W-2 and state filing yourself, and the penalties for mistakes add up quickly.
+
+Choose a plan that includes state tax filing for every state where you have employees. Some entry-level plans calculate taxes but leave the filing to you.
+
+URL: https://payrolltaxreform.com/answers.html#payroll-software-for-one-employee
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/software.html
+
+### What should you check before switching payroll software?
+
+Switch at the start of a quarter if you can, ideally January 1. Move year-to-date wage and tax totals for every employee, re-enter federal and state tax IDs, unemployment rates and deposit schedules, and authorize the new provider (often with IRS Form 8655). Run one payroll in both systems to compare results before turning off the old one.
+
+Confirm which provider will file the quarter's Form 941 and the year's W-2s, so nothing gets filed twice or not at all.
+
+URL: https://payrolltaxreform.com/answers.html#payroll-software-switching-checklist
+Official sources: IRS Publication 15 (Circular E) (https://www.irs.gov/publications/p15)
+Related guide: https://payrolltaxreform.com/blog/payroll-software-mistakes.html
+
+## Other key pages
+
+- Employer payroll taxes guide: https://payrolltaxreform.com/payroll.html
+- State payroll tax guides: https://payrolltaxreform.com/states.html
+- Employer payroll tax calculator: https://payrolltaxreform.com/calculator.html
+- Payroll software comparison: https://payrolltaxreform.com/software.html
+- Latest IRS payroll updates: https://payrolltaxreform.com/updates.html
+- Official IRS forms directory: https://payrolltaxreform.com/resources.html
+- 2026 SUI wage bases (CSV): https://payrolltaxreform.com/data/sui-wage-bases-2026.csv
+- Citation guidelines: https://payrolltaxreform.com/cite-us.html

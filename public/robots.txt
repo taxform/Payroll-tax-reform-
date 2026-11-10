@@ -1,5 +1,26 @@
+# PayrollTaxReform.com welcomes search engines and AI answer engines.
+# Content may be quoted with attribution; see https://payrolltaxreform.com/cite-us.html
+# LLM-readable summaries: https://payrolltaxreform.com/llms.txt and /llms-full.txt
+
+# AI search and answer engines
 User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: DuckAssistBot
+User-agent: meta-externalagent
+User-agent: MistralAI-User
+User-agent: CCBot
 Allow: /
+Disallow: /__forms.html
 
 User-agent: *
 Allow: /
