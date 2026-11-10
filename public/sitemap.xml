@@ -145,4 +145,16 @@
     <priority>0.8</priority>
   </url>
   <url><loc>https://payrolltaxreform.com/blog/year-end-payroll-checklist-2026.html</loc><lastmod>2026-11-10</lastmod></url>
+  <url>
+    <loc>https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://payrolltaxreform.com/press.html</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
