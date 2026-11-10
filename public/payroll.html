@@ -46,87 +46,100 @@
   <link rel="stylesheet" href="/style.css">
 
   <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Article",
-        "headline": "Employer Payroll Taxes Guide 2026: FICA, Withholding and Employer Responsibilities",
-        "description": "A comprehensive guide for U.S. employers explaining FICA taxes, federal income tax withholding, FUTA unemployment taxes, and filing forms.",
-        "author": {
-          "@type": "Organization",
-          "name": "PayrollTaxReform.com"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "PayrollTaxReform.com",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://payrolltaxreform.com/favicon.svg"
-          }
-        },
-        "mainEntityOfPage": "https://payrolltaxreform.com/payroll.html",
-        "datePublished": "2026-11-03",
-        "dateModified": "2026-11-03"
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Employer Payroll Taxes Guide 2026: FICA, Withholding and Employer Responsibilities",
+      "description": "A comprehensive guide for U.S. employers explaining FICA taxes, federal income tax withholding, FUTA unemployment taxes, and filing forms.",
+      "author": {
+        "@type": "Organization",
+        "name": "PayrollTaxReform.com",
+        "url": "https://payrolltaxreform.com/about.html"
       },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://payrolltaxreform.com/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Payroll Taxes",
-            "item": "https://payrolltaxreform.com/payroll.html"
-          }
-        ]
+      "publisher": {
+        "@type": "Organization",
+        "name": "PayrollTaxReform.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://payrolltaxreform.com/favicon.svg"
+        }
       },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What taxes do employers pay vs employees?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Employers and employees split FICA taxes equally (6.2% Social Security and 1.45% Medicare each). In addition, employers pay 100% of federal unemployment tax (FUTA) and state unemployment insurance (SUTA), while employees pay federal and state income tax withholding."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What is the 2026 Social Security wage base limit?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The annual Social Security wage base cap is updated each year by the Social Security Administration ($176,100). Once an employee reaches this cumulative threshold in a calendar year, neither employee nor employer pays further Social Security tax on earnings above it."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "When are employer payroll taxes due?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Tax deposits are made on either a monthly or semi-weekly schedule via the Electronic Federal Tax Payment System (EFTPS). Quarterly returns (IRS Form 941) are due by the end of the month following each calendar quarter (April 30, July 31, October 31, January 31)."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What is the penalty for late payroll tax deposits?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The IRS Failure to Deposit penalty ranges from 2% (1-5 days late) to 10% (more than 15 days late), and rises to 15% if amounts remain unpaid after IRS demand notices."
-            }
+      "mainEntityOfPage": "https://payrolltaxreform.com/payroll.html",
+      "datePublished": "2026-11-03",
+      "dateModified": "2026-11-10",
+      "citation": [
+        "https://www.irs.gov/publications/p15",
+        "https://www.ssa.gov/oact/cola/cbb.html"
+      ],
+      "inLanguage": "en-US",
+      "isAccessibleForFree": true
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://payrolltaxreform.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Payroll Taxes",
+          "item": "https://payrolltaxreform.com/payroll.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What taxes do employers pay vs employees?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Employers generally pay matching Social Security and Medicare taxes, plus applicable federal and state unemployment taxes. Employees generally pay Social Security and Medicare taxes and income tax withholding. Some states also require employee unemployment contributions."
           }
-        ]
-      }
-    ]
-  }
-  </script>
+        },
+        {
+          "@type": "Question",
+          "name": "What is the 2026 Social Security wage base limit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For 2026, Social Security tax applies to the first $184,500 of covered wages per employee. The employer and employee each pay 6.2%, up to $11,439 each. Medicare tax has no wage base limit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When are employer payroll taxes due?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Form 941 is generally due April 30, July 31, October 31, and January 31, with weekend and legal-holiday adjustments. Deposits follow a separate monthly or semiweekly schedule for most employers; the $100,000 next-day deposit rule can override that schedule. Check the IRS instructions for exceptions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the employer match Additional Medicare Tax?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Employers withhold an additional 0.9% from Medicare wages they pay an employee above $200,000 in a calendar year, regardless of filing status. There is no employer match. The employee\u2019s final tax liability can depend on filing status."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can payroll software guarantee that I avoid penalties?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Payroll software can assist with calculations, deposits, and filings, but errors, funding issues, and incorrect setup can still cause penalties. Check the service plan and verify that required deposits and returns are completed."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
 
   <!-- Google AdSense -->
   <script async
@@ -200,7 +213,7 @@
           <a class="btn secondary" href="/software.html">Compare Payroll Providers</a>
         </div>
       </div>
-    </section>
+    </section><section class="section" id="quick-answer"><div class="wrap"><h2>Employer payroll taxes in 2026: quick answer</h2><p>For covered wages, employers generally pay 6.2% Social Security tax up to the 2026 wage base of $184,500 and 1.45% Medicare tax without a wage cap. FUTA and applicable state or local employer taxes are additional costs. Employee income tax withholding is separate from the employer’s own tax expense.</p><p>By PayrollTaxReform.com · Updated <time datetime="2026-11-10">November 10, 2026</time> · Federal figures apply to 2026 wages.</p><p>Sources: <a href="https://www.irs.gov/publications/p15">IRS Publication 15</a> and <a href="https://www.ssa.gov/oact/cola/cbb.html">SSA contribution and benefit base</a>. <a href="/about.html#sources-and-corrections">Sources and corrections</a>.</p><nav aria-label="Payroll guide sections"><a href="#payroll-answers">Common questions</a> · <a href="/calculator.html">Estimate employer FICA</a> · <a href="/states.html">State requirements</a></nav></div></section>
 
     <section class="section">
       <div class="wrap">
@@ -226,7 +239,7 @@
                 <td><strong>Social Security (OASDI)</strong></td>
                 <td>Split 50/50 (Employer &amp; Employee)</td>
                 <td>6.2% employer + 6.2% employee (12.4% total)</td>
-                <td>Capped at annual wage base ($176,100)</td>
+                <td>Capped at annual wage base ($184,500)</td>
               </tr>
               <tr>
                 <td><strong>Medicare (Hospital Insurance)</strong></td>
@@ -237,7 +250,7 @@
               <tr>
                 <td><strong>Additional Medicare Tax</strong></td>
                 <td>Employee only (Withheld by employer)</td>
-                <td>0.9% on wages over $200,000 ($250,000 MFJ)</td>
+                <td>0.9% withheld on wages paid by the employer over $200,000 annually</td>
                 <td>No employer matching contribution</td>
               </tr>
               <tr>
@@ -254,7 +267,7 @@
               </tr>
               <tr>
                 <td><strong>State Unemployment (SUTA/SUI)</strong></td>
-                <td>Employer 100% (in almost all states)</td>
+                <td>Generally employer; some states also require employee contributions</td>
                 <td>Experience-rated (typically 0.5% to 10%+)</td>
                 <td>Varies by state ($7,000 to $60,000+)</td>
               </tr>
@@ -338,7 +351,7 @@
               Employer's Quarterly Federal Tax Return. Reports federal income taxes withheld,
               employee and employer Social Security tax, and Medicare tax. Filed four times a year.
             </p>
-            <p><strong>Due Dates:</strong> April 30, July 31, October 31, January 31.</p>
+            <p><strong>General due dates:</strong> April 30, July 31, October 31, January 31. Weekend and legal-holiday adjustments apply; see current IRS instructions.</p>
           </article>
 
           <article class="card">
@@ -347,7 +360,7 @@
               Employer's Annual Federal Unemployment (FUTA) Tax Return. Calculates annual FUTA tax liability,
               verifies state unemployment tax credits, and reconciles deposits.
             </p>
-            <p><strong>Due Date:</strong> January 31 of each year.</p>
+            <p><strong>General due date:</strong> January 31, with weekend and legal-holiday adjustments and applicable filing extensions under IRS rules.</p>
           </article>
 
           <article class="card">
@@ -356,7 +369,7 @@
               Wage and Tax Statements. Reports annual employee earnings and tax withholdings to employees,
               the Social Security Administration (SSA), and state revenue departments.
             </p>
-            <p><strong>Due Date:</strong> January 31 for both employee copies and SSA transmittal.</p>
+            <p><strong>General due date:</strong> January 31 for employee copies and SSA filing, with applicable weekend and legal-holiday adjustments.</p>
           </article>
 
         </div>
@@ -515,46 +528,7 @@
       </div>
     </section>
 
-    <section class="section alt">
-      <div class="wrap">
-        <h2>Frequently Asked Questions About Payroll Taxes</h2>
-
-        <details class="faq-item" open>
-          <summary>What taxes do employers pay vs employees?</summary>
-          <p>
-            Employers and employees split FICA taxes equally: 6.2% for Social Security and 1.45% for Medicare each.
-            In addition, employers pay 100% of federal unemployment tax (FUTA) and state unemployment insurance (SUTA),
-            while employees pay federal and state income tax withholding deducted from their wages.
-          </p>
-        </details>
-
-        <details class="faq-item">
-          <summary>What is the 2026 Social Security wage base limit?</summary>
-          <p>
-            The annual Social Security wage base cap is updated annually by the Social Security Administration ($176,100).
-            Once an employee reaches this cumulative threshold in a calendar year, neither employee nor employer pays further
-            Social Security tax on earnings above it.
-          </p>
-        </details>
-
-        <details class="faq-item">
-          <summary>When are employer payroll taxes due?</summary>
-          <p>
-            Tax deposits are made on either a monthly or semi-weekly schedule via EFTPS depending on your lookback liability.
-            Quarterly returns (Form 941) are due by the end of the month following each calendar quarter (April 30, July 31,
-            October 31, January 31).
-          </p>
-        </details>
-
-        <details class="faq-item">
-          <summary>What is the penalty for late payroll tax deposits?</summary>
-          <p>
-            The IRS Failure to Deposit penalty ranges from 2% (1-5 days late) to 10% (more than 15 days late), and rises to
-            15% if amounts remain unpaid after IRS demand notices. Using automated payroll software prevents late deposit penalties.
-          </p>
-        </details>
-      </div>
-    </section>
+<section class="section alt" id="payroll-answers"><div class="wrap"><h2>Frequently Asked Questions About Payroll Taxes</h2><details class="faq-item" open><summary>What taxes do employers pay vs employees?</summary><p>Employers generally pay matching Social Security and Medicare taxes, plus applicable federal and state unemployment taxes. Employees generally pay Social Security and Medicare taxes and income tax withholding. Some states also require employee unemployment contributions.</p></details><details class="faq-item" open><summary>What is the 2026 Social Security wage base limit?</summary><p>For 2026, Social Security tax applies to the first $184,500 of covered wages per employee. The employer and employee each pay 6.2%, up to $11,439 each. Medicare tax has no wage base limit.</p></details><details class="faq-item" open><summary>When are employer payroll taxes due?</summary><p>Form 941 is generally due April 30, July 31, October 31, and January 31, with weekend and legal-holiday adjustments. Deposits follow a separate monthly or semiweekly schedule for most employers; the $100,000 next-day deposit rule can override that schedule. Check the IRS instructions for exceptions.</p></details><details class="faq-item" open><summary>Does the employer match Additional Medicare Tax?</summary><p>No. Employers withhold an additional 0.9% from Medicare wages they pay an employee above $200,000 in a calendar year, regardless of filing status. There is no employer match. The employee’s final tax liability can depend on filing status.</p></details><details class="faq-item" open><summary>Can payroll software guarantee that I avoid penalties?</summary><p>No. Payroll software can assist with calculations, deposits, and filings, but errors, funding issues, and incorrect setup can still cause penalties. Check the service plan and verify that required deposits and returns are completed.</p></details></div></section>
 
   </main>
 
