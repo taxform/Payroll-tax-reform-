@@ -1,6 +1,8 @@
 name: Apply Form 940 patch
 on:
   workflow_dispatch:
+  push:
+    branches: [form-940-guide]
 permissions:
   contents: write
 jobs:
@@ -14,7 +16,7 @@ jobs:
         run: |
           git config user.name taxform
           git config user.email taxform@users.noreply.github.com
-          git status --short
+          test -f form-940.patch || { echo "No patch file, nothing to do"; exit 0; }
           git apply --whitespace=fix form-940.patch
           rm form-940.patch
           git add -A
