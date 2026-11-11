@@ -73,6 +73,9 @@
           If our information saved you time or helped you get payroll right, a small donation
           helps us keep researching, updating, and publishing it.
         </p>
+        <p id="donate-thanks" class="notice" hidden>
+          <strong>Thank you for your donation!</strong> Your support helps keep this information free.
+        </p>
         <p id="donate-unavailable" class="notice" hidden>
           Online donations are temporarily unavailable. Please check back soon, or
           <a href="/contact.html">contact us</a>.
@@ -139,8 +142,12 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    if (new URLSearchParams(location.search).has("unavailable")) {
+    var donateParams = new URLSearchParams(location.search);
+    if (donateParams.has("unavailable")) {
       document.getElementById("donate-unavailable").hidden = false;
+    }
+    if (donateParams.has("thanks")) {
+      document.getElementById("donate-thanks").hidden = false;
     }
   </script>
 </body>
