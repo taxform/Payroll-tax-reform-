@@ -535,9 +535,13 @@ federal, state, and local obligations.
 </p>
 `;
 
+// Report a Taboola "calculator use" conversion (once per session, only for Taboola ad visitors).
+if (window.taboolaConversion) window.taboolaConversion("calculator");
+
 }
 
 </script>
 
+  <script src="/taboola.js" defer></script>
 </body>
 </html>

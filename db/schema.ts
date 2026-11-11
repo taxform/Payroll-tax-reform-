@@ -29,4 +29,8 @@ export const orders = pgTable("orders", {
   currency: text().notNull().default("USD"),
   status: text().notNull().default("pending"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  // Taboola click ID (tblci) captured when the buyer arrived from a Taboola ad.
+  taboolaClickId: text("taboola_click_id"),
+  // Set once the order has been reported to Taboola as a purchase conversion.
+  taboolaReportedAt: timestamp("taboola_reported_at", { withTimezone: true }),
 });
