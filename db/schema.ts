@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer, date } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer, date, numeric } from "drizzle-orm/pg-core";
 
 // Official IRS news releases collected from irs.gov. Headlines and links only.
 export const irsUpdates = pgTable("irs_updates", {
@@ -19,4 +19,14 @@ export const feedChecks = pgTable("feed_checks", {
   status: text().notNull(),
   itemsFound: integer("items_found").notNull().default(0),
   error: text(),
+});
+
+// Orders served by the Netlify Server at GET /api/orders/:id.
+export const orders = pgTable("orders", {
+  id: serial().primaryKey(),
+  customerEmail: text("customer_email").notNull(),
+  amount: numeric({ precision: 12, scale: 2 }).notNull(),
+  currency: text().notNull().default("USD"),
+  status: text().notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

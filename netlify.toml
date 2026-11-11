@@ -1,6 +1,10 @@
 [build]
   publish = "public"
 
+[build.environment]
+  # Netlify Server requires Node.js 24 or later.
+  NODE_VERSION = "24"
+
 [functions]
   directory = "netlify/functions"
 
