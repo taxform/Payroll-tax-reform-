@@ -1,0 +1,493 @@
+From a46c8edfbe1ccd28a4b78a793344fe3beaafcacd Mon Sep 17 00:00:00 2001
+From: Muse <payrolltaxreform@gmail.com>
+Date: Wed, 11 Nov 2026 21:22:48 +0000
+Subject: [PATCH] Add Form 940 (FUTA) 2026 guide: line-by-line, $42 question,
+ $500 deposit rule
+
+- New public/blog/how-to-file-form-940.html, IRS-sourced (Instructions
+  for Form 940, Topic 759, Pub. 15 (2026), Pub. 509 (2026)), verified
+  Nov 11, 2026. Due Feb 1, 2027 (Feb 10 with timely deposits); FUTA
+  6.0% on first $7,000, 0.6% net = $42/employee with full 5.4% credit.
+  No 2026 credit-reduction states listed (DOL list not final Nov 11).
+  FAQ + FAQPage schema, sources, internal links to Form 941 guide and
+  2026 rates page. AdSense ca-pub-5889154162791392, GTM-M48TL752,
+  AW-18545848708 + ads-tracking.js, as on the Form 941 page.
+- List on /blog.html (card first, JSON-LD, count 9), posts.json,
+  feed.xml; sitemap entry lastmod 2026-11-11, blog.html lastmod bumped.
+- Reciprocal link from Form 941 page (body + Keep reading).
+- No donate.html, casino, affiliate-link, GTM-container or AdCash changes.
+---
+ public/blog.html                      |   6 +-
+ public/blog/feed.xml                  |   7 +
+ public/blog/how-to-file-form-940.html | 351 ++++++++++++++++++++++++++
+ public/blog/how-to-file-form-941.html |   3 +-
+ public/blog/posts.json                |   7 +
+ public/sitemap.xml                    |   7 +-
+ 6 files changed, 378 insertions(+), 3 deletions(-)
+ create mode 100644 public/blog/how-to-file-form-940.html
+
+diff --git a/public/blog.html b/public/blog.html
+index 3e882af..195cd34 100644
+--- a/public/blog.html
++++ b/public/blog.html
+@@ -64,6 +64,9 @@
+           "logo": { "@type": "ImageObject", "url": "https://payrolltaxreform.com/favicon.svg" }
+         },
+         "blogPost": [
++          { "@type": "BlogPosting", "headline": "How to File Form 940 (2026): FUTA Guide for Employers", "url": "https://payrolltaxreform.com/blog/how-to-file-form-940.html", "datePublished": "2026-11-11" },
++          { "@type": "BlogPosting", "headline": "How to File Form 941 (2026): Line-by-Line Guide for Employers", "url": "https://payrolltaxreform.com/blog/how-to-file-form-941.html", "datePublished": "2026-11-11" },
++          { "@type": "BlogPosting", "headline": "Year-End Payroll Checklist 2026: W-2 Preparation for Employers", "url": "https://payrolltaxreform.com/blog/year-end-payroll-checklist-2026.html", "datePublished": "2026-11-10" },
+           { "@type": "BlogPosting", "headline": "2026 Payroll Tax Changes: What Employers Need to Know", "url": "https://payrolltaxreform.com/blog/2026-payroll-tax-changes.html", "datePublished": "2026-11-03" },
+           { "@type": "BlogPosting", "headline": "The True Cost of an Employee: What a $60,000 Salary Really Costs", "url": "https://payrolltaxreform.com/blog/true-cost-of-an-employee.html", "datePublished": "2026-11-03" },
+           { "@type": "BlogPosting", "headline": "W-2 vs 1099: The Misclassification Mistake That Costs Employers Everything", "url": "https://payrolltaxreform.com/blog/w2-vs-1099-misclassification.html", "datePublished": "2026-11-03" },
+@@ -154,10 +157,11 @@
+       <div class="wrap">
+         <h2>Latest articles</h2>
+         <p class="section-intro">Start with the topic closest to your business — every article ends with the tools and guides to act on it.</p>
+-        <p class="section-intro">Currently featuring <span data-blog-count>6</span> articles — this list updates automatically whenever a post is added.</p>
++        <p class="section-intro">Currently featuring <span data-blog-count>9</span> articles — this list updates automatically whenever a post is added.</p>
+ 
+         <!-- Automatic listing: cards below are replaced at load time with /blog/posts.json. -->
+         <div class="grid" data-blog-list>
++<article class="card"><span class="badge">Form 940 guide</span><h3>How to File Form 940 (2026): FUTA Guide for Employers</h3><p>Who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, the $500 deposit rule, and penalties — IRS-sourced.</p><a href="/blog/how-to-file-form-940.html">Read guide →</a></article>
+ <article class="card"><span class="badge">Form 941 guide</span><h3>How to File Form 941 (2026): Line-by-Line Guide for Employers</h3><p>Who must file, 2026 due dates, line-by-line instructions, a worked example, deposit rules, and penalties — IRS-sourced.</p><a href="/blog/how-to-file-form-941.html">Read guide →</a></article>
+ <article class="card"><span class="badge">Year-end checklist</span><h3>Year-End Payroll Checklist 2026: W-2 Preparation for Employers</h3><p>A printable checklist for payroll reconciliation, W-2 preparation, and the February 1, 2027 SSA filing deadline.</p><a href="/blog/year-end-payroll-checklist-2026.html">Read checklist →</a></article>
+           <article class="card">
+diff --git a/public/blog/feed.xml b/public/blog/feed.xml
+index 8c0a8a3..61b98e9 100644
+--- a/public/blog/feed.xml
++++ b/public/blog/feed.xml
+@@ -6,6 +6,13 @@
+     <description>Independent payroll guides and checklists for U.S. employers.</description>
+     <language>en-us</language>
+     <item>
++      <title>How to File Form 940 (2026): FUTA Guide for Employers</title>
++    <link>https://payrolltaxreform.com/blog/how-to-file-form-940.html</link>
++    <description>Who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, the $500 deposit rule, and penalties for filing or depositing late.</description>
++    <pubDate>Wed, 11 Nov 2026 00:00:00 +0000</pubDate>
++    <guid isPermaLink="true">https://payrolltaxreform.com/blog/how-to-file-form-940.html</guid>
++  </item>
++  <item>
+       <title>How to File Form 941 (2026): Line-by-Line Guide for Employers</title>
+     <link>https://payrolltaxreform.com/blog/how-to-file-form-941.html</link>
+     <description>Who must file, 2026 due dates, line-by-line instructions, a worked example, deposit rules, and penalties for filing or depositing late.</description>
+diff --git a/public/blog/how-to-file-form-940.html b/public/blog/how-to-file-form-940.html
+new file mode 100644
+index 0000000..0bcc23d
+--- /dev/null
++++ b/public/blog/how-to-file-form-940.html
+@@ -0,0 +1,351 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-M48TL752"></script>
++<script>
++window.dataLayer = window.dataLayer || [];
++function gtag(){dataLayer.push(arguments);}
++gtag('js', new Date());
++</script>
++<!-- Google tag (gtag.js) -->
++<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18545848708"></script>
++<script>
++  window.dataLayer = window.dataLayer || [];
++  function gtag(){dataLayer.push(arguments);}
++  gtag('js', new Date());
++
++  gtag('config', 'AW-18545848708');
++</script>
++<meta charset="utf-8">
++<meta name="viewport" content="width=device-width, initial-scale=1">
++<title>How to File Form 940 (2026): FUTA Guide for Employers | PayrollTaxReform.com</title>
++<meta name="description" content="How to file Form 940, the Employer's Annual FUTA Tax Return, for 2026: who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, deposit rules, and penalties. IRS-sourced, verified November 11, 2026.">
++<link rel="canonical" href="https://payrolltaxreform.com/blog/how-to-file-form-940.html">
++<meta name="robots" content="index,follow,max-image-preview:large">
++<link rel="stylesheet" href="/style.css">
++<link rel="icon" href="/favicon.svg" type="image/svg+xml">
++<link rel="alternate" type="application/rss+xml" title="PayrollTaxReform.com articles" href="https://payrolltaxreform.com/blog/feed.xml">
++<meta property="og:type" content="article">
++<meta property="og:title" content="How to File Form 940 (2026): FUTA Guide for Employers">
++<meta property="og:description" content="How to file Form 940, the Employer's Annual FUTA Tax Return, for 2026: who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, deposit rules, and penalties. IRS-sourced, verified November 11, 2026.">
++<meta property="og:url" content="https://payrolltaxreform.com/blog/how-to-file-form-940.html">
++<meta property="og:image" content="https://payrolltaxreform.com/og-image.png">
++<meta name="twitter:card" content="summary_large_image">
++<meta name="twitter:title" content="How to File Form 940 (2026): FUTA Guide for Employers">
++<meta name="twitter:description" content="How to file Form 940, the Employer's Annual FUTA Tax Return, for 2026: who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, deposit rules, and penalties. IRS-sourced, verified November 11, 2026.">
++<meta name="twitter:image" content="https://payrolltaxreform.com/og-image.png">
++<style>.answer{background:#132238;border:1px solid #8fb8a8;padding:12px 14px;margin:16px 0}.note{background:#132238;border-left:4px solid #d5ab56;padding:10px 14px;margin:16px 0}.warning{background:#2a1f0a;border:1px solid #e6c200;padding:12px 14px;margin:16px 0}@media print{.top,.site-header,footer,.actions{display:none}body,.card,.notice,.answer,.note,.warning{background:white;color:black}a{color:black}.section,.hero{padding:12px 0}.wrap{width:100%}.card{break-inside:auto}}</style>
++<!-- Google AdSense -->
++<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392" crossorigin="anonymous"></script>
++<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"How to File Form 940 (2026): FUTA Guide for Employers","description":"How to file Form 940, the Employer's Annual FUTA Tax Return, for 2026: who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, deposit rules, and penalties. IRS-sourced, verified November 11, 2026.","url":"https://payrolltaxreform.com/blog/how-to-file-form-940.html","mainEntityOfPage":"https://payrolltaxreform.com/blog/how-to-file-form-940.html","datePublished":"2026-11-11","dateModified":"2026-11-11","author":{"@type":"Organization","name":"PayrollTaxReform.com","url":"https://payrolltaxreform.com/about.html"},"publisher":{"@type":"Organization","name":"PayrollTaxReform.com","url":"https://payrolltaxreform.com/about.html"},"image":"https://payrolltaxreform.com/og-image.png"}</script>
++<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"When is Form 940 due for 2026?","acceptedAnswer":{"@type":"Answer","text":"Form 940 for calendar year 2026 is due Monday, February 1, 2027 (January 31 is a Sunday). If you deposited all of your FUTA tax on time and in full during the year, you may file by Wednesday, February 10, 2027."}},{"@type":"Question","name":"How much is FUTA tax per employee?","acceptedAnswer":{"@type":"Answer","text":"With the full 5.4% credit for state unemployment tax, FUTA is 0.6% on the first $7,000 of each employee's wages — $42 per employee per year at most. The gross rate is 6.0% ($420 on $7,000) before the credit."}},{"@type":"Question","name":"Do I have to deposit FUTA tax during the year?","acceptedAnswer":{"@type":"Answer","text":"Only once your cumulative undeposited FUTA liability is more than $500. At or below $500, carry it forward to the next quarter. Once it is more than $500, deposit by the last day of the month after the quarter ends. If your total for the year is $500 or less, you may pay it with your Form 940."}},{"@type":"Question","name":"Is FUTA tax withheld from employees' pay?","acceptedAnswer":{"@type":"Answer","text":"No. FUTA is an employer-only tax. Nothing is withheld from employees' wages, and it does not appear on their W-2s."}},{"@type":"Question","name":"What is the difference between Form 940 and Form 941?","acceptedAnswer":{"@type":"Answer","text":"Form 940 is the annual return for FUTA, the federal unemployment tax — 6.0% on the first $7,000 of each employee's wages, 0.6% net with the full state credit. Form 941 is the quarterly return for withheld federal income tax and Social Security and Medicare taxes. They are separate forms with separate due dates."}},{"@type":"Question","name":"What is a credit-reduction state?","acceptedAnswer":{"@type":"Answer","text":"A state that has not repaid money it borrowed from the federal government to pay unemployment benefits. The Department of Labor names the states each year; employers who paid wages there owe additional FUTA tax, figured on Schedule A (Form 940). The 2026 list was not final when this guide was published on November 11, 2026 — check the current Schedule A before you file."}},{"@type":"Question","name":"What if I cannot pay the full amount?","acceptedAnswer":{"@type":"Answer","text":"File on time anyway — the failure-to-file penalty (5% per month) is ten times the failure-to-pay penalty (0.5% per month). Then apply for an online installment agreement if you owe $25,000 or less and can pay within 24 months."}},{"@type":"Question","name":"Is there a Form 940-X to correct a mistake?","acceptedAnswer":{"@type":"Answer","text":"No. There is no separate Form 940-X. Correct a filed Form 940 by filing an amended Form 940 for the same tax year, checking the Amended Return box, entering all of the corrected amounts, and attaching an explanation of what changed and why."}}]}</script>
++  <script src="/ads-tracking.js" defer></script>
++</head>
++<body>
++
++<div class="top">
++<div class="wrap">
++Independent U.S. payroll tax information · Educational guidance only · Not tax or legal advice
++</div>
++</div>
++<header class="site-header">
++<div class="wrap nav">
++<a class="brand" href="/">PayrollTaxReform.com</a>
++<nav class="mainnav" aria-label="Main navigation">
++<a href="/">Home</a>
++<a href="/payroll.html">Payroll Taxes</a>
++<a href="/states.html">State Guides</a>
++<a href="/software.html">Software</a>
++<a href="/calculator.html">Calculator</a>
++<a href="/resources.html">Resources</a>
++<a href="/updates.html">Updates</a>
++<a href="/blog.html" aria-current="page">Blog</a>
++<a class="nav-donate" href="/donate.html">Donate</a>
++</nav>
++</div>
++</header>
++<main>
++<div class="wrap breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/blog.html">Blog</a></li><li aria-current="page">How to File Form 940</li></ol></div>
++<section class="hero"><div class="wrap"><div class="eyebrow">Form 940 guide · Published November 11, 2026</div>
++<h1>How to File Form 940 (2026): FUTA Guide for Employers</h1>
++<p class="lead">Form 940, the Employer's Annual Federal Unemployment (FUTA) Tax Return, is the once-a-year return where employers report and pay the federal unemployment tax: 6.0% on the first $7,000 of each employee's wages, usually reduced to 0.6% — $42 per employee — by the credit for state unemployment tax. This guide walks through it line by line, with a worked example, the February 1, 2027 due date, the $500 deposit rule, Schedule A and credit reduction, and the penalties for getting it wrong.</p>
++</div></section>
++<section class="section"><div class="wrap">
++
++<div class="answer">
++<p><strong>Quick answer:</strong> Form 940 for calendar year 2026 is due <strong>Monday, February 1, 2027</strong> (January 31 is a Sunday). If you deposited all of your FUTA tax on time and in full during the year, you may file by <strong>Wednesday, February 10, 2027</strong>. FUTA is 6.0% on the first $7,000 paid to each employee during the year; with the full 5.4% credit for state unemployment tax paid on time, the net rate is 0.6%, or $42 per employee per year at most. FUTA is employer-only — nothing is withheld from employees' pay.</p>
++</div>
++
++<div class="note">
++<p><strong>A note on the 2026 form:</strong> as of this guide's publication on November 11, 2026, the current published Instructions for Form 940 on IRS.gov are the 2025 revision. The 2026 revision follows the U.S. Department of Labor's November 10, 2026 credit-reduction determination and is expected in late November or December 2026. The rate, wage base, filing tests, deposit rule, and due-date rule in this guide are set by statute and regulation and are unchanged for 2026 — but file on the 2026 form once the IRS publishes it, not on the 2025 form, and check the current Schedule A (Form 940) for the final 2026 credit-reduction list before you file.</p>
++</div>
++
++<h2>What Form 940 is — and what it is not</h2>
++<p>FUTA, the Federal Unemployment Tax Act, funds the federal-state unemployment insurance system. Employers pay FUTA to the federal government; the states run their own unemployment programs and collect their own state unemployment tax (SUTA) on separate state returns. The two taxes are partners, not substitutes: paying your state unemployment tax on time is what earns you the federal credit that cuts FUTA from 6.0% to 0.6%.</p>
++<p>Three facts define Form 940:</p>
++<ul>
++<li><strong>It is annual.</strong> One return per calendar year, filed in January or February for the year just ended. The tax itself, however, may have to be deposited quarterly during the year — the form is annual, the liability is not.</li>
++<li><strong>It is employer-only.</strong> FUTA is paid entirely by the employer from its own funds. It is not withheld from employees' wages, it does not appear on their W-2s, and there is no employee share to match.</li>
++<li><strong>It is capped low.</strong> Only the first $7,000 of wages per employee per year is subject to FUTA. An employee who earns $7,000 in February stops accumulating FUTA wages for the rest of the year, however much more they earn.</li>
++</ul>
++<p>Form 940 does <strong>not</strong> report withheld income tax or Social Security and Medicare taxes — that is <a href="/blog/how-to-file-form-941.html">Form 941</a>, filed quarterly. It does not report your state unemployment tax — that goes on your state's own quarterly wage reports. And it does not cover household employees on Schedule H (unless you choose to include them on Form 940) or agricultural labor on Form 943. If you are not sure which form applies, the Instructions for Form 940, not a vendor blog, are the authority.</p>
++
++<h2>Who must file Form 940</h2>
++<p>Under the general test, you are subject to FUTA tax and must file Form 940 for 2026 if you meet <strong>either</strong> of these conditions, in 2026 or in 2025:</p>
++<ul>
++<li><strong>The $1,500 wage test:</strong> you paid wages of $1,500 or more to employees in any calendar quarter; or</li>
++<li><strong>The 20-week test:</strong> you had one or more employees for at least some part of a day in any 20 or more different weeks. Count all full-time, part-time, and temporary employees. If your business is a partnership, do not count its partners.</li>
++</ul>
++<p>Meeting either test in either year makes you liable. If your business was sold or transferred during the year, each employer who meets one of the tests must file — do not include wages paid by a predecessor employer on your return unless you are a successor employer (see below).</p>
++<p><strong>Special cases:</strong></p>
++<ul>
++<li><strong>Household employers.</strong> A separate test applies: you paid cash wages of $1,000 or more (for all domestic employees combined) in any calendar quarter in 2025 or 2026. Household FUTA is usually reported on Schedule H (Form 1040); you may instead include household employees on Form 940 if you also file Form 941, 943, or 944 for them.</li>
++<li><strong>Agricultural employers.</strong> You file if you paid cash wages of $20,000 or more to farmworkers during any calendar quarter in 2025 or 2026, or employed 10 or more farmworkers during some part of a day in any 20 or more different weeks in 2025 or 2026. Wages paid to H-2A visa workers are not subject to FUTA tax.</li>
++<li><strong>Generally exempt — no Form 940 required.</strong> Religious, educational, scientific, and charitable organizations described in section 501(c)(3); state and local governments and their instrumentalities; and federally recognized Indian tribal governments (if the tribe participated in the state unemployment system for the full year and is in compliance with state unemployment law).</li>
++<li><strong>No payments to employees in 2026.</strong> If you are not liable for FUTA tax for 2026 because you made no payments to employees, check box c ("No payments to employees in 2026") at the top of the form, sign it, and file it.</li>
++<li><strong>Closing the business.</strong> If this is a final return because you went out of business or stopped paying wages and will not be liable for filing Form 940 in the future, check box d ("Final: Business closed or stopped paying wages"), complete the applicable lines, sign, and attach a statement showing who is keeping the payroll records and where they are kept.</li>
++</ul>
++
++<h2>The $42 question: 6.0%, the 5.4% credit, and the 0.6% net rate</h2>
++<p>The arithmetic that confuses employers is that FUTA has two rates: the statutory rate and the rate most employers actually pay.</p>
++<div class="table-wrap">
++<table>
++<tr><th>Step</th><th>Rate</th><th>On $7,000 of wages</th></tr>
++<tr><td><strong>Gross FUTA rate</strong></td><td>6.0%</td><td>$420.00</td></tr>
++<tr><td><strong>Less: credit for state unemployment tax</strong></td><td>up to 5.4%</td><td>− $378.00</td></tr>
++<tr><td><strong>Net FUTA rate (with full credit)</strong></td><td><strong>0.6%</strong></td><td><strong>$42.00 per employee per year</strong></td></tr>
++</table>
++</div>
++<p>You are entitled to the maximum 5.4% credit if you paid your state unemployment taxes <strong>in full, by the due date of your Form 940, and on all the same wages that are subject to FUTA tax</strong> — and your state is not a credit-reduction state. Three things can shrink the credit:</p>
++<ul>
++<li><strong>Your state experience rate is below 5.4%.</strong> You still get the full credit: the additional credit is the difference between what you actually paid and what you would have paid at 5.4%. A low state rate does not cost you federal credit — it is handled on the line 10 worksheet.</li>
++<li><strong>You paid some state unemployment tax late.</strong> Late payments earn only 90% of the credit timely payment would have earned (worksheet line 5d multiplies the late amount by 0.900). Pay your state tax by the Form 940 due date to keep the full credit.</li>
++<li><strong>Some of your FUTA wages were excluded from state unemployment tax.</strong> In some states, wages paid to corporate officers, certain sick pay, or certain fringe benefits are excluded from state unemployment tax. On those wages you may owe FUTA at the full 6.0% rate — the line 9 and line 10 adjustments exist for exactly this situation.</li>
++<li><strong>Credit reduction.</strong> If your state is a credit-reduction state, your credit is reduced and you owe more — see Schedule A below.</li>
++</ul>
++<p>The $42 figure assumes the full credit on the full $7,000 wage base. An employee paid less than $7,000 in the year costs proportionally less: an employee paid $3,500 costs $21.00 in FUTA at the net rate.</p>
++
++<h2>Due dates and deposits for 2026</h2>
++<p>Form 940 is due January 31 of the year after the tax year. If that day falls on a Saturday, Sunday, or legal holiday, the due date moves to the next business day. For 2026, January 31, 2027 is a Sunday, so the return is due <strong>Monday, February 1, 2027</strong>. If you deposited all of your FUTA tax when due, you have until <strong>Wednesday, February 10, 2027</strong> to file. A paper return postmarked by the due date counts as filed on time, if it is properly addressed and has sufficient postage.</p>
++<p>Deposits run on a separate, quarterly clock. Figure your FUTA liability each quarter at the net 0.6% rate on the first $7,000 of each employee's wages paid in that quarter:</p>
++<div class="table-wrap">
++<table>
++<tr><th>Quarter (2026)</th><th>If cumulative undeposited FUTA liability is more than $500 at quarter-end</th><th>Deposit by</th></tr>
++<tr><td>Q1: January 1 – March 31</td><td>Deposit the full cumulative amount</td><td>Thursday, April 30, 2026</td></tr>
++<tr><td>Q2: April 1 – June 30</td><td>Deposit the full cumulative amount</td><td>Friday, July 31, 2026</td></tr>
++<tr><td>Q3: July 1 – September 30</td><td>Deposit the full cumulative amount</td><td>Monday, November 2, 2026 (October 31 is a Saturday)</td></tr>
++<tr><td>Q4: October 1 – December 31</td><td>Deposit the full cumulative amount</td><td>Monday, February 1, 2027 (January 31 is a Sunday)</td></tr>
++</table>
++</div>
++<p>The <strong>$500 rule</strong> is the whole deposit system: if your FUTA liability is $500 or less in a quarter, carry it forward to the next quarter. Keep carrying it forward until the cumulative amount is more than $500 — at that point, deposit the full cumulative amount by the last day of the month after the quarter ends. If your total FUTA tax for the whole year is $500 or less, you never have to deposit at all; you may simply pay it with your Form 940. In years with credit-reduction states, include the credit-reduction liability with your fourth-quarter deposit — it counts as fourth-quarter liability, even though you may deposit it earlier in the year.</p>
++<p>All federal tax deposits must be made by electronic funds transfer — through EFTPS, IRS Direct Pay, or your IRS business tax account. Do not combine FUTA deposits with your Form 941 deposits; they are separate taxes with separate deposit schedules. EFTPS deposits must be scheduled by 8 p.m. Eastern time the day before the deposit is due.</p>
++<p>For the full 2026 calendar, including Form 941 and W-2 dates, see our <a href="/blog/payroll-tax-deadlines-2026.html">2026 payroll tax deadlines calendar</a>. For the rates behind every line, see the <a href="/research/2026-payroll-tax-rates-deadlines.html">2026 rates, wage bases &amp; deadlines reference</a>.</p>
++
++<h2>Form 940, line by line</h2>
++<p>Form 940 has seven parts across two pages. You must complete both pages and sign on page 2. Enter your name and EIN on all pages, and do not use your Social Security number or ITIN where the form asks for an EIN. Leave a line blank if it does not apply — do not enter zero.</p>
++
++<h3>Part 1 — Lines 1–2: which states, and credit reduction</h3>
++<div class="table-wrap">
++<table>
++<tr><th>Line</th><th>What goes here</th></tr>
++<tr><td><strong>Line 1a</strong> — One state only</td><td>The two-letter USPS abbreviation for the state where you were required to pay state unemployment tax. You must complete line 1a or 1b even if your state rate was 0% — leave them blank only if all wages you paid in all states were excluded from state unemployment tax.</td></tr>
++<tr><td><strong>Line 1b</strong> — More than one state</td><td>Check the box if you were required to pay state unemployment tax in more than one state. You are a multi-state employer: fill out <strong>Schedule A (Form 940)</strong> and attach it.</td></tr>
++<tr><td><strong>Line 2</strong> — Credit-reduction state</td><td>Check the box if you paid wages subject to the unemployment tax laws of a credit-reduction state, and fill out Schedule A. See the Schedule A section below — do not guess whether your state is on the list.</td></tr>
++</table>
++</div>
++
++<h3>Part 2 — Lines 3–8: your FUTA tax before adjustments</h3>
++<div class="table-wrap">
++<table>
++<tr><th>Line</th><th>What goes here</th></tr>
++<tr><td><strong>Line 3</strong> — Total payments to all employees</td><td>Everything you paid employees during the year, even payments that are not taxable for FUTA: salaries, wages, commissions, fees, bonuses, vacation allowances, sick pay, the value of goods, lodging, food, clothing and non-cash fringe benefits, section 125 cafeteria plan benefits, employer 401(k) contributions, and other payments listed in the instructions.</td></tr>
++<tr><td><strong>Line 4</strong> — Payments exempt from FUTA tax</td><td>Payments that are not subject to FUTA, with the applicable boxes 4a–4e checked. The main categories are employer retirement plan contributions, employer health insurance benefits, dependent care payments (up to $5,000 per employee, $2,500 if married filing separately), workers' compensation payments, payments for domestic services below the household threshold, payments to a parent, spouse, or child under 21, payments to H-2A visa workers, and certain other payments listed in section 15 of Publication 15.</td></tr>
++<tr><td><strong>Line 5</strong> — Payments over the $7,000 wage base</td><td>The total of the payments made to each employee in excess of $7,000 for the year, <em>after</em> subtracting the exempt payments on line 4. Only the first $7,000 per employee counts; everything above it is excluded here. If you are a successor employer, you may include wages the predecessor paid to employees who continue to work for you, but only if the predecessor was required to file Form 940.</td></tr>
++<tr><td><strong>Line 6</strong> — Subtotal</td><td>Line 4 + line 5.</td></tr>
++<tr><td><strong>Line 7</strong> — Total taxable FUTA wages</td><td>Line 3 − line 6. This is the total of the first $7,000 of each employee's wages for the year, after exempt payments.</td></tr>
++<tr><td><strong>Line 8</strong> — FUTA tax before adjustments</td><td>Line 7 × 0.006. The 0.6% rate already assumes the maximum 5.4% state credit — lines 9–11 below add back tax where that assumption does not hold.</td></tr>
++</table>
++</div>
++
++<h3>Part 3 — Lines 9–11: adjustments</h3>
++<div class="table-wrap">
++<table>
++<tr><th>Line</th><th>What goes here</th></tr>
++<tr><td><strong>Line 9</strong> — All FUTA wages excluded from state tax</td><td>If <em>all</em> of the taxable FUTA wages you paid were excluded from state unemployment tax, multiply line 7 by 0.054 and enter the result. You then owe FUTA at the full 6.0% rate, because you have no state credit at all. If line 9 applies, lines 10 and 11 do not — leave them blank. This line does not apply merely because your state assigned you a 0% rate.</td></tr>
++<tr><td><strong>Line 10</strong> — Some wages excluded, or state tax paid late</td><td>Complete the line 10 worksheet in the instructions if some of your taxable FUTA wages were excluded from state unemployment tax, or if any of your state unemployment tax payments were late. The worksheet figures your actual credit: the maximum allowable credit (line 7 × 0.054), less the credit for timely state payments, plus the additional credit for experience rates below 5.4%, plus 90% of the credit for late payments. Enter the worksheet's result here. Do not attach the worksheet — keep it with your records.</td></tr>
++<tr><td><strong>Line 11</strong> — Credit reduction</td><td>If credit reduction applies, enter the total from Schedule A (Form 940). Skip this line if you entered an amount on line 9.</td></tr>
++</table>
++</div>
++
++<h3>Part 4 — Lines 12–15: total tax, balance due, or overpayment</h3>
++<div class="table-wrap">
++<table>
++<tr><th>Line</th><th>What goes here</th></tr>
++<tr><td><strong>Line 12</strong> — Total FUTA tax after adjustments</td><td>Lines 8 + 9 + 10 + 11. This is the year's total FUTA tax.</td></tr>
++<tr><td><strong>Line 13</strong> — FUTA tax deposited for the year</td><td>Your deposits for the year, including any overpayment from a prior year that you applied to this return.</td></tr>
++<tr><td><strong>Line 14</strong> — Balance due</td><td>If line 12 is more than line 13, the difference. If line 14 is more than $500, you must deposit it. If it is $500 or less, you may deposit it, pay by EFT, pay by credit or debit card, pay by electronic funds withdrawal if filing electronically, or pay by check or money order with your return. If it is less than $1, you do not have to pay it. Pay a balance due electronically — and do not file Form 940-V, the payment voucher, if you pay electronically.</td></tr>
++<tr><td><strong>Line 15a–15e</strong> — Overpayment</td><td>If line 13 is more than line 12, the difference goes on 15a. On 15b choose one: have the overpayment applied to your next return, or refunded. Refunds are now issued by direct deposit — complete lines 15c (routing number), 15d (account type), and 15e (account number). If line 15a is less than $1, the IRS will refund it or apply it only if you ask in writing.</td></tr>
++</table>
++</div>
++
++<h3>Part 5 — Lines 16–17: quarterly liability (only if line 12 is more than $500)</h3>
++<p>Fill out Part 5 <strong>only if line 12 is more than $500</strong>. If line 12 is $500 or less, leave it blank. On lines 16a–16d, enter the amount of your FUTA tax <em>liability</em> for each quarter — not the deposits you made. If you had no liability for a quarter, leave that line blank. To figure the fourth quarter, complete the form through line 12, copy line 12 onto line 17, then subtract lines 16a–16c from line 17 and enter the result on line 16d. Line 17, your total tax liability for the year, must equal line 12.</p>
++
++<h3>Parts 6–7 — Third-party designee and signature</h3>
++<p>Part 6 is the optional third-party designee — a specific person (not a firm) the IRS may discuss this return with, identified by name, phone number, and a five-digit PIN. The authorization covers only this form, for this year, and expires one year after the filing due date. Part 7 is the signature: complete both pages and sign on page 2, or processing will be delayed. A sole proprietor signs personally; a partnership is signed by a responsible partner, member, or officer; a corporation by the president, vice president, or another duly authorized principal officer.</p>
++
++<h2>Schedule A and credit-reduction states: check the list, do not guess it</h2>
++<p>A credit-reduction state is a state that has not repaid money it borrowed from the federal government to pay unemployment benefits. The U.S. Department of Labor determines the list each year. If you paid wages subject to the unemployment tax laws of a credit-reduction state, your credit against FUTA tax is reduced, you owe additional federal unemployment tax, and you must complete <strong>Schedule A (Form 940)</strong> to figure it. The additional tax goes on Form 940, line 11, and counts as fourth-quarter liability for deposit purposes.</p>
++<p>Multi-state employers must also file Schedule A, even if none of their states is a credit-reduction state.</p>
++<div class="warning">
++<p><strong>Do not use last year's list.</strong> The 2026 credit-reduction list was not final when this guide was published on November 11, 2026 — the Department of Labor makes its determination on November 10, and the IRS publishes the final 2026 Schedule A after that. This guide deliberately names no 2026 credit-reduction states. Before you file, check the current Schedule A (Form 940) and the IRS FUTA credit reduction page (linked in Sources) and use the list printed on the form itself. A state that was on the list last year may not be on it this year, and the reduction rate changes with how long the state has been behind.</p>
++</div>
++
++<h2>Worked example: 8 employees, $336 of FUTA for the year</h2>
++<p>A small business has 8 employees. Each was paid $25,000 in 2026, in equal quarterly paychecks of $6,250. There are no payments exempt from FUTA, the state unemployment tax was paid on time and in full, and the employer is not in a credit-reduction state. Here is how the return fills in:</p>
++<div class="table-wrap">
++<table>
++<tr><th>Line</th><th>Figure</th><th>How it is calculated</th></tr>
++<tr><td>Line 3 — Total payments to all employees</td><td>$200,000.00</td><td>8 × $25,000</td></tr>
++<tr><td>Line 4 — Payments exempt from FUTA tax</td><td>$0.00</td><td>None in this example</td></tr>
++<tr><td>Line 5 — Payments over the $7,000 wage base</td><td>$144,000.00</td><td>8 × ($25,000 − $7,000)</td></tr>
++<tr><td>Line 6 — Subtotal</td><td>$144,000.00</td><td>Line 4 + line 5</td></tr>
++<tr><td>Line 7 — Total taxable FUTA wages</td><td>$56,000.00</td><td>$200,000 − $144,000 (8 × $7,000)</td></tr>
++<tr><td>Line 8 — FUTA tax before adjustments</td><td><strong>$336.00</strong></td><td>$56,000 × 0.006</td></tr>
++<tr><td>Lines 9–11 — Adjustments</td><td>$0.00</td><td>Full state credit; no credit reduction</td></tr>
++<tr><td>Line 12 — Total FUTA tax after adjustments</td><td><strong>$336.00</strong></td><td>Line 8 + lines 9–11</td></tr>
++<tr><td>Line 13 — FUTA tax deposited for the year</td><td>$0.00</td><td>No deposit was required (see below)</td></tr>
++<tr><td>Line 14 — Balance due</td><td><strong>$336.00</strong></td><td>Line 12 − line 13, paid with the return</td></tr>
++</table>
++</div>
++<p>That is $42.00 per employee — 8 × $42.00 = $336.00. <strong>Why no deposit was due:</strong> the quarterly liability was $300.00 in Q1 (8 × $6,250 × 0.006), $36.00 in Q2 (each employee's remaining $750 of FUTA wages: 8 × $750 × 0.006), and $0 in Q3 and Q4, because every employee had already passed the $7,000 wage base. The cumulative liability never exceeded $500 in any quarter, so the whole $336.00 could simply be paid with the return. Part 5 is left blank, because line 12 is $500 or less.</p>
++<p>Contrast that with a 30-employee business where each employee was paid $10,000 in Q1 alone: FUTA wages for the quarter are 30 × $7,000 = $210,000, and the liability is $210,000 × 0.006 = <strong>$1,260.00</strong> — more than $500, so the full $1,260.00 must be deposited by Thursday, April 30, 2026, nine months before the return is filed. Run your own salary numbers on our <a href="/calculator.html">payroll tax calculator</a>.</p>
++
++<h2>How to file Form 940</h2>
++<p><strong>E-file (recommended).</strong> The IRS accepts Form 940 electronically through Modernized e-File, either through payroll software or an authorized e-file provider. An amended Form 940 can also be e-filed. If you filed electronically, do not also file a paper return.</p>
++<p><strong>Paper.</strong> Mail the completed form to the IRS address in the instructions for your location — the "Where Do You File" section of the Instructions for Form 940 lists separate addresses for returns with and without a payment, and the address may have changed since you last filed. If you pay a balance due by check or money order, make it payable to "United States Treasury," write your EIN, "Form 940," and the tax year on it, and enclose Form 940-V, the payment voucher. Do not send Form 940-V if you pay electronically.</p>
++<p><strong>Paying a balance due.</strong> Pay electronically — through EFTPS, IRS Direct Pay, your IRS business tax account, or electronic funds withdrawal if you e-file. You may also pay by credit or debit card through an IRS payment processor (a processing fee applies). Do not use a credit or debit card to pay taxes that were required to be deposited. If you cannot pay in full, the IRS offers an online installment agreement if you owe $25,000 or less and can pay it off within 24 months — interest and penalties still apply to the unpaid amount.</p>
++<p>Most employers do not file Form 940 by hand at all: full-service payroll software calculates, deposits, and files it for you. That is the main reason to compare providers on tax-filing coverage, not just price — see <a href="/software.html">payroll software for small businesses</a>. If you run payroll yourself, the two things that matter most are the $500 deposit test during the year and the state unemployment tax deadline — pay the state on time, or the federal credit shrinks with it.</p>
++
++<h2>Penalties for filing, paying, or depositing late</h2>
++<p>Three separate penalties can apply, and they are not the same thing. The rates below are the general employment-tax penalties in Publication 15, sections 11 and 12 — the same penalties that apply to Form 941:</p>
++<div class="table-wrap">
++<table>
++<tr><th>Penalty</th><th>Rate</th></tr>
++<tr><td><strong>Failure to file</strong> — the return is late</td><td>5% of the unpaid tax for each month (or part of a month) the return is late, up to 25%. Filing on time even if you cannot pay in full avoids this larger penalty.</td></tr>
++<tr><td><strong>Failure to pay</strong> — tax shown on the return is unpaid</td><td>0.5% of the unpaid tax per month, up to 25%. Interest also accrues on unpaid amounts.</td></tr>
++<tr><td><strong>Failure to deposit</strong> — a deposit is late or short</td><td>2% if 1–5 days late; 5% if 6–15 days late; 10% if more than 15 days late; 15% if still unpaid more than 10 days after the first IRS notice (or on demand for immediate payment). The tiers replace each other — they do not stack.</td></tr>
++</table>
++</div>
++<p>Source: IRS Publication 15 (2026), Employer's Tax Guide, sections 11 and 12. The deposit penalty is the one small employers hit most often on FUTA, because it is triggered by a single missed quarterly deposit during the year — not by the February filing date. If you receive a penalty notice, reply to it with an explanation; the IRS will determine whether you meet the reasonable-cause criteria. Use Form 843 to request abatement of an assessed penalty or interest — do not request abatement on Form 940 itself.</p>
++<p>One difference from Form 941 is worth knowing: FUTA is the employer's own tax, not tax withheld from employees, so it is not trust fund tax. The trust fund recovery penalty — the 100% personal penalty for withheld employee taxes that are not paid over — does not apply to FUTA. That does not make FUTA optional; the failure-to-file, failure-to-pay, and failure-to-deposit penalties above apply in full.</p>
++
++<h2>Correcting a mistake: there is no Form 940-X</h2>
++<p>Unlike Form 941, which has a dedicated correction form (Form 941-X), there is no separate Form 940-X. To correct a filed Form 940, file an <strong>amended Form 940</strong>:</p>
++<ul>
++<li>Use the Form 940 for the tax year you are correcting — not the current year's form.</li>
++<li>Check the <strong>Amended Return</strong> box (box a) in the top right corner of page 1.</li>
++<li>Fill in <strong>all</strong> the amounts that should have been on the original form — the complete corrected return, not just the lines that changed.</li>
++<li>Sign the form, and attach an explanation telling the IRS why you are amending — for example, that you are claiming credit for state unemployment tax paid after the due date of the original return.</li>
++<li>File electronically through Modernized e-File if you can; otherwise file the paper amended return using the "Without a payment" address in the instructions, even if a payment is included.</li>
++</ul>
++<p>Do not file a second, unmarked Form 940 for the same year — without the Amended box checked, the IRS will treat it as a duplicate original. Fix errors as soon as you find them: an underpayment corrected late still accrues penalties and interest, and a credit-reduction correction discovered after the DOL's November determination is one of the most common reasons employers amend.</p>
++
++<h2>Form 940 vs. Form 941 vs. Form 944 — which one do you file?</h2>
++<div class="table-wrap">
++<table>
++<tr><th></th><th>Form 940</th><th>Form 941</th><th>Form 944</th></tr>
++<tr><td><strong>Tax reported</strong></td><td>FUTA (federal unemployment)</td><td>Withheld income tax + Social Security/Medicare</td><td>Same taxes as Form 941</td></tr>
++<tr><td><strong>How often</strong></td><td>Annually</td><td>Quarterly</td><td>Annually</td></tr>
++<tr><td><strong>Who files</strong></td><td>Employers meeting the $1,500 or 20-week test</td><td>Employers who paid wages subject to withholding or FICA</td><td>Only if the IRS notifies you in writing; generally annual liability of $1,000 or less</td></tr>
++<tr><td><strong>2026 due date</strong></td><td><strong>February 1, 2027</strong> (February 10 with timely deposits)</td><td>April 30, July 31, November 2, 2026; February 1, 2027</td><td>February 1, 2027</td></tr>
++<tr><td><strong>Paid by</strong></td><td>Employer only</td><td>Employer + employees (withheld)</td><td>Employer + employees (withheld)</td></tr>
++</table>
++</div>
++<p>Most employers file both Form 940 and Form 941: the 941 every quarter for the taxes taken out of pay, and the 940 once a year for the unemployment tax the employer pays itself. Form 944 replaces Form 941 for the smallest employers the IRS assigns to it — it never replaces Form 940. See our <a href="/blog/how-to-file-form-941.html">line-by-line Form 941 guide</a> for the quarterly return.</p>
++
++<h2>FUTA vs. SUTA vs. FICA — do not mix them up</h2>
++<div class="table-wrap">
++<table>
++<tr><th></th><th>FUTA</th><th>SUTA</th><th>FICA (Social Security + Medicare)</th></tr>
++<tr><td><strong>Paid to</strong></td><td>Federal government (IRS)</td><td>Your state unemployment agency</td><td>Federal government (IRS)</td></tr>
++<tr><td><strong>Paid by</strong></td><td>Employer only</td><td>Employer (in most states)</td><td>Employer + employee</td></tr>
++<tr><td><strong>Rate (2026)</strong></td><td>6.0% gross, 0.6% net</td><td>Varies by state and experience rate</td><td>6.2% + 1.45% each side</td></tr>
++<tr><td><strong>Wage base</strong></td><td>First $7,000 per employee</td><td>State wage base (varies)</td><td>$184,500 for Social Security; no cap for Medicare</td></tr>
++<tr><td><strong>Reported on</strong></td><td>Form 940, annually</td><td>State quarterly wage reports</td><td>Form 941, quarterly</td></tr>
++</table>
++</div>
++<p>Paying SUTA is what earns the FUTA credit, so the two are linked — but they are filed with different governments, on different forms, on different schedules. The SUTA wage base in your state is almost always higher than the $7,000 FUTA base, which is why the line 10 worksheet asks for your taxable state wages separately from your taxable FUTA wages.</p>
++
++<h2>5 mistakes that trigger IRS notices</h2>
++<ol>
++<li><strong>Applying the 6.0% rate to all wages.</strong> FUTA stops at $7,000 per employee per year. Taxing a $60,000 salary at 6.0% overstates the tax by $3,180 per employee before the credit — and the return will not reconcile.</li>
++<li><strong>Paying state unemployment tax late and still claiming the full credit.</strong> The credit is only full if the state tax is paid by the Form 940 due date. Late state payments earn 90% credit, and unpaid state tax earns none. Pay the state first, then file.</li>
++<li><strong>Using last year's credit-reduction list.</strong> The Department of Labor redetermines credit-reduction states every November. Filing with a stale list — in either direction — produces the wrong line 11 and the wrong line 12.</li>
++<li><strong>Reporting deposits on Part 5 instead of liability.</strong> Lines 16a–16d record what you <em>owed</em> each quarter, not what you deposited. If the two differ, the IRS uses Part 5 to test whether deposits were timely.</li>
++<li><strong>Filing a second Form 940 to fix an error.</strong> There is no Form 940-X, and a duplicate unmarked 940 is not a correction. Amend by checking the Amended box on a fresh form for the same tax year, with all corrected amounts and an explanation attached.</li>
++</ol>
++
++<h2>Frequently asked questions</h2>
++<p><strong>Q: When is Form 940 due for 2026?</strong><br>
++A: Monday, February 1, 2027 (January 31 is a Sunday). If you deposited all of your FUTA tax on time and in full during the year, you may file by Wednesday, February 10, 2027.</p>
++<p><strong>Q: How much is FUTA tax per employee?</strong><br>
++A: With the full 5.4% credit for state unemployment tax, FUTA is 0.6% on the first $7,000 of each employee's wages — $42 per employee per year at most. Without the credit, the gross rate is 6.0%, or $420 on $7,000 of wages.</p>
++<p><strong>Q: Do I have to deposit FUTA tax during the year, or can I just pay when I file?</strong><br>
++A: Only once your cumulative undeposited FUTA liability is more than $500. At $500 or less, carry it forward to the next quarter. Once it is more than $500, deposit the full cumulative amount by the last day of the month after the quarter ends. If your total FUTA tax for the year is $500 or less, you may pay it with your Form 940.</p>
++<p><strong>Q: What is a credit-reduction state?</strong><br>
++A: A state that has not repaid money it borrowed from the federal government to pay unemployment benefits. The Department of Labor names the states each year; employers who paid wages there owe additional FUTA tax, figured on Schedule A (Form 940). The 2026 list was not final when this guide was published on November 11, 2026 — check the current Schedule A before you file, and do not rely on last year's list.</p>
++<p><strong>Q: Is FUTA tax withheld from employees' pay?</strong><br>
++A: No. FUTA is an employer-only tax. Nothing is withheld from employees, it does not appear on their W-2s, and there is no employee share.</p>
++<p><strong>Q: What is the difference between Form 940 and Form 941?</strong><br>
++A: Form 940 is the annual return for FUTA, the federal unemployment tax — 6.0% on the first $7,000 of each employee's wages, 0.6% net with the full state credit. Form 941 is the quarterly return for withheld federal income tax and Social Security and Medicare taxes. Most employers file both: Form 941 four times a year, Form 940 once a year. See our <a href="/blog/how-to-file-form-941.html">Form 941 guide</a>.</p>
++<p><strong>Q: I made a mistake on my Form 940. Is there a Form 940-X?</strong><br>
++A: No. There is no separate Form 940-X. File an amended Form 940 for the same tax year, check the Amended Return box, enter all of the corrected amounts (not just the changed lines), and attach an explanation of what changed and why.</p>
++<p><strong>Q: What if I cannot pay the full amount?</strong><br>
++A: File on time anyway — the failure-to-file penalty (5% per month) is ten times the failure-to-pay penalty (0.5% per month). Then apply for an online installment agreement if you owe $25,000 or less and can pay within 24 months.</p>
++
++<h2>Sources</h2>
++<p>All figures in this guide were checked against IRS primary sources on November 11, 2026. The 2026 Form 940 and its instructions were not yet final on IRS.gov on that date; the mechanics below come from the current published (2025) Instructions for Form 940 and IRS Topic No. 759, and the rate, wage base, filing tests, and deposit rule are unchanged for 2026.</p>
++<ol>
++<li>IRS, Instructions for Form 940 (2025 revision, current published version as of November 11, 2026) — who must file, due dates, the $500 deposit rule, line-by-line instructions for lines 1–17, the line 10 worksheet, Schedule A and credit reduction, amended returns, and direct-deposit refunds. <a href="https://www.irs.gov/instructions/i940">irs.gov/instructions/i940</a></li>
++<li>IRS, Topic No. 759, Form 940 — Filing and Deposit Requirements — the $1,500 wage test and 20-week test, FUTA rate 6.0% on the first $7,000, credit of up to 5.4%, net rate 0.6%, credit-reduction states, January 31 due date and February 10 extension, and the $500 quarterly deposit rule. <a href="https://www.irs.gov/taxtopics/tc759">irs.gov/taxtopics/tc759</a></li>
++<li>IRS, Publication 15 (2026), Employer's Tax Guide, sections 11 and 12 — deposit rules, failure-to-file and failure-to-pay penalties, failure-to-deposit penalty tiers. <a href="https://www.irs.gov/publications/p15">irs.gov/publications/p15</a></li>
++<li>IRS, Publication 509 (2026), Tax Calendars — Form 940/941 due dates and the 10-day extension. <a href="https://www.irs.gov/publications/p509">irs.gov/publications/p509</a></li>
++<li>IRS, FUTA Credit Reduction — the Department of Labor's annual credit-reduction determination and the current Schedule A (Form 940). Check this page before filing; this guide names no 2026 credit-reduction states because the list was not final on November 11, 2026. <a href="https://www.irs.gov/businesses/small-businesses-self-employed/futa-credit-reduction">irs.gov/businesses/small-businesses-self-employed/futa-credit-reduction</a></li>
++<li>IRS, Schedule A (Form 940), Multi-State Employer and Credit Reduction Information — who must file it and how the credit reduction is figured. <a href="https://www.irs.gov/pub/irs-pdf/f940sa.pdf">irs.gov/pub/irs-pdf/f940sa.pdf</a></li>
++</ol>
++<p><em>Worked example: the 8-employee business in the example pays each employee $25,000 in equal quarterly paychecks — the quarterly split ($300.00 in Q1, $36.00 in Q2) follows from that pay pattern. All other figures in the example follow directly from the rates above.</em></p>
++
++<h2>Keep reading</h2>
++<ul>
++<li><a href="/blog/how-to-file-form-941.html">How to File Form 941 (2026): Line-by-Line Guide for Employers</a> — the quarterly return for withheld income tax and Social Security/Medicare taxes.</li>
++<li><a href="/research/2026-payroll-tax-rates-deadlines.html">2026 U.S. Payroll Tax Rates, Wage Bases &amp; Deadlines</a> — the full rates table behind this guide, including the FUTA row.</li>
++<li><a href="/blog/payroll-tax-deadlines-2026.html">2026 Payroll Tax Deadlines: The Employer Calendar</a> — every deposit and filing date for 2026.</li>
++<li><a href="/blog/year-end-payroll-checklist-2026.html">Year-End Payroll Checklist 2026</a> — W-2 preparation for the February 1, 2027 deadline.</li>
++<li><a href="/calculator.html">Payroll Tax Calculator</a> — run your own salary numbers, including the $42 FUTA figure.</li>
++<li><a href="/blog/first-payroll-checklist.html">Hiring Your First Employee? The First-Payroll Checklist</a> — EIN, state registration, W-4, I-9, and EFTPS.</li>
++<li><a href="/software.html">Payroll Software for Small Businesses</a> — compare providers that file Form 940 for you.</li>
++</ul>
++</div>
++</section>
++</main>
++<footer>
++<div class="wrap">
++<nav class="footer-links" aria-label="Footer navigation">
++<a href="/about.html">About</a>
++<a href="/contact.html">Contact</a>
++<a href="/privacy.html">Privacy Policy</a>
++<a href="/partners.html">Partners</a>
++<a href="/advertise.html">Advertise</a>
++<a href="/resources.html">Resources</a>
++<a href="/cite-us.html">Cite Us</a>
++<a href="/press.html">Press</a>
++<a href="/blog.html">Blog</a>
++<a href="/donate.html">Donate</a>
++</nav>
++<p>© <span id="year">2026</span> PayrollTaxReform.com. All rights reserved.</p>
++<p>Independent educational information only. Tax laws and rates can change. Verify requirements with official government agencies or a qualified professional.</p>
++</div>
++</footer>
++</body>
++</html>
+diff --git a/public/blog/how-to-file-form-941.html b/public/blog/how-to-file-form-941.html
+index ad50c7e..d6b5d89 100644
+--- a/public/blog/how-to-file-form-941.html
++++ b/public/blog/how-to-file-form-941.html
+@@ -82,7 +82,7 @@ Independent U.S. payroll tax information · Educational guidance only · Not tax
+ <li><strong>Social Security tax</strong> — 6.2% from the employee and a matching 6.2% from the employer, on wages up to the 2026 wage base of <strong>$184,500</strong> per employee.</li>
+ <li><strong>Medicare tax</strong> — 1.45% from the employee and a matching 1.45% from the employer, on all wages, with no wage cap. Plus the 0.9% Additional Medicare Tax withheld from employees on wages over $200,000 (employee only — there is no employer share).</li>
+ </ul>
+-<p>Form 941 does <strong>not</strong> report federal unemployment tax — that is Form 940, filed annually. It does not report backup withholding or withholding on nonpayroll payments such as pensions — that is Form 945. And it does not cover agricultural labor (Form 943) or household employees (usually Schedule H). If you are not sure which form applies, the Instructions for Form 941, not a vendor blog, are the authority.</p>
++<p>Form 941 does <strong>not</strong> report federal unemployment tax — that is <a href="/blog/how-to-file-form-940.html">Form 940</a>, filed annually. It does not report backup withholding or withholding on nonpayroll payments such as pensions — that is Form 945. And it does not cover agricultural labor (Form 943) or household employees (usually Schedule H). If you are not sure which form applies, the Instructions for Form 941, not a vendor blog, are the authority.</p>
+ <p>One point employers get wrong: <strong>filing and depositing are separate steps.</strong> Form 941 is the quarterly report. The tax money itself is deposited during the quarter, on a monthly or semiweekly schedule, through EFTPS or another electronic method. By the time you file, the balance due on the return should usually be zero — the deposits have already paid it. If it is not zero, something went wrong during the quarter, and the return is where it shows up.</p>
+ 
+ <h2>Who must file Form 941</h2>
+@@ -258,6 +258,7 @@ A: Full-service plans do — they calculate, deposit, and file federal, state, a
+ <h2>Keep reading</h2>
+ <ul>
+ <li><a href="/research/2026-payroll-tax-rates-deadlines.html">2026 U.S. Payroll Tax Rates, Wage Bases &amp; Deadlines</a> — the full rates table behind this guide.</li>
++<li><a href="/blog/how-to-file-form-940.html">How to File Form 940 (2026): FUTA Guide for Employers</a> — the annual FUTA return: 6.0% on the first $7,000, $42 per employee with the full credit, due February 1, 2027.</li>
+ <li><a href="/blog/payroll-tax-deadlines-2026.html">2026 Payroll Tax Deadlines: The Employer Calendar</a> — every deposit and filing date for 2026.</li>
+ <li><a href="/blog/year-end-payroll-checklist-2026.html">Year-End Payroll Checklist 2026</a> — W-2 preparation for the February 1, 2027 deadline.</li>
+ <li><a href="/calculator.html">Payroll Tax Calculator</a> — run your own salary numbers.</li>
+diff --git a/public/blog/posts.json b/public/blog/posts.json
+index 6ccf797..c4b9988 100644
+--- a/public/blog/posts.json
++++ b/public/blog/posts.json
+@@ -1,4 +1,11 @@
+ [
++  {
++    "title": "How to File Form 940 (2026): FUTA Guide for Employers",
++    "url": "/blog/how-to-file-form-940.html",
++    "badge": "Form 940 guide",
++    "excerpt": "Who must file, the February 1, 2027 due date, line-by-line instructions, the $42 question, the $500 deposit rule, and penalties for filing or depositing late.",
++    "date": "2026-11-11"
++  },
+   {
+     "title": "How to File Form 941 (2026): Line-by-Line Guide for Employers",
+     "url": "/blog/how-to-file-form-941.html",
+diff --git a/public/sitemap.xml b/public/sitemap.xml
+index 3dd2d09..3e1b4bb 100644
+--- a/public/sitemap.xml
++++ b/public/sitemap.xml
+@@ -110,7 +110,7 @@
+   </url>
+   <url>
+     <loc>https://payrolltaxreform.com/blog.html</loc>
+-    <lastmod>2026-11-10</lastmod>
++    <lastmod>2026-11-11</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>0.8</priority>
+   </url>
+@@ -174,4 +174,9 @@
+     <lastmod>2026-11-11</lastmod>
+     <priority>0.8</priority>
+   </url>
++  <url>
++    <loc>https://payrolltaxreform.com/blog/how-to-file-form-940.html</loc>
++    <lastmod>2026-11-11</lastmod>
++    <priority>0.8</priority>
++  </url>
+ </urlset>
+-- 
+2.43.0
+
