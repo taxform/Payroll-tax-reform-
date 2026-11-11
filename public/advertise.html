@@ -105,16 +105,19 @@ Independent U.S. payroll tax information · Educational guidance only · Not tax
 </div>
 </header>
 <main>
-<nav class="breadcrumb" aria-label="Breadcrumb">
-<a href="/">Home</a> <span aria-hidden="true">›</span> Advertise
-</nav>
+<div class="wrap breadcrumb">
+<ol>
+<li><a href="/">Home</a></li>
+<li aria-current="page">Advertise</li>
+</ol>
+</div>
 <section class="hero">
 <div class="wrap">
 <div class="eyebrow">Sponsorship &amp; Display Placements</div>
 <h1>Advertise With Us</h1>
 <p class="lead">Reach U.S. employers who are choosing payroll software, checking tax deadlines, and running payroll right now.</p>
 <div class="actions">
-<a class="btn" href="/advertise-start">Start: 1-minute availability check</a>
+<a class="btn" href="/advertise-start">Start 1-minute availability check →</a>
 <a class="btn secondary" href="/advertise-apply">Skip to the form</a>
 </div>
 </div>
@@ -156,20 +159,20 @@ Independent U.S. payroll tax information · Educational guidance only · Not tax
 <h2>Advertiser inquiry</h2>
 <p>Email <a href="mailto:support@payrolltaxreform.com">support@payrolltaxreform.com</a> with: your company, the placement you want, your dates, and a link to your site. Or use the inquiry form on this page.</p>
 <div class="card">
+<h2>Advertiser Inquiry Form</h2>
+<p>Submit your details to discuss sponsorship opportunities:</p>
 <form name="advertiser-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field">
 <input type="hidden" name="form-name" value="advertiser-inquiry">
 <input type="hidden" name="subject" value="New advertising inquiry">
-<input type="hidden" name="tblci" value="1">
-<p class="hidden" style="display:none">
-<label>Do not fill this out if you are human: <input name="bot-field"></label>
-</p>
+<p style="display:none;"><label>Bot field: <input name="bot-field"></label></p>
+<input type="hidden" name="tblci">
 <div class="form-group">
-<label for="company">Company</label>
-<input type="text" id="company" name="company" placeholder="Acme Payroll">
+<label for="company">Company Name</label>
+<input type="text" id="company" name="company" required placeholder="Acme Payroll Corp">
 </div>
 <div class="form-group">
-<label for="name">Your name</label>
-<input type="text" id="name" name="name" required placeholder="Jane Smith">
+<label for="name">Contact Name</label>
+<input type="text" id="name" name="name" required placeholder="John Smith">
 </div>
 <div class="form-group">
 <label for="email">Work Email</label>
