@@ -62,7 +62,9 @@ async function checkoutUrl(origin: string): Promise<string | null> {
   const key = secretKey();
   if (!key) {
     const raw = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
-    if (/^mk_/.test(raw)) {
+    if (/\bpk_(?:live|test)_/.test(raw)) {
+      console.error("STRIPE_SECRET_KEY is a Stripe publishable key (pk_...), which cannot create Checkout sessions. Use the secret key (sk_live_...) or a restricted key (rk_live_...).");
+    } else if (/^mk_/.test(raw)) {
       console.error("STRIPE_SECRET_KEY is a Stripe key ID (mk_...), not the secret key. Use the full sk_live_/rk_live_ value.");
     } else if (raw.includes("...")) {
       console.error("STRIPE_SECRET_KEY is Stripe's masked preview (contains '...'), not the full key.");
