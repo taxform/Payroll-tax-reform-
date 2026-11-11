@@ -1,0 +1,315 @@
+From 20ffa3c78adfc5b9d4282df56517dcf7e3988dc9 Mon Sep 17 00:00:00 2001
+From: Muse <payrolltaxreform@gmail.com>
+Date: Wed, 11 Nov 2026 19:21:21 +0000
+Subject: [PATCH] Fix payroll tag gaps: AdSense on all content pages, AW +
+ ads-tracking on Form 941, research RSS, CJ label
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Add AdSense (ca-pub-5889154162791392) to 13 pages that lacked it:
+  answers, advertise-start, advertise-apply, blog index, 7 older blog
+  posts, salary research page, press. Donate.html intentionally untouched.
+- Add Google Ads AW-18545848708 gtag + ads-tracking.js to
+  /blog/how-to-file-form-941.html (was the only sitemap page missing both).
+- Create public/research.xml (RSS for the two research pages) — fixes
+  the 404 linked from the 2026 rates page.
+- Relabel partners.html CJ card from 'File Your IRS Taxes' to
+  'e-file.com — File Your IRS Taxes' (link lands on e-file.com via CJ).
+- Stay22 script left in place (unverified, removal needs Dan's call).
+- No casino, donate, affiliate-link, GTM or AdCash changes.
+---
+ public/advertise-apply.html                   |  4 ++++
+ public/advertise-start.html                   |  4 ++++
+ public/answers.html                           |  4 ++++
+ public/blog.html                              |  4 ++++
+ public/blog/2026-payroll-tax-changes.html     |  4 ++++
+ public/blog/first-payroll-checklist.html      |  4 ++++
+ public/blog/how-to-file-form-941.html         | 10 ++++++++
+ public/blog/payroll-software-mistakes.html    |  4 ++++
+ public/blog/payroll-tax-deadlines-2026.html   |  4 ++++
+ public/blog/true-cost-of-an-employee.html     |  4 ++++
+ public/blog/w2-vs-1099-misclassification.html |  4 ++++
+ .../blog/year-end-payroll-checklist-2026.html |  6 ++++-
+ public/partners.html                          |  4 ++--
+ public/press.html                             |  4 ++++
+ public/research.xml                           | 23 +++++++++++++++++++
+ .../employer-payroll-tax-by-salary-2026.html  |  4 ++++
+ 16 files changed, 88 insertions(+), 3 deletions(-)
+ create mode 100644 public/research.xml
+
+diff --git a/public/advertise-apply.html b/public/advertise-apply.html
+index 05a94b4..641a73b 100644
+--- a/public/advertise-apply.html
++++ b/public/advertise-apply.html
+@@ -109,6 +109,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/advertise-start.html b/public/advertise-start.html
+index ede05b4..a700a3a 100644
+--- a/public/advertise-start.html
++++ b/public/advertise-start.html
+@@ -105,6 +105,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/answers.html b/public/answers.html
+index b25c848..57ca1ef 100644
+--- a/public/answers.html
++++ b/public/answers.html
+@@ -321,6 +321,10 @@
+   ]
+ }
+   </script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog.html b/public/blog.html
+index 591ad65..3e882af 100644
+--- a/public/blog.html
++++ b/public/blog.html
+@@ -98,6 +98,10 @@
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
+ <link rel="alternate" type="application/rss+xml" title="PayrollTaxReform.com articles" href="https://payrolltaxreform.com/blog/feed.xml">
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/2026-payroll-tax-changes.html b/public/blog/2026-payroll-tax-changes.html
+index c215732..cb20207 100644
+--- a/public/blog/2026-payroll-tax-changes.html
++++ b/public/blog/2026-payroll-tax-changes.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/first-payroll-checklist.html b/public/blog/first-payroll-checklist.html
+index 39b5f7b..a7ad835 100644
+--- a/public/blog/first-payroll-checklist.html
++++ b/public/blog/first-payroll-checklist.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/how-to-file-form-941.html b/public/blog/how-to-file-form-941.html
+index 17f5697..ad50c7e 100644
+--- a/public/blog/how-to-file-form-941.html
++++ b/public/blog/how-to-file-form-941.html
+@@ -7,6 +7,15 @@ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ </script>
++<!-- Google tag (gtag.js) -->
++<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18545848708"></script>
++<script>
++  window.dataLayer = window.dataLayer || [];
++  function gtag(){dataLayer.push(arguments);}
++  gtag('js', new Date());
++
++  gtag('config', 'AW-18545848708');
++</script>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>How to File Form 941 (2026): Line-by-Line Guide for Employers | PayrollTaxReform.com</title>
+@@ -29,6 +38,7 @@ gtag('js', new Date());
+ <!-- Google AdSense -->
+ <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392" crossorigin="anonymous"></script>
+ <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"How to File Form 941 (2026): Line-by-Line Guide for Employers","description":"How to file Form 941, the Employer's Quarterly Federal Tax Return, for 2026: who must file, due dates, line-by-line instructions, a worked example, deposit rules, and penalties. IRS-sourced, verified November 11, 2026.","url":"https://payrolltaxreform.com/blog/how-to-file-form-941.html","mainEntityOfPage":"https://payrolltaxreform.com/blog/how-to-file-form-941.html","datePublished":"2026-11-11","dateModified":"2026-11-11","author":{"@type":"Organization","name":"PayrollTaxReform.com","url":"https://payrolltaxreform.com/about.html"},"publisher":{"@type":"Organization","name":"PayrollTaxReform.com","url":"https://payrolltaxreform.com/about.html"},"image":"https://payrolltaxreform.com/og-image.png"}</script>
++  <script src="/ads-tracking.js" defer></script>
+ </head>
+ <body>
+ 
+diff --git a/public/blog/payroll-software-mistakes.html b/public/blog/payroll-software-mistakes.html
+index 397a1ec..a083dc1 100644
+--- a/public/blog/payroll-software-mistakes.html
++++ b/public/blog/payroll-software-mistakes.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/payroll-tax-deadlines-2026.html b/public/blog/payroll-tax-deadlines-2026.html
+index 8b96c23..6942efe 100644
+--- a/public/blog/payroll-tax-deadlines-2026.html
++++ b/public/blog/payroll-tax-deadlines-2026.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/true-cost-of-an-employee.html b/public/blog/true-cost-of-an-employee.html
+index 6ce29cd..fc6a646 100644
+--- a/public/blog/true-cost-of-an-employee.html
++++ b/public/blog/true-cost-of-an-employee.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/w2-vs-1099-misclassification.html b/public/blog/w2-vs-1099-misclassification.html
+index fce37a2..f32e6be 100644
+--- a/public/blog/w2-vs-1099-misclassification.html
++++ b/public/blog/w2-vs-1099-misclassification.html
+@@ -117,6 +117,10 @@
+ </script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKuVAv0U_Fv2nWNd7ZgqdRLk&amp;media=89&amp;campaign=1&amp;SUB_undefined="></script>
+   <script type="text/javascript" src="https://js.elitecasinopartners.ag/javascript.php?prefix=y05imBnTWKvKto_EPcZApGNd7ZgqdRLk&amp;media=28&amp;campaign=1&amp;SUB_undefined="></script>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/blog/year-end-payroll-checklist-2026.html b/public/blog/year-end-payroll-checklist-2026.html
+index 5553b26..36be9e0 100644
+--- a/public/blog/year-end-payroll-checklist-2026.html
++++ b/public/blog/year-end-payroll-checklist-2026.html
+@@ -9,7 +9,11 @@
+ <meta property="og:type" content="article"><meta property="og:title" content="Year-End Payroll Checklist 2026: W-2 Preparation for Employers"><meta property="og:description" content="Prepare for payroll year-end with a practical 2026 checklist: employee details, wage reconciliation, W-2 filing, records, and official IRS sources."><meta property="og:url" content="https://payrolltaxreform.com/blog/year-end-payroll-checklist-2026.html"><meta property="og:image" content="https://payrolltaxreform.com/og-image.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Year-End Payroll Checklist 2026: W-2 Preparation for Employers"><meta name="twitter:description" content="Prepare for payroll year-end with a practical 2026 checklist: employee details, wage reconciliation, W-2 filing, records, and official IRS sources."><meta name="twitter:image" content="https://payrolltaxreform.com/og-image.png">
+ <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Year-End Payroll Checklist 2026: W-2 Preparation for Employers", "description": "Prepare for payroll year-end with a practical 2026 checklist: employee details, wage reconciliation, W-2 filing, records, and official IRS sources.", "url": "https://payrolltaxreform.com/blog/year-end-payroll-checklist-2026.html", "mainEntityOfPage": "https://payrolltaxreform.com/blog/year-end-payroll-checklist-2026.html", "datePublished": "2026-11-10", "dateModified": "2026-11-10", "author": {"@type": "Organization", "name": "PayrollTaxReform.com", "url": "https://payrolltaxreform.com/about.html"}, "publisher": {"@type": "Organization", "name": "PayrollTaxReform.com"}, "image": "https://payrolltaxreform.com/og-image.png"}</script>
+ <style>@media print { .top,.site-header,footer,.actions {display:none} body,.card,.notice {background:white;color:black} a {color:black} .section,.hero {padding:12px 0} .wrap {width:100%} .card {break-inside:auto} }</style>
+-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18545848708"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','AW-18545848708');</script>  <script src="/ads-tracking.js" defer></script>
++<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18545848708"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','AW-18545848708');</script>  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
++  <script src="/ads-tracking.js" defer></script>
+ </head><body>
+ 
+   <div class="top">
+diff --git a/public/partners.html b/public/partners.html
+index 7d68103..1b6b422 100644
+--- a/public/partners.html
++++ b/public/partners.html
+@@ -163,11 +163,11 @@
+ 
+           <article class="card">
+             <span class="badge">Tax Filing</span>
+-            <h3>File Your IRS Taxes</h3>
++            <h3>e-file.com — File Your IRS Taxes Online</h3>
+             <p>
+               Prepare and e-file your federal tax return online.
+             </p>
+-            <a href="https://www.anrdoezrs.net/click-101916404-11917163" target="_blank" rel="nofollow sponsored noopener">File Your IRS Taxes</a><img src="https://www.ftjcfx.com/image-101916404-11917163" width="1" height="1" border="0" alt=""/>
++            <a href="https://www.anrdoezrs.net/click-101916404-11917163" target="_blank" rel="nofollow sponsored noopener">e-file.com — File Your IRS Taxes</a><img src="https://www.ftjcfx.com/image-101916404-11917163" width="1" height="1" border="0" alt=""/>
+           </article>
+ 
+           <article class="card">
+diff --git a/public/press.html b/public/press.html
+index 3d02ecc..c9a735c 100644
+--- a/public/press.html
++++ b/public/press.html
+@@ -78,6 +78,10 @@
+     .press-form input, .press-form select, .press-form textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: #0f1c32; color: inherit; font: inherit; }
+     .press-form .form-group { margin-bottom: 16px; }
+   </style>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+diff --git a/public/research.xml b/public/research.xml
+new file mode 100644
+index 0000000..54163bb
+--- /dev/null
++++ b/public/research.xml
+@@ -0,0 +1,23 @@
++<?xml version='1.0' encoding='utf-8'?>
++<rss version="2.0">
++  <channel>
++    <title>PayrollTaxReform.com — Research</title>
++    <link>https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html</link>
++    <description>Payroll tax research and reference tables for U.S. employers.</description>
++    <language>en-us</language>
++    <item>
++      <title>2026 U.S. Payroll Tax Rates, Wage Bases &amp; Deadlines — Complete Reference for Employers</title>
++      <link>https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html</link>
++      <description>2026 U.S. payroll tax rates, wage bases, Additional Medicare thresholds, and filing and deposit deadlines — one reference for employers, with worked examples and a free CSV download.</description>
++      <pubDate>Tue, 11 Nov 2026 00:00:00 +0000</pubDate>
++      <guid isPermaLink="true">https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html</guid>
++    </item>
++    <item>
++      <title>Employer Payroll Tax by Salary (2026): What Each Salary Costs in Federal Taxes</title>
++      <link>https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html</link>
++      <description>What each salary level costs an employer in federal payroll taxes in 2026, worked out by salary band.</description>
++      <pubDate>Mon, 10 Nov 2026 00:00:00 +0000</pubDate>
++      <guid isPermaLink="true">https://payrolltaxreform.com/research/employer-payroll-tax-by-salary-2026.html</guid>
++    </item>
++  </channel>
++</rss>
+diff --git a/public/research/employer-payroll-tax-by-salary-2026.html b/public/research/employer-payroll-tax-by-salary-2026.html
+index cde0488..399db43 100644
+--- a/public/research/employer-payroll-tax-by-salary-2026.html
++++ b/public/research/employer-payroll-tax-by-salary-2026.html
+@@ -116,6 +116,10 @@
+     .highlight-row { background: rgba(213, 171, 86, 0.08); }
+     .key-stat { font-size: 30px; font-weight: 800; color: var(--gold); margin: 0 0 6px; line-height: 1.1; }
+   </style>
++  <!-- Google AdSense -->
++  <script async
++    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5889154162791392"
++    crossorigin="anonymous"></script>
+   <script src="/ads-tracking.js" defer></script>
+ </head>
+ 
+-- 
+2.43.0
+
