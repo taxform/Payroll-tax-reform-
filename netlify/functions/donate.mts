@@ -61,7 +61,14 @@ async function stripe(path: string, key: string, body?: URLSearchParams) {
 async function checkoutUrl(origin: string): Promise<string | null> {
   const key = secretKey();
   if (!key) {
-    if (process.env.STRIPE_SECRET_KEY) console.error("STRIPE_SECRET_KEY does not contain a valid Stripe secret key");
+    const raw = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
+    if (/^mk_/.test(raw)) {
+      console.error("STRIPE_SECRET_KEY is a Stripe key ID (mk_...), not the secret key. Use the full sk_live_/rk_live_ value.");
+    } else if (raw.includes("...")) {
+      console.error("STRIPE_SECRET_KEY is Stripe's masked preview (contains '...'), not the full key.");
+    } else if (raw) {
+      console.error("STRIPE_SECRET_KEY does not contain a valid Stripe secret key");
+    }
     return null;
   }
   const priceId = process.env.STRIPE_DONATION_PRICE_ID?.trim() || DEFAULT_PRICE_ID;
