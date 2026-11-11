@@ -15,9 +15,23 @@ const DEFAULT_PRICE_ID = "price_1UaWcR2ErYo0uswkv6d8wThT";
 const ALLOWED_HOSTS = new Set(["buy.stripe.com", "donate.stripe.com"]);
 const STRIPE_API = "https://api.stripe.com/v1";
 
+// Pulls a Stripe secret/restricted key out of the env value, tolerating
+// surrounding quotes, whitespace or a pasted curl command.
+function secretKey(): string | null {
+  const raw = process.env.STRIPE_SECRET_KEY ?? "";
+  const match = raw.match(/\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]+/);
+  return match ? match[0] : null;
+}
+
 function paymentLinkUrl(): string | null {
   let raw = process.env.DONATION_URL?.trim();
   if (!raw) return null;
+  // Product, price and other API object IDs are not Payment Links; Stripe
+  // answers buy.stripe.com/prod_... with "access denied".
+  if (/^(prod|price|plink|cs|pi|acct)_/.test(raw)) {
+    console.error(`DONATION_URL looks like a Stripe object ID (${raw.split("_")[0]}_...), not a Payment Link URL; ignoring it`);
+    return null;
+  }
   if (/^[A-Za-z0-9_]+$/.test(raw)) raw = `https://buy.stripe.com/${raw}`;
   try {
     const url = new URL(raw);
@@ -45,8 +59,11 @@ async function stripe(path: string, key: string, body?: URLSearchParams) {
 }
 
 async function checkoutUrl(origin: string): Promise<string | null> {
-  const key = process.env.STRIPE_SECRET_KEY?.trim();
-  if (!key) return null;
+  const key = secretKey();
+  if (!key) {
+    if (process.env.STRIPE_SECRET_KEY) console.error("STRIPE_SECRET_KEY does not contain a valid Stripe secret key");
+    return null;
+  }
   const priceId = process.env.STRIPE_DONATION_PRICE_ID?.trim() || DEFAULT_PRICE_ID;
 
   const price = await stripe(`/prices/${encodeURIComponent(priceId)}`, key);
