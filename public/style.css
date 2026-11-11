@@ -845,3 +845,15 @@ textarea.snippet {
     columns: 1;
   }
 }
+
+/* Donate link in the main navigation */
+.mainnav a.nav-donate {
+  color: #111827;
+  background: var(--gold);
+}
+
+.mainnav a.nav-donate:hover,
+.mainnav a.nav-donate[aria-current="page"] {
+  color: #111827;
+  background: var(--gold-hover);
+}
