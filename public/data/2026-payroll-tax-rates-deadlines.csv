@@ -1,0 +1,87 @@
+category,item,detail,value,unit,notes,source
+rate,Social Security (OASDI),Employer rate,6.2,percent,"Applies to wages up to the $184,500 wage base",IRS Publication 15 (2026); IRS Topic No. 751
+rate,Social Security (OASDI),Employee rate (withheld),6.2,percent,"Applies to wages up to the $184,500 wage base",IRS Publication 15 (2026); IRS Topic No. 751
+rate,Social Security (OASDI),Wage base,184500,USD,Maximum wages subject to Social Security tax in 2026,SSA Contribution and Benefit Base; IRS Publication 15 (2026)
+rate,Social Security (OASDI),Maximum employer tax per employee,11439.00,USD,"6.2% x $184,500",SSA EFW2 Tax Year 2026
+rate,Medicare (hospital insurance),Employer rate,1.45,percent,No wage base limit,IRS Publication 15 (2026); IRS Topic No. 751
+rate,Medicare (hospital insurance),Employee rate (withheld),1.45,percent,No wage base limit,IRS Publication 15 (2026); IRS Topic No. 751
+rate,Additional Medicare Tax,Employer withholding rate,0.9,percent,"Withheld on wages over $200,000 in the calendar year; no employer share",IRS Publication 15 (2026); IRS Topic No. 751
+rate,Additional Medicare Tax,Employer withholding threshold,200000,USD,Applies regardless of filing status,IRS Topic No. 751
+rate,FUTA,Gross rate,6.0,percent,"On the first $7,000 of wages per employee",IRS FUTA Credit Reduction
+rate,FUTA,Maximum state credit,5.4,percent,For timely state unemployment payments; smaller in credit-reduction states,IRS FUTA Credit Reduction
+rate,FUTA,Net rate with full credit,0.6,percent,6.0% - 5.4%,IRS FUTA Credit Reduction
+rate,FUTA,Wage base,7000,USD,"First $7,000 of wages per employee per year",IRS FUTA Credit Reduction
+rate,FUTA,Maximum net tax per employee with full credit,42.00,USD,"0.6% x $7,000",IRS FUTA Credit Reduction
+additional_medicare_threshold,Married filing jointly,Employee liability threshold,250000,USD,Threshold for the employee's own Additional Medicare Tax liability; not indexed for inflation,IRS Topic No. 560; Instructions for Form 8959
+additional_medicare_threshold,Married filing separately,Employee liability threshold,125000,USD,Threshold for the employee's own Additional Medicare Tax liability; not indexed for inflation,IRS Topic No. 560; Instructions for Form 8959
+additional_medicare_threshold,Single,Employee liability threshold,200000,USD,Threshold for the employee's own Additional Medicare Tax liability; not indexed for inflation,IRS Topic No. 560; Instructions for Form 8959
+additional_medicare_threshold,Head of household,Employee liability threshold,200000,USD,Threshold for the employee's own Additional Medicare Tax liability; not indexed for inflation,IRS Topic No. 560; Instructions for Form 8959
+additional_medicare_threshold,Qualifying surviving spouse,Employee liability threshold,200000,USD,Threshold for the employee's own Additional Medicare Tax liability; not indexed for inflation,IRS Topic No. 560; Instructions for Form 8959
+wage_base_history,2016,Social Security wage base,118500,USD,"Max employer Social Security tax $7,347.00; change from prior year n/a",SSA Contribution and Benefit Base
+wage_base_history,2017,Social Security wage base,127200,USD,"Max employer Social Security tax $7,886.40; change from prior year 7.3%",SSA Contribution and Benefit Base
+wage_base_history,2018,Social Security wage base,128400,USD,"Max employer Social Security tax $7,960.80; change from prior year 0.9%",SSA Contribution and Benefit Base
+wage_base_history,2019,Social Security wage base,132900,USD,"Max employer Social Security tax $8,239.80; change from prior year 3.5%",SSA Contribution and Benefit Base
+wage_base_history,2020,Social Security wage base,137700,USD,"Max employer Social Security tax $8,537.40; change from prior year 3.6%",SSA Contribution and Benefit Base
+wage_base_history,2021,Social Security wage base,142800,USD,"Max employer Social Security tax $8,853.60; change from prior year 3.7%",SSA Contribution and Benefit Base
+wage_base_history,2022,Social Security wage base,147000,USD,"Max employer Social Security tax $9,114.00; change from prior year 2.9%",SSA Contribution and Benefit Base
+wage_base_history,2023,Social Security wage base,160200,USD,"Max employer Social Security tax $9,932.40; change from prior year 9.0%",SSA Contribution and Benefit Base
+wage_base_history,2024,Social Security wage base,168600,USD,"Max employer Social Security tax $10,453.20; change from prior year 5.2%",SSA Contribution and Benefit Base
+wage_base_history,2025,Social Security wage base,176100,USD,"Max employer Social Security tax $10,918.20; change from prior year 4.4%",SSA Contribution and Benefit Base
+wage_base_history,2026,Social Security wage base,184500,USD,"Max employer Social Security tax $11,439.00; change from prior year 4.8%",SSA Contribution and Benefit Base
+worked_example,"Annual salary $50,000",Employer Social Security (6.2%),3100.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $50,000",Employer Medicare (1.45%),725.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $50,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $50,000",Employer federal total,3867.00,USD,Effective rate 7.73% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $50,000",Employee Additional Medicare Tax withheld,0.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $60,000",Employer Social Security (6.2%),3720.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $60,000",Employer Medicare (1.45%),870.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $60,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $60,000",Employer federal total,4632.00,USD,Effective rate 7.72% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $60,000",Employee Additional Medicare Tax withheld,0.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $100,000",Employer Social Security (6.2%),6200.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $100,000",Employer Medicare (1.45%),1450.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $100,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $100,000",Employer federal total,7692.00,USD,Effective rate 7.69% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $100,000",Employee Additional Medicare Tax withheld,0.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $184,500",Employer Social Security (6.2%),11439.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $184,500",Employer Medicare (1.45%),2675.25,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $184,500",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $184,500",Employer federal total,14156.25,USD,Effective rate 7.67% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $184,500",Employee Additional Medicare Tax withheld,0.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $200,000",Employer Social Security (6.2%),11439.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $200,000",Employer Medicare (1.45%),2900.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $200,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $200,000",Employer federal total,14381.00,USD,Effective rate 7.19% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $200,000",Employee Additional Medicare Tax withheld,0.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $250,000",Employer Social Security (6.2%),11439.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $250,000",Employer Medicare (1.45%),3625.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $250,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $250,000",Employer federal total,15106.00,USD,Effective rate 6.04% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $250,000",Employee Additional Medicare Tax withheld,450.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+worked_example,"Annual salary $500,000",Employer Social Security (6.2%),11439.00,USD,"Employer share only; capped at $184,500 wage base",IRS Publication 15 (2026)
+worked_example,"Annual salary $500,000",Employer Medicare (1.45%),7250.00,USD,Employer share only; no cap,IRS Publication 15 (2026)
+worked_example,"Annual salary $500,000",Employer FUTA (net 0.6%),42.00,USD,Net with full 5.4% state credit; $42.00 maximum,IRS FUTA Credit Reduction
+worked_example,"Annual salary $500,000",Employer federal total,18731.00,USD,Effective rate 3.75% of salary; excludes state taxes and benefits,PayrollTaxReform.com calculation from IRS/SSA rates
+worked_example,"Annual salary $500,000",Employee Additional Medicare Tax withheld,2700.00,USD,"0.9% on wages over $200,000; employee only, employer does not match",IRS Topic No. 751
+deadline,Form 941 (Q4 2025),Filing due date,2026-02-02,date,"Period: Oct-Dec 2025. January 31, 2026 was a Saturday",IRS Publication 509 (2026)
+deadline,Form 941 (Q4 2025),Extended filing date if all deposits timely and in full,2026-02-10,date,Period: Oct-Dec 2025.,IRS Publication 509 (2026)
+deadline,Forms W-2 / W-3 (2025),Furnish to employees and file with SSA,2026-02-02,date,"Period: Tax year 2025. January 31, 2026 was a Saturday",IRS Publication 509 (2026); SSA EFW2
+deadline,Form 940 FUTA (2025),Filing due date,2026-02-02,date,"Period: Tax year 2025. January 31, 2026 was a Saturday",IRS Publication 509 (2026)
+deadline,Form 940 FUTA (2025),Extended filing date if all deposits timely and in full,2026-02-10,date,Period: Tax year 2025.,IRS Publication 509 (2026)
+deadline,Form 941 (Q1 2026),Filing due date,2026-04-30,date,Period: Jan-Mar 2026.,IRS Publication 509 (2026)
+deadline,Form 941 (Q1 2026),Extended filing date if all deposits timely and in full,2026-05-11,date,"Period: Jan-Mar 2026. May 10, 2026 was a Sunday",IRS Publication 509 (2026)
+deadline,Form 941 (Q2 2026),Filing due date,2026-07-31,date,Period: Apr-Jun 2026.,IRS Publication 509 (2026)
+deadline,Form 941 (Q2 2026),Extended filing date if all deposits timely and in full,2026-08-10,date,Period: Apr-Jun 2026.,IRS Publication 509 (2026)
+deadline,Form 941 (Q3 2026),Filing due date,2026-11-02,date,"Period: Jul-Sep 2026. October 31, 2026 was a Saturday",IRS Publication 509 (2026)
+deadline,Form 941 (Q3 2026),Extended filing date if all deposits timely and in full,2026-11-10,date,Period: Jul-Sep 2026.,IRS Publication 509 (2026)
+deadline,Form 941 (Q4 2026),Filing due date,2027-02-01,date,"Period: Oct-Dec 2026. January 31, 2027 is a Sunday",IRS Publication 509 (2026)
+deadline,Form 941 (Q4 2026),Extended filing date if all deposits timely and in full,2027-02-10,date,Period: Oct-Dec 2026.,IRS Publication 509 (2026)
+deadline,Forms W-2 / W-3 (2026),Furnish to employees and file with SSA,2027-02-01,date,"Period: Tax year 2026. January 31, 2027 is a Sunday; paper and electronic filing",SSA EFW2 Tax Year 2026; IRS Publication 509 (2026)
+deadline,Form 940 FUTA (2026),Filing due date,2027-02-01,date,"Period: Tax year 2026. January 31, 2027 is a Sunday",IRS Publication 509 (2026)
+deadline,Form 940 FUTA (2026),Extended filing date if all deposits timely and in full,2027-02-10,date,Period: Tax year 2026.,IRS Publication 509 (2026)
+deadline,Form 1099-NEC (2026),Furnish and file,2027-02-01,date,"Period: Tax year 2026. January 31, 2027 is a Sunday",IRS Employment Tax Due Dates
+deposit_schedule,Monthly depositor,Deposit due,15,day of following month,"$50,000 or less in employment taxes in the lookback period; new employers start monthly",IRS Topic No. 757; IRS Employment Tax Due Dates
+deposit_schedule,Semiweekly depositor,Deposit due - paydays Wed-Fri,following Wednesday,weekday,"More than $50,000 in the lookback period",IRS Topic No. 757; IRS Employment Tax Due Dates
+deposit_schedule,Semiweekly depositor,Deposit due - paydays Sat-Tue,following Friday,weekday,"More than $50,000 in the lookback period",IRS Topic No. 757; IRS Employment Tax Due Dates
+deposit_schedule,"$100,000 next-day rule",Deposit due,next business day,days,"If $100,000 or more in taxes accumulates on any day during a deposit period",IRS Topic No. 757; IRS Employment Tax Due Dates
+deposit_schedule,FUTA deposits,Deposit threshold,500,USD,"If FUTA liability is $500 or less in a quarter, carry it to the next quarter; deposit once it reaches $500 or more, by the last day of the first month after the quarter",IRS Employment Tax Due Dates
