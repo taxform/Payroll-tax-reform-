@@ -22,8 +22,10 @@
 
   var recent = new Map();
   function partnerClick(event) {
-    // Ignore scripted clicks, right-click menus, and cancelled navigation.
-    if (!event.isTrusted || event.defaultPrevented) return;
+    // Ignore scripted clicks and right-click menus. This runs in the capture phase,
+    // before affiliate scripts (Impact, Stay22, etc.) can rewrite or intercept the click,
+    // so a partner click is still counted when another script handles the navigation.
+    if (!event.isTrusted) return;
     if (event.type === 'click' && event.button !== 0) return;
     if (event.type === 'auxclick' && event.button !== 1) return;
     var target = event.target;
@@ -45,6 +47,6 @@
     });
     // Do not cancel the click, delay navigation, or assign an invented sale value.
   }
-  document.addEventListener('click', partnerClick);
-  document.addEventListener('auxclick', partnerClick);
+  document.addEventListener('click', partnerClick, true);
+  document.addEventListener('auxclick', partnerClick, true);
 })();
