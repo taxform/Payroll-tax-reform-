@@ -10,8 +10,8 @@
   --navy-alt: #132238;
   --gold: #d5ab56;
   --gold-hover: #e8c578;
-  --text: #e9edf5;
-  --muted: #b8c3d4;
+  --text: #f4f7fc;
+  --muted: #d6deea;
   --border: rgba(213, 171, 86, 0.25);
   --border-subtle: rgba(255, 255, 255, 0.1);
   --success: #34d399;
@@ -31,8 +31,9 @@ body {
   color: var(--text);
   font-family: Arial, Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.65;
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
+  font-size: 17px;
+  -webkit-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -65,7 +66,7 @@ textarea:focus-visible {
 .top {
   background: #07101f;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14.5px;
   padding: 9px 0;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -137,7 +138,7 @@ textarea:focus-visible {
 /* Breadcrumbs */
 .breadcrumb {
   padding: 14px 0 0;
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--muted);
 }
 
@@ -180,7 +181,7 @@ textarea:focus-visible {
 
 .eyebrow {
   color: var(--gold);
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -310,7 +311,7 @@ h3 {
   background: rgba(213, 171, 86, 0.15);
   color: var(--gold);
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -528,7 +529,7 @@ textarea.snippet {
   border-radius: 8px;
   color: var(--text);
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 13px;
+  font-size: 14.5px;
   padding: 12px 14px;
   margin: 12px 0;
   white-space: pre-wrap;
@@ -795,7 +796,7 @@ textarea.snippet {
 .bl-stat { gap: 6px; }
 .bl-label { color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .05em; }
 .bl-value { font-size: 38px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.bl-sub { font-size: 13px; }
+.bl-sub { font-size: 14.5px; }
 .bl-meta { margin-top: 14px; font-size: 14px; }
 .bl-note { margin-top: 30px; }
 @media (max-width: 640px) { .bl-row { flex-direction: column; } }
