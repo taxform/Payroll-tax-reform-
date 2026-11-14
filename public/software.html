@@ -141,12 +141,12 @@ crossorigin="anonymous"></script>
 
 .software-heading h1 {
   font-size: clamp(30px, 5vw, 48px);
-  color: #101d33;
+  color: #ffffff;
   line-height: 1.2;
 }
 
 .software-heading p {
-  color: #44526a;
+  color: var(--muted);
   max-width: 760px;
   margin: auto;
 }
@@ -159,21 +159,21 @@ crossorigin="anonymous"></script>
 }
 
 .software-card {
-  background: white;
+  background: var(--navy-card);
   padding: 30px;
   border-radius: 14px;
-  border: 1px solid #dce3ed;
-  box-shadow: 0 8px 28px rgba(16,35,61,.07);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 28px rgba(0,0,0,.25);
 }
 
 .software-card h2 {
-  color: #101d33;
+  color: #ffffff;
   margin-top: 0;
 }
 
 .software-card p,
 .software-card li {
-  color: #44526a;
+  color: var(--muted);
 }
 
 .software-card ul {
@@ -193,27 +193,36 @@ crossorigin="anonymous"></script>
 
 .software-button:hover {
   background: #e8c578;
+  color: #101d33;
+}
+
+.software-card strong,
+.software-section strong,
+.software-card h3,
+.software-section h3 {
+  color: #ffffff;
 }
 
 .software-section {
-  background: white;
+  background: var(--navy-card);
   padding: 30px;
   border-radius: 14px;
-  border: 1px solid #dce3ed;
+  border: 1px solid var(--border);
   margin: 30px 0;
 }
 
 .software-section h2 {
-  color: #101d33;
+  color: #ffffff;
 }
 
 .software-section p,
 .software-section li {
-  color: #44526a;
+  color: var(--muted);
 }
 
 .software-disclosure {
-  background: #fff8e8;
+  background: #14233b;
+  color: var(--text);
   border-left: 4px solid #d5ab56;
   padding: 18px;
   margin: 25px 0;
@@ -306,7 +315,7 @@ crossorigin="anonymous"></script>
 </header>
 
 <div style="max-width:1190px;margin:14px auto 0;padding:0 22px;font-size:14.5px;color:#d6deea;">
-  <a href="/" style="color:#d5ab56;text-decoration:none;">Home</a> / <span style="color:#101d33;font-weight:600;">Software Comparison</span>
+  <a href="/" style="color:#d5ab56;text-decoration:none;">Home</a> / <span style="color:#ffffff;font-weight:600;">Software Comparison</span>
 </div>
 
 <main class="software-container">
