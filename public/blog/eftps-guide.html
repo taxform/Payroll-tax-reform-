@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Pay Federal Payroll Taxes with EFTPS (2026) | PayrollTaxReform.com</title>
+<meta name="description" content="EFTPS is how employers pay federal payroll taxes: withheld income tax, Social Security, Medicare, and FUTA. This guide covers enrollment, monthly vs. semiweekly deposit schedules, the 8 p.m. ET deadline, the $100,000 next-day rule, same-day wires, and late-deposit penalties — with worked examples.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is EFTPS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "EFTPS — the Electronic Federal Tax Payment System — is the free service run by the U.S. Department of the Treasury that employers use to pay federal taxes electronically, including payroll tax deposits. You enroll once at eftps.gov, then schedule payments that are debited from your business bank account by ACH on the date you choose."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I have to use EFTPS to pay federal payroll taxes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, for practical purposes. Federal payroll tax deposits must be made electronically, and EFTPS is the system the IRS provides for them. There is no paper check or coupon option for payroll tax deposits. The only same-day alternative is a Fedwire same-day wire through your bank."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does EFTPS enrollment take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Online enrollment takes up to five business days to process, and the IRS then mails your PIN to your address of record — expect it within five to seven business days. You cannot schedule payments until you have the PIN and have created your Internet password, so enroll as soon as you hire your first employee. Paper enrollment on Form 9779 is slower: the PIN arrives within two weeks after EFTPS receives the form."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Am I a monthly or semiweekly depositor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on your lookback period: the total Form 941 tax liability you reported from July 1, 2024 through June 30, 2025. If that total was $50,000 or less, you are a monthly depositor for 2026 and deposit each month's taxes by the 15th of the following month. If it was more than $50,000, you are a semiweekly depositor and deposit within days of each payday. New employers are monthly depositors in their first year."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the 8 p.m. ET deadline for EFTPS payments?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "To count as on time, an EFTPS payment must be scheduled by 8:00 p.m. Eastern Time on the day before the due date. If you submit after 8 p.m., the earliest settlement date moves forward a business day — and if that pushes past the due date, the deposit is late. The one exception is a same-day EFTPS payment of $1,000,000 or less submitted before 3:00 p.m. ET on a business day."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I miss my deposit deadline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Make the deposit immediately — a late deposit stops getting more expensive the day you pay it, because the failure-to-deposit penalty grows with time. If you missed the 8 p.m. ET EFTPS cutoff but still need the money in the same day, your bank may be able to send a same-day Fedwire wire using the IRS Same-Day Taxpayer Worksheet. Do not pay with the return instead of depositing unless the under-$2,500 rule applies; paying with the return when a deposit was required draws a 10% penalty."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the penalties for a late federal payroll tax deposit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The failure-to-deposit penalty under IRC section 6656 is tiered: 2% if the deposit is 1 to 5 days late, 5% if 6 to 15 days late, 10% if more than 15 days late, and 15% for amounts still unpaid more than 10 days after the first IRS notice. Interest accrues on top of the penalty. A $5,660 deposit that is 8 days late costs $283 in penalties; 20 days late costs $566."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does EFTPS work with Forms 941 and 940?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "EFTPS carries the deposits; the forms report them. Form 941 is the quarterly return for withheld income tax and Social Security/Medicare taxes, and its deposits follow your monthly or semiweekly schedule. Form 940 is the annual FUTA return: you deposit FUTA only in a quarter when the FUTA liability exceeds $500, and smaller amounts carry forward. Very small employers may file Form 944 annually instead of Form 941 and pay with the return."
+      }
+    }
+  ]
+}
+</script>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.65; color: #1a1a1a; max-width: 760px; margin: 0 auto; padding: 24px 20px 60px; }
+  h1 { font-size: 1.9em; line-height: 1.25; margin-bottom: 0.2em; }
+  h2 { font-size: 1.35em; margin-top: 1.8em; border-top: 1px solid #ddd; padding-top: 1em; }
+  h3 { font-size: 1.1em; margin-top: 1.4em; }
+  .meta { color: #666; font-size: 0.9em; margin-bottom: 1.5em; }
+  .quick-answer { background: #f2f7f2; border-left: 4px solid #2e7d32; padding: 14px 18px; margin: 1.2em 0; }
+  .note { background: #fff8e1; border-left: 4px solid #e6a700; padding: 12px 18px; margin: 1.2em 0; font-size: 0.95em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+  th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #f5f5f5; }
+  ol, ul { padding-left: 1.4em; }
+  li { margin-bottom: 0.4em; }
+  .faq p { margin: 0.3em 0 1em; }
+  .sources { font-size: 0.92em; color: #444; }
+  .sources li { margin-bottom: 0.6em; }
+  a { color: #1a5fb4; }
+</style>
+</head>
+<body>
+
+<h1>How to Pay Federal Payroll Taxes with EFTPS (2026)</h1>
+<p class="meta">EFTPS explainer &middot; Published November 15, 2026</p>
+
+<p>Every payday creates a federal tax bill: the income tax you withheld from your employees, plus Social Security and Medicare taxes from both sides of the paycheck. That money does not wait until you file your quarterly return — you deposit it with the Treasury on a schedule the IRS sets for you, and the way you send it is EFTPS, the Electronic Federal Tax Payment System. This guide explains what EFTPS is, how to enroll, which deposit schedule you are on, the deadlines that actually matter, and what a late deposit costs — with worked examples.</p>
+
+<p class="quick-answer"><strong>Quick answer:</strong> EFTPS is the free online system run by the U.S. Department of the Treasury for paying federal taxes, including payroll tax deposits. You enroll once at eftps.gov, the IRS mails you a PIN within five to seven business days, and then you schedule payments that are debited from your business bank account on the date you choose. Every payment must be scheduled by <strong>8:00 p.m. Eastern Time the day before the due date</strong>. Whether you deposit monthly or semiweekly depends on your lookback period — $50,000 or less in Form 941 tax liability means monthly; more means semiweekly. Miss a deposit and the penalty is 2%, 5%, or 10% depending on how late you are.</p>
+
+<p class="note"><strong>Figures checked November 15, 2026.</strong> Deposit rules, thresholds, and penalty rates in this guide are the 2026 values from IRS Publication 15 (2026), the EFTPS Financial Institution Handbook, and the IRS pages listed in Sources. Tax law and IRS procedures change — confirm the current figures with the IRS before you file or pay.</p>
+
+<h2>What EFTPS is — and who must use it</h2>
+
+<p>EFTPS is the Electronic Federal Tax Payment System, a free service of the U.S. Department of the Treasury. It is how employers send federal tax deposits to the IRS: withheld federal income tax, the employer and employee shares of Social Security and Medicare taxes, and FUTA (federal unemployment tax). You use it at <strong>eftps.gov</strong>, by phone through the EFTPS voice response system, or through a payroll provider or reporting agent authorized to pay on your behalf.</p>
+
+<p>Federal payroll tax deposits must be made electronically — EFTPS is the channel the IRS provides for them, and there is no paper check or coupon option for payroll tax deposits. That applies to essentially every employer with employees: if you run payroll, you deposit through EFTPS. Three groups should note the exceptions and edges:</p>
+
+<ul>
+<li><strong>Corporations</strong> must deposit federal taxes electronically — EFTPS is the way.</li>
+<li><strong>Household employers</strong> with an EIN enroll in EFTPS the same way any business does.</li>
+<li><strong>Individuals</strong> can no longer create new EFTPS enrollments — since October 17, 2025, new individual enrollment is closed, and individuals pay their own taxes through IRS Direct Pay or an IRS Online Account instead. Businesses with an EIN are unaffected and still enroll normally.</li>
+</ul>
+
+<p>EFTPS is not a tax return and it is not tax software. It moves money. The returns — Form 941 quarterly and Form 940 annually — are where you report what you deposited. A deposit made through EFTPS is credited to your account for the tax form, tax type, and tax period you select when you schedule it, so getting those three fields right matters as much as the amount. A payment applied to the wrong period is a misapplied deposit, and fixing it takes a phone call.</p>
+
+<h2>How to enroll in EFTPS</h2>
+
+<p>Enrollment is a one-time setup, and the only slow part is the mail. Enroll as soon as you hire your first employee — not the week your first deposit is due.</p>
+
+<h3>What you need before you start</h3>
+<ul>
+<li>Your <strong>Employer Identification Number (EIN)</strong>.</li>
+<li>Your business legal name and mailing address <strong>exactly as they appear on your IRS records</strong> — the PIN is mailed to the address the IRS has on file, so if you moved and never told the IRS, fix that first.</li>
+<li>The <strong>routing number and account number</strong> of the bank account you want payments debited from. Use your business account, not a personal one.</li>
+<li>A <strong>Login.gov or ID.me account</strong> for multi-factor sign-in, which EFTPS has required since October 19, 2023.</li>
+</ul>
+
+<h3>Enroll online (fastest)</h3>
+<ol>
+<li>Go to <strong>eftps.gov</strong> and select <strong>Enrollment</strong>, then <strong>Business</strong>.</li>
+<li>Enter your EIN, business name and address, and bank account and routing numbers. Review and submit.</li>
+<li>The IRS validates your information. New enrollments take <strong>up to five business days</strong> to process.</li>
+<li>Watch your mail. The IRS mails your <strong>Personal Identification Number (PIN)</strong> to your address of record, usually within <strong>five to seven business days</strong>.</li>
+<li>When the PIN arrives, return to eftps.gov, enter your EIN and PIN, and create your <strong>Internet Password</strong>. Your account is now active and you can schedule payments.</li>
+</ol>
+
+<h3>Enroll by mail (slower)</h3>
+<p>Complete <strong>IRS Form 9779</strong>, Electronic Federal Tax Payment System Business Enrollment, and mail it to the EFTPS Enrollment Processing Center, P.O. Box 173788, Denver, CO 80217-3788. The PIN arrives within <strong>two weeks after EFTPS receives the form</strong> — longer than online enrollment, because the form has to travel by mail and be keyed in by hand. If a deposit deadline is approaching, paper enrollment will not clear in time.</p>
+
+<h3>Enroll by phone</h3>
+<p>Call EFTPS Customer Service at <strong>1-800-555-4477</strong> (English) or 1-800-244-4829 (Spanish). The automated voice response system for making payments is <strong>1-800-555-3453</strong>. If your PIN never arrives and two weeks have passed since enrollment, call customer service rather than enrolling again — a duplicate enrollment creates a second account and confusion over which one is active.</p>
+
+<p><strong>Check whether you are already enrolled.</strong> A new employer that indicated a federal tax obligation when it applied for its EIN is pre-enrolled and receives a PIN mailing with activation instructions. If you applied for an EIN recently, look for that letter before starting a new enrollment.</p>
+
+<p class="note"><strong>A correction to a common misunderstanding:</strong> enrollment does <em>not</em> give you a 15-digit EFTPS number. You log in with your EIN, the mailed PIN, and the Internet Password you create. The 15-digit number associated with EFTPS is the <strong>EFT number</strong> assigned by the Federal Tax Collection Service to a <strong>same-day Fedwire payment</strong> — it is proof that a wire was made, not an account number. See the same-day wire section below.</p>
+
+<h2>Your deposit schedule: monthly vs. semiweekly</h2>
+
+<p>Your deposit schedule for a calendar year is set before the year begins, by a <strong>lookback period</strong>: the four quarters from July 1 through June 30 that end in the prior year. For 2026, the lookback period is <strong>July 1, 2024 through June 30, 2025</strong>. Add the total tax from line 12 of each Form 941 in that period — that is the number the IRS uses.</p>
+
+<table>
+<tr><th>Your lookback total (Form 941, line 12)</th><th>Your 2026 schedule</th><th>Deposit deadline</th></tr>
+<tr><td><strong>$50,000 or less</strong></td><td><strong>Monthly depositor</strong></td><td>Deposit the taxes accumulated during a month by the <strong>15th of the following month</strong></td></tr>
+<tr><td><strong>More than $50,000</strong></td><td><strong>Semiweekly depositor</strong></td><td>Deposit within days of each payday (see below)</td></tr>
+</table>
+
+<p>Exactly $50,000 is monthly — the line is a cliff, not a range, and $50,001 is semiweekly. Corrections on Form 941-X do not change your lookback total: the IRS uses the amounts as originally reported. And your schedule has nothing to do with how often you pay your employees — a weekly-payroll employer with a small liability is still a monthly depositor.</p>
+
+<h3>Monthly depositors</h3>
+<p>Deposit all employment taxes accumulated during a calendar month by the 15th of the following month. Wages paid in October 2026 are deposited by <strong>November 15, 2026</strong>. If the 15th falls on a weekend or a legal holiday, the deadline moves to the next business day. <strong>New employers are monthly depositors in their first calendar year</strong> — tax liability for any quarter in the lookback period before the business started is treated as zero.</p>
+
+<h3>Semiweekly depositors</h3>
+<p>Your week is split into two deposit periods, and the deadline depends on which day you pay your employees:</p>
+
+<table>
+<tr><th>Payday falls on</th><th>Deposit by</th></tr>
+<tr><td>Wednesday, Thursday, or Friday</td><td>The <strong>following Wednesday</strong></td></tr>
+<tr><td>Saturday, Sunday, Monday, or Tuesday</td><td>The <strong>following Friday</strong></td></tr>
+</table>
+
+<p>If a deposit due date falls on a weekend or legal holiday, it moves to the next business day. Semiweekly depositors report their liability by pay date on <strong>Schedule B (Form 941)</strong>; monthly depositors report it by month on <strong>Form 941, line 16</strong>.</p>
+
+<h2>Two rules that override your schedule</h2>
+
+<p>Two rules beat the monthly/semiweekly schedule, in opposite directions.</p>
+
+<h3>The $100,000 next-day rule</h3>
+<p>If you accumulate <strong>$100,000 or more in taxes on any day</strong> during a deposit period, the whole amount is due by the <strong>next business day</strong> — regardless of whether you are a monthly or semiweekly depositor. A monthly depositor that hits $100,000 becomes a semiweekly depositor the next day, for the rest of that year and all of the next year. This is the rule that catches growing businesses: a single large bonus payroll, or a payroll that includes several highly paid employees, can push one day's liability over $100,000 without warning. The $100,000 is measured before any reduction for nonrefundable credits.</p>
+
+<h3>The $2,500 rule</h3>
+<p>On the small end, if your total tax for the <strong>current quarter or the prior quarter is less than $2,500</strong>, and you did not trigger the $100,000 next-day rule during the current quarter, you do not have to deposit at all — you may pay the tax with a <strong>timely filed Form 941</strong> instead. A one-person business with a quarterly liability of $1,800, for example, can simply pay when it files. The moment either quarter reaches $2,500, deposits resume on your normal schedule.</p>
+
+<h2>Worked example: one month of deposits, and what late costs</h2>
+
+<p>Take a small employer with four employees, each paid $5,000 a month. Monthly wages are $20,000. Here is the deposit for that month:</p>
+
+<table>
+<tr><th>Component</th><th>Calculation</th><th>Amount</th></tr>
+<tr><td>Federal income tax withheld</td><td>Assume $650 per employee</td><td>$2,600.00</td></tr>
+<tr><td>Social Security — employee share</td><td>6.2% &times; $20,000</td><td>$1,240.00</td></tr>
+<tr><td>Social Security — employer share</td><td>6.2% &times; $20,000</td><td>$1,240.00</td></tr>
+<tr><td>Medicare — employee share</td><td>1.45% &times; $20,000</td><td>$290.00</td></tr>
+<tr><td>Medicare — employer share</td><td>1.45% &times; $20,000</td><td>$290.00</td></tr>
+<tr><td><strong>Total deposit</strong></td><td></td><td><strong>$5,660.00</strong></td></tr>
+</table>
+
+<p>This employer is a monthly depositor, so the $5,660 for October's payroll is due by November 15, 2026 — and the EFTPS payment must be scheduled by 8:00 p.m. ET on November 14. Now suppose the employer misses it:</p>
+
+<table>
+<tr><th>How late</th><th>Penalty rate</th><th>Penalty on $5,660</th></tr>
+<tr><td>1–5 days</td><td>2%</td><td>$113.20</td></tr>
+<tr><td>6–15 days</td><td>5%</td><td>$283.00</td></tr>
+<tr><td>More than 15 days</td><td>10%</td><td>$566.00</td></tr>
+<tr><td>Still unpaid 10+ days after the first IRS notice</td><td>15%</td><td>$849.00</td></tr>
+</table>
+
+<p>Interest accrues on top of the penalty, and the penalty is charged on the amount that was late — so a deposit that is half-paid on time is penalized only on the late half. The cheapest day to pay a late deposit is today: every day you wait moves you toward the next tier.</p>
+
+<h2>How to schedule a payment, step by step</h2>
+
+<ol>
+<li><strong>Log in at eftps.gov</strong> with your EIN, PIN, and Internet Password, plus multi-factor authentication through Login.gov or ID.me. You can also schedule by phone through the voice response system at 1-800-555-3453.</li>
+<li><strong>Select "Make a Payment."</strong> Choose the tax form — <strong>941</strong> for withheld income tax and Social Security/Medicare, <strong>940</strong> for FUTA.</li>
+<li><strong>Choose the tax type and the tax period.</strong> For Form 941, the period is the calendar quarter (for example, 3rd quarter 2026). Double-check this: a payment applied to the wrong quarter is a misapplied deposit.</li>
+<li><strong>Enter the amount</strong> and the <strong>settlement date</strong> — the date the Treasury will debit your bank account. The settlement date must fall on or before the due date.</li>
+<li><strong>Pick the bank account</strong> the payment comes from, then review everything on the confirmation screen.</li>
+<li><strong>Submit.</strong> EFTPS immediately issues an <strong>EFT Acknowledgment Number</strong>. Save it — it is your proof that the payment was submitted on time, and you will need it if the IRS ever disputes the payment date or if you need to change the payment later.</li>
+</ol>
+
+<p>Three timing facts make the system forgiving if you use it right:</p>
+<ul>
+<li><strong>The 8 p.m. ET rule.</strong> Schedule by 8:00 p.m. Eastern Time the day before the due date. Submit after 8 p.m. and the earliest settlement date shifts forward one business day — which makes the deposit late if the due date was the next day.</li>
+<li><strong>Schedule up to 365 days in advance.</strong> EFTPS lets you warehouse payments: as soon as a payroll is finalized and the liability is known, schedule the deposit for its due date. Semiweekly and monthly depositors can set up a whole quarter at once.</li>
+<li><strong>Change or cancel up to two business days before the scheduled date.</strong> If you find a payroll error after scheduling, cancel the payment first — EFTPS issues a cancellation acknowledgment number — then schedule the corrected one. Do not schedule a second payment on top of the first.</li>
+</ul>
+
+<p>You can view up to <strong>16 months of payment history</strong> online, which is the record to reconcile against your payroll reports each quarter. If a payment does not appear, or the amount looks wrong, call EFTPS Customer Service at 1-800-555-4477 before the due date, not after.</p>
+
+<h2>Missed the deadline? The same-day options</h2>
+
+<p>If the 8 p.m. ET cutoff has passed and the due date is today, EFTPS may still save you. <strong>EFTPS accepts same-day payments for business tax payments of $1,000,000 or less submitted before 3:00 p.m. ET on a business day.</strong> Anything larger must be scheduled by 8 p.m. ET the day before. If you are inside that window, schedule the payment immediately — a same-day EFTPS payment that settles on the due date is on time.</p>
+
+<p>If that window has closed too, the fallback is a <strong>same-day wire</strong> through your bank. This is not processed through EFTPS itself:</p>
+
+<ol>
+<li>Download the <strong>IRS Same-Day Taxpayer Worksheet</strong> and complete it for the tax form, tax period, and amount you are paying. A separate worksheet is required for each form or period.</li>
+<li>Take it to your bank. The bank initiates a Fedwire transfer to the Treasury's Federal Tax Collection Service on your behalf.</li>
+<li>Your bank's fees and cutoff times apply, and not every institution offers the service — confirm both with your bank before you need it, not at 4 p.m. on a due date.</li>
+<li>Keep the proof: the <strong>IMAD number</strong> (Input Message Accountability Data) from your bank and the <strong>15-digit EFT number</strong> assigned by the Federal Tax Collection Service. Treasury regulations require your bank to provide both numbers on request.</li>
+</ol>
+
+<p>A same-day wire costs a bank fee and takes a trip to the bank, but it beats a late-deposit penalty on any deposit of meaningful size. It is a fallback, not a plan — if you are wiring more than once a year, your scheduling process is broken.</p>
+
+<h2>What happens if a deposit is late</h2>
+
+<p>The failure-to-deposit penalty is set by Internal Revenue Code section 6656, and it is a ladder, not a flat rate. The longer the deposit is late, the higher the percentage — and the penalty applies to the amount that was late, not to your whole quarter.</p>
+
+<table>
+<tr><th>Deposit late by</th><th>Penalty</th></tr>
+<tr><td>1–5 days</td><td><strong>2%</strong> of the late amount</td></tr>
+<tr><td>6–15 days</td><td><strong>5%</strong></td></tr>
+<tr><td>More than 15 days</td><td><strong>10%</strong></td></tr>
+<tr><td>More than 10 days after the first IRS notice or demand</td><td><strong>15%</strong></td></tr>
+</table>
+
+<p>Two more 10% traps:</p>
+<ul>
+<li><strong>Paying with the return when a deposit was required</strong> draws a 10% penalty on the amount paid that way, unless the $2,500 rule or the accuracy-of-deposits rule covers it. This is the expensive version of the $2,500 rule mistake: small employers who could pay with the return do so safely, but an employer that owed deposits and mailed a check with Form 941 instead pays 10% for the convenience.</li>
+<li><strong>The averaged penalty.</strong> If your deposits were not made on time and in full, the IRS may apply an averaged failure-to-deposit penalty of 2% to 10% on returns with tax of $2,500 or more, instead of computing the penalty deposit by deposit.</li>
+</ul>
+
+<p>Penalties are not the only cost: <strong>interest accrues on any unpaid tax</strong> from the due date until it is paid, at the IRS underpayment rate, which the IRS resets every quarter. And a deposit that fails because the bank account had insufficient funds does not count as a deposit at all — the money has to actually leave your account on the settlement date. If the IRS assesses a penalty you believe is wrong — for example, a deposit that was timely but misapplied to the wrong period — you can request penalty abatement, and first-time abatement is available for employers with a clean compliance history. That is a request, not a right; the reliable fix is to deposit on time.</p>
+
+<h2>How EFTPS fits with Form 941 and Form 940</h2>
+
+<p>EFTPS carries the money; the forms report it. The two returns use EFTPS differently:</p>
+
+<table>
+<tr><th></th><th>Form 941</th><th>Form 940</th></tr>
+<tr><td><strong>What it reports</strong></td><td>Withheld income tax + Social Security/Medicare taxes</td><td>FUTA (federal unemployment tax)</td></tr>
+<tr><td><strong>How often filed</strong></td><td>Quarterly</td><td>Annually</td></tr>
+<tr><td><strong>Deposit schedule</strong></td><td>Monthly or semiweekly, by lookback</td><td>Quarterly, only when liability exceeds $500</td></tr>
+<tr><td><strong>Deposit reported on</strong></td><td>Line 16 (monthly) or Schedule B (semiweekly)</td><td>Line 14, by quarter</td></tr>
+<tr><td><strong>2026 due dates</strong></td><td>Apr 30, Jul 31, Nov 2, Feb 1, 2027</td><td>Feb 1, 2027</td></tr>
+</table>
+
+<p><strong>Form 941.</strong> Filed quarterly; the 2026 due dates are April 30, July 31, and November 2 (October 31 falls on a Saturday), with the fourth-quarter return due February 1, 2027 (January 31 is a Sunday). If you deposited all your taxes on time and in full, the IRS gives you 10 extra days to file. Your EFTPS deposits for the quarter are totaled on line 13, and the balance due or overpayment is figured on lines 14–15.</p>
+
+<p><strong>Form 940 and the $500 rule.</strong> FUTA is 6.0% on the first $7,000 of each employee's wages — $420 per employee before credits, $42 after the 5.4% SUTA credit. FUTA deposits are quarterly, but only when the liability exceeds $500: if your FUTA tax for the quarter is $500 or less, you carry it forward to the next quarter instead of depositing it. A 10-employee business owes $420 of FUTA for the whole year — $105 a quarter — so it never makes a quarterly FUTA deposit and pays the full $420 with Form 940 by February 1, 2027. A 50-employee business owes $2,100 a year, $525 a quarter, and deposits $525 each quarter through EFTPS.</p>
+
+<p><strong>Form 944.</strong> Very small employers whose annual employment tax liability is $1,000 or less may be invited by the IRS to file Form 944 once a year instead of Form 941 quarterly — and to pay with the return instead of depositing. If you file Form 944, your lookback rules are different: a former Form 944 filer uses the prior calendar year as its lookback period.</p>
+
+<p>For the full line-by-line returns, see our Form 941 guide and our Form 940 guide, linked below. EFTPS is where the money moves; the guides are where the forms get filled in.</p>
+
+<h2>Practical tips: recordkeeping, confirmation, and avoiding trouble</h2>
+
+<ul>
+<li><strong>Save every acknowledgment number.</strong> Each EFTPS payment produces an EFT Acknowledgment Number, and each cancellation produces another. Keep them with your payroll records for the quarter — they are your proof of timely payment if the IRS ever questions a deposit date.</li>
+<li><strong>Reconcile every quarter.</strong> Compare the 16 months of payment history available in EFTPS against your payroll software's deposit report and the totals on Form 941, line 13. A deposit applied to the wrong period shows up here first, while there is still time to fix it.</li>
+<li><strong>Schedule right after payroll is finalized.</strong> The liability is known the moment payroll runs. Schedule the deposit then, up to 365 days out, instead of remembering to do it the day before the deadline.</li>
+<li><strong>Use a dedicated business bank account</strong> for EFTPS debits, and keep the balance above the scheduled debit. A returned debit is not a deposit, and the penalty clock does not stop for an insufficient-funds return.</li>
+<li><strong>Keep the PIN and password secure and separate.</strong> The PIN arrives by mail precisely so it cannot be intercepted online. Do not email it, do not store it in a shared document, and change the Internet Password if anyone who had access leaves the business.</li>
+<li><strong>Update bank details before you switch banks.</strong> Add the new account to EFTPS and verify it before closing the old one, or a scheduled debit will bounce.</li>
+<li><strong>A payroll provider can deposit for you</strong> if you authorize it on Form 8655, Reporting Agent Authorization. The provider enrolls your EIN and makes deposits in your name — but the liability for a missed deposit stays with you, so verify the provider's deposits in your own EFTPS payment history.</li>
+<li><strong>Do not use personal payment services for payroll deposits.</strong> Online bill pay and person-to-person payment apps cannot make a federal tax deposit, and a payment sent that way is not a deposit.</li>
+</ul>
+
+<h2>5 mistakes that cost employers money on EFTPS</h2>
+
+<ol>
+<li><strong>Enrolling the week a deposit is due.</strong> The PIN takes five to seven business days by mail, and you cannot pay until you have it. Enroll when you hire your first employee; the deposit deadline does not wait for the post office.</li>
+<li><strong>Scheduling after 8 p.m. ET the day before.</strong> An EFTPS payment entered at 8:30 p.m. settles a business day later than you think. If the due date was the next day, that deposit is late — and the penalty is 2% before you have even noticed.</li>
+<li><strong>Selecting the wrong form or period.</strong> A Form 941 deposit applied to a Form 940 period, or a third-quarter payment applied to the second quarter, is a misapplied deposit. The money left your account, but the quarter you owed still shows unpaid. Check form, type, and period on the confirmation screen every time.</li>
+<li><strong>Forgetting the $100,000 next-day rule.</strong> A monthly depositor with a big bonus payroll can owe $100,000 on a single day and not realize the deposit is due tomorrow, not the 15th of next month. Large or unusual payrolls deserve a liability check the same day.</li>
+<li><strong>Paying with the return instead of depositing.</strong> Mailing a check with Form 941 when deposits were required draws a 10% penalty on the amount. The $2,500 rule is the only safe version of paying with the return — if your quarter is over $2,500, deposit through EFTPS.</li>
+</ol>
+
+<div class="faq">
+<h2>Frequently asked questions</h2>
+
+<p><strong>Q: What is EFTPS?</strong></p>
+<p>A: EFTPS — the Electronic Federal Tax Payment System — is the free service run by the U.S. Department of the Treasury that employers use to pay federal taxes electronically, including payroll tax deposits. You enroll once at eftps.gov, then schedule payments that are debited from your business bank account by ACH on the date you choose.</p>
+
+<p><strong>Q: Do I have to use EFTPS to pay federal payroll taxes?</strong></p>
+<p>A: Yes, for practical purposes. Federal payroll tax deposits must be made electronically, and EFTPS is the system the IRS provides for them. There is no paper check or coupon option for payroll tax deposits. The only same-day alternative is a Fedwire same-day wire through your bank.</p>
+
+<p><strong>Q: How long does EFTPS enrollment take?</strong></p>
+<p>A: Online enrollment takes up to five business days to process, and the IRS then mails your PIN to your address of record — expect it within five to seven business days. You cannot schedule payments until you have the PIN and have created your Internet password, so enroll as soon as you hire your first employee. Paper enrollment on Form 9779 is slower: the PIN arrives within two weeks after EFTPS receives the form.</p>
+
+<p><strong>Q: Am I a monthly or semiweekly depositor?</strong></p>
+<p>A: It depends on your lookback period: the total Form 941 tax liability you reported from July 1, 2024 through June 30, 2025. If that total was $50,000 or less, you are a monthly depositor for 2026 and deposit each month's taxes by the 15th of the following month. If it was more than $50,000, you are a semiweekly depositor and deposit within days of each payday. New employers are monthly depositors in their first year.</p>
+
+<p><strong>Q: What is the 8 p.m. ET deadline for EFTPS payments?</strong></p>
+<p>A: To count as on time, an EFTPS payment must be scheduled by 8:00 p.m. Eastern Time on the day before the due date. If you submit after 8 p.m., the earliest settlement date moves forward a business day — and if that pushes past the due date, the deposit is late. The one exception is a same-day EFTPS payment of $1,000,000 or less submitted before 3:00 p.m. ET on a business day.</p>
+
+<p><strong>Q: What if I miss my deposit deadline?</strong></p>
+<p>A: Make the deposit immediately — a late deposit stops getting more expensive the day you pay it, because the failure-to-deposit penalty grows with time. If you missed the 8 p.m. ET EFTPS cutoff but still need the money in the same day, your bank may be able to send a same-day Fedwire wire using the IRS Same-Day Taxpayer Worksheet. Do not pay with the return instead of depositing unless the under-$2,500 rule applies; paying with the return when a deposit was required draws a 10% penalty.</p>
+
+<p><strong>Q: What are the penalties for a late federal payroll tax deposit?</strong></p>
+<p>A: The failure-to-deposit penalty under IRC section 6656 is tiered: 2% if the deposit is 1 to 5 days late, 5% if 6 to 15 days late, 10% if more than 15 days late, and 15% for amounts still unpaid more than 10 days after the first IRS notice. Interest accrues on top of the penalty. A $5,660 deposit that is 8 days late costs $283 in penalties; 20 days late costs $566.</p>
+
+<p><strong>Q: How does EFTPS work with Forms 941 and 940?</strong></p>
+<p>A: EFTPS carries the deposits; the forms report them. Form 941 is the quarterly return for withheld income tax and Social Security/Medicare taxes, and its deposits follow your monthly or semiweekly schedule. Form 940 is the annual FUTA return: you deposit FUTA only in a quarter when the FUTA liability exceeds $500, and smaller amounts carry forward. Very small employers may file Form 944 annually instead of Form 941 and pay with the return.</p>
+</div>
+
+<h2>Sources</h2>
+<p class="sources">All figures in this guide were checked against the sources below on November 15, 2026. Deposit rules and penalty rates change — always confirm the current figures with the IRS before you file or pay.</p>
+<ol class="sources">
+<li>IRS, Publication 15 (2026), (Circular E), Employer's Tax Guide, Section 11 — the lookback period (July 1, 2024–June 30, 2025 for 2026), the $50,000 test, monthly and semiweekly schedules, the $100,000 next-day rule, the $2,500 rule, the 8 p.m. ET scheduling rule, the 10-day filing extension for timely depositors, and the averaged failure-to-deposit penalty. The 2026 Social Security wage base ($184,500) and rates (6.2% Social Security, 1.45% Medicare) used in the worked example are also from Publication 15 (2026).</li>
+<li>IRS, EFTPS: The Electronic Federal Tax Payment System — free Treasury service at eftps.gov; online enrollment processing up to five business days; PIN mailed within five to seven business days; multi-factor sign-in through Login.gov or ID.me required since October 19, 2023; no new individual enrollments since October 17, 2025; new EIN applicants pre-enrolled when they indicated a federal tax obligation.</li>
+<li>U.S. Department of the Treasury, EFTPS Financial Institution Handbook (Rev. 10/2025) — same-day EFTPS payments for business tax payments of $1,000,000 or less submitted before 3:00 p.m. ET; payments scheduled up to 365 days in advance; up to 16 months of payment history viewable online; the 15-digit EFT number and IMAD number as proof of a same-day wire payment; EFTPS Customer Service 1-800-555-4477. <a href="https://download.eftps.gov/Financial_Institution_Handbook.pdf">download.eftps.gov/Financial_Institution_Handbook.pdf</a></li>
+<li>U.S. Department of the Treasury, Treasury Financial Manual, Chapter 2000, Electronic Federal Tax Collections — ACH debit warehousing: future-day settlements schedulable up to 365 calendar days in advance; EFT acknowledgment (EFT) numbers issued for timely deposit reports. <a href="https://tfx.treasury.gov/tfm/volume4/part1/chapter-2000-electronic-federal-tax-collections">tfx.treasury.gov/tfm/volume4/part1/chapter-2000-electronic-federal-tax-collections</a></li>
+<li>IRS, Topic No. 759, Form 940 — Filing and Deposit Requirements — FUTA rate 6.0% on the first $7,000, credit of up to 5.4%, net rate 0.6%, and the $500 quarterly deposit rule (carry FUTA forward until the quarterly liability exceeds $500).</li>
+<li>IRS, Topic No. 757, Forms 941 and 944 — Deposit Requirements — the $2,500 rule and the deposit schedules for Form 941 and Form 944 filers.</li>
+<li>IRS, Form 9779, Electronic Federal Tax Payment System Business Enrollment — paper enrollment by mail to the EFTPS Enrollment Processing Center, P.O. Box 173788, Denver, CO 80217-3788; PIN within two weeks after EFTPS receives the form; Form 8655 for reporting-agent authorization.</li>
+<li>IRS, Instructions for Form 941 (Rev. 03/2026) — line 12 as the lookback measure, Schedule B for semiweekly depositors, line 16 for monthly depositors, and the Form 944 lookback rule for former Form 944 filers.</li>
+<li>IRS, Same-Day Wire Federal Tax Payments — the Same-Day Taxpayer Worksheet, one worksheet per tax form and tax period, and Fedwire as the fallback when the EFTPS cutoff is missed.</li>
+<li>Internal Revenue Code section 6656 — the failure-to-deposit penalty tiers: 2% (1–5 days), 5% (6–15 days), 10% (more than 15 days), 15% (unpaid more than 10 days after notice or demand), and 10% for amounts paid directly to the IRS or with the return when a deposit was required.</li>
+</ol>
+
+<h2>Keep reading</h2>
+<ul>
+<li><a href="/blog/how-to-file-form-941.html">How to File Form 941 (2026): Line-by-Line Guide for Employers</a> — the quarterly return where your EFTPS deposits are reported.</li>
+<li><a href="/blog/how-to-file-form-940.html">How to File Form 940 (2026): FUTA Guide for Employers</a> — the annual return for the FUTA deposits in this guide.</li>
+<li><a href="/blog/what-is-suta-state-unemployment-insurance.html">What Is SUTA Tax? State Unemployment Insurance Explained (2026)</a> — the state unemployment tax that earns your FUTA credit.</li>
+<li><a href="/research/2026-payroll-tax-rates-deadlines.html">2026 U.S. Payroll Tax Rates, Wage Bases &amp; Deadlines</a> — the full rates table behind this guide, including the $184,500 Social Security wage base.</li>
+</ul>
+
+</body>
+</html>
