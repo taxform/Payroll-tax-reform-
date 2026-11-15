@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>First Hire Tool — Classification Check, True Cost &amp; Setup Checklist</title>
+    <meta name="description" content="Hiring your first person? Check employee vs. contractor classification risk, see the true cost of the hire with 2026 payroll tax figures, and get your first-hire setup checklist and payroll software match. From Payroll Tax Reform." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,650;0,6..72,800;1,6..72,500&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f4f5f2;
+        --surface: #ffffff;
+        --surface-2: #eceee8;
+        --ink: #1b241e;
+        --ink-soft: #46524a;
+        --line: #d5dad1;
+        --accent: #14663f;
+        --accent-ink: #ffffff;
+        --accent-soft: #e2efe6;
+        --amber: #9a6206;
+        --amber-bg: #faf0da;
+        --red: #a52a1e;
+        --red-bg: #f9e7e3;
+        --green-bg: #e2efe6;
+        --shadow: 0 1px 2px rgba(20, 30, 22, .06), 0 8px 24px rgba(20, 30, 22, .06);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #11150f;
+          --surface: #1a1f18;
+          --surface-2: #232a20;
+          --ink: #e9ede4;
+          --ink-soft: #a9b4a4;
+          --line: #333c2f;
+          --accent: #4cc283;
+          --accent-ink: #0c1a11;
+          --accent-soft: #1e3325;
+          --amber: #e5b95c;
+          --amber-bg: #38300f;
+          --red: #ef9a8d;
+          --red-bg: #3d201b;
+          --green-bg: #1e3325;
+          --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 880px; margin: 0 auto; padding: 0 18px 64px; }
+      h1, h2, h3 { font-family: "Newsreader", Georgia, serif; line-height: 1.15; margin: 0; }
+      a { color: var(--accent); font-weight: 600; }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      .num { font-variant-numeric: tabular-nums; }
+
+      /* ---------- header ---------- */
+      header.intro { padding: 34px 0 8px; }
+      .brandline { font-size: .8rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+      h1 { font-size: clamp(2rem, 6vw, 3.1rem); font-weight: 800; letter-spacing: -.01em; }
+      h1 em { font-style: italic; font-weight: 500; }
+      .lede { font-size: 1.08rem; color: var(--ink-soft); max-width: 62ch; margin: 14px 0 0; }
+      .lede strong { color: var(--ink); }
+
+      /* ---------- step nav ---------- */
+      nav.steps {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; gap: 8px; flex-wrap: wrap;
+        padding: 12px 0; margin-top: 18px;
+        background: var(--bg);
+      }
+      nav.steps a {
+        flex: 1 1 150px; text-decoration: none; color: var(--ink);
+        background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+        padding: 9px 14px; font-size: .9rem; font-weight: 600;
+        display: flex; align-items: center; gap: 9px; min-height: 44px;
+      }
+      nav.steps a .n {
+        background: var(--accent); color: var(--accent-ink);
+        width: 24px; height: 24px; border-radius: 50%; flex: none;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: .82rem; font-weight: 800;
+      }
+      nav.steps a small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .76rem; }
+
+      /* ---------- sections / cards ---------- */
+      section.step { margin-top: 26px; scroll-margin-top: 84px; }
+      .card {
+        background: var(--surface); border: 1px solid var(--line);
+        border-radius: var(--radius); box-shadow: var(--shadow);
+        padding: 26px 24px;
+      }
+      .step-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 6px; }
+      .step-badge {
+        background: var(--accent); color: var(--accent-ink);
+        font-family: "Newsreader", Georgia, serif; font-weight: 800; font-size: 1.3rem;
+        width: 46px; height: 46px; border-radius: 12px; flex: none;
+        display: flex; align-items: center; justify-content: center;
+      }
+      h2 { font-size: 1.65rem; font-weight: 800; }
+      .step-sub { color: var(--ink-soft); margin: 4px 0 0; max-width: 64ch; }
+      h3 { font-size: 1.18rem; font-weight: 650; margin: 26px 0 10px; }
+      h3:first-of-type { margin-top: 18px; }
+
+      /* ---------- form controls ---------- */
+      label.field { display: block; font-weight: 600; font-size: .92rem; margin: 16px 0 0; }
+      label.field span.hint { display: block; font-weight: 500; color: var(--ink-soft); font-size: .83rem; margin-top: 2px; }
+      select, input[type="number"], input[type="text"] {
+        width: 100%; margin-top: 6px; padding: 10px 12px;
+        font: inherit; color: var(--ink);
+        background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+      }
+      select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+      .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 18px; }
+      @media (max-width: 620px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+      .money { position: relative; }
+      .money::before { content: "$"; position: absolute; left: 12px; bottom: 10px; color: var(--ink-soft); font-weight: 600; }
+      .money input { padding-left: 26px; }
+      .pct { position: relative; }
+      .pct::after { content: "%"; position: absolute; right: 12px; bottom: 10px; color: var(--ink-soft); font-weight: 600; }
+      .pct input { padding-right: 28px; }
+
+      .seg { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 4px; gap: 4px; margin-top: 8px; }
+      .seg button {
+        border: 0; background: transparent; color: var(--ink-soft);
+        font: inherit; font-weight: 700; font-size: .9rem;
+        padding: 8px 18px; border-radius: 999px; cursor: pointer; min-height: 40px;
+      }
+      .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+      /* ---------- questions ---------- */
+      .cat-label {
+        font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+        color: var(--accent); margin: 24px 0 4px;
+      }
+      .cat-label span { color: var(--ink-soft); font-weight: 600; letter-spacing: 0; text-transform: none; }
+      .q { padding: 14px 0; border-bottom: 1px solid var(--line); }
+      .q:last-child { border-bottom: 0; }
+      .q p { margin: 0 0 10px; font-weight: 600; }
+      .q p .why { display: block; font-weight: 500; color: var(--ink-soft); font-size: .86rem; margin-top: 2px; }
+      .yn { display: flex; gap: 10px; }
+      .yn label {
+        flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+        border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px;
+        font-weight: 700; cursor: pointer; min-height: 48px; text-align: center;
+        background: var(--surface);
+      }
+      .yn input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+      .yn label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+      .progress-note { font-size: .88rem; color: var(--ink-soft); margin: 14px 0 0; font-weight: 600; }
+
+      /* ---------- results ---------- */
+      .verdict { border-radius: 12px; padding: 18px; margin-top: 20px; border: 1.5px solid var(--line); }
+      .verdict.low { background: var(--green-bg); border-color: var(--accent); }
+      .verdict.med { background: var(--amber-bg); border-color: var(--amber); }
+      .verdict.high { background: var(--red-bg); border-color: var(--red); }
+      .verdict .risk { font-family: "Newsreader", Georgia, serif; font-size: 1.5rem; font-weight: 800; margin: 0; }
+      .verdict p { margin: 6px 0 0; }
+      .testrows { display: grid; gap: 10px; margin-top: 14px; }
+      .testrow {
+        display: flex; gap: 12px; align-items: flex-start;
+        border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface);
+      }
+      .testrow .tag {
+        flex: none; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+        padding: 4px 9px; border-radius: 999px; margin-top: 2px;
+      }
+      .tag.emp { background: var(--red-bg); color: var(--red); }
+      .tag.con { background: var(--green-bg); color: var(--accent); }
+      .tag.mix { background: var(--amber-bg); color: var(--amber); }
+      .testrow p { margin: 0; font-size: .94rem; }
+      .testrow p strong { display: block; font-size: .98rem; }
+
+      table.ledger { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .96rem; }
+      table.ledger th, table.ledger td { padding: 9px 8px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+      table.ledger td.amt, table.ledger th.amt { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      table.ledger tr.total td { border-bottom: 0; border-top: 2.5px solid var(--ink); font-weight: 800; font-size: 1.04rem; }
+      table.ledger tr.subtotal td { font-weight: 700; background: var(--surface-2); }
+      table.ledger .note { display: block; font-size: .8rem; color: var(--ink-soft); font-weight: 500; }
+      .bigfigs { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
+      .bigfig {
+        flex: 1 1 180px; border: 1px solid var(--line); border-radius: 12px; padding: 16px;
+        background: var(--surface-2);
+      }
+      .bigfig .v { font-family: "Newsreader", Georgia, serif; font-size: 1.9rem; font-weight: 800; line-height: 1.1; }
+      .bigfig .k { font-size: .84rem; color: var(--ink-soft); font-weight: 600; margin-top: 4px; }
+      .fineprint { font-size: .84rem; color: var(--ink-soft); }
+      .disclaimer {
+        border: 1.5px dashed var(--amber); background: var(--amber-bg);
+        border-radius: 12px; padding: 14px 16px; font-size: .9rem; margin-top: 18px;
+      }
+      .disclaimer strong { display: block; margin-bottom: 2px; }
+
+      /* ---------- checklist ---------- */
+      ol.checklist { list-style: none; margin: 14px 0 0; padding: 0; counter-reset: item; }
+      ol.checklist li {
+        counter-increment: item; position: relative;
+        padding: 14px 0 14px 52px; border-bottom: 1px solid var(--line);
+      }
+      ol.checklist li:last-child { border-bottom: 0; }
+      ol.checklist li::before {
+        content: counter(item); position: absolute; left: 0; top: 12px;
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--accent-soft); color: var(--accent);
+        font-weight: 800; display: flex; align-items: center; justify-content: center;
+        font-family: "Newsreader", Georgia, serif; font-size: 1.05rem;
+      }
+      ol.checklist strong { display: block; font-size: 1rem; }
+      ol.checklist p { margin: 3px 0 0; color: var(--ink-soft); font-size: .93rem; }
+      .due { display: inline-block; background: var(--red-bg); color: var(--red); font-weight: 800; font-size: .78rem; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
+
+      /* ---------- software ---------- */
+      .pick {
+        border: 2px solid var(--accent); background: var(--accent-soft);
+        border-radius: 12px; padding: 18px; margin-top: 16px;
+      }
+      .pick .kicker { font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0; }
+      .pick h3 { margin: 6px 0 4px; font-size: 1.45rem; }
+      .pick p { margin: 4px 0 0; }
+      .pick .price { font-weight: 800; }
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        background: var(--accent); color: var(--accent-ink); text-decoration: none;
+        font-weight: 700; padding: 12px 20px; border-radius: 10px; border: 0;
+        font: inherit; font-weight: 700; cursor: pointer; min-height: 48px; margin-top: 14px;
+      }
+      .btn.secondary { background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent); }
+      table.vendors { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .95rem; }
+      table.vendors th, table.vendors td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      table.vendors td.amt, table.vendors th.amt { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      @media (max-width: 560px) {
+        table.vendors thead { display: none; }
+        table.vendors tr { display: block; padding: 8px 0; border-bottom: 1px solid var(--line); }
+        table.vendors td { display: block; border-bottom: 0; padding: 2px 8px; }
+        table.vendors td.amt { text-align: left; }
+      }
+
+      /* ---------- house ad slots (AdSense-swappable) ---------- */
+      .house-ad {
+        margin-top: 26px; border: 1px solid var(--line); border-radius: var(--radius);
+        background: var(--surface); padding: 20px 22px; box-shadow: var(--shadow);
+        display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+      }
+      .house-ad .ad-label { font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); width: 100%; margin: 0; }
+      .house-ad h3 { margin: 0; font-size: 1.25rem; flex: 1 1 260px; }
+      .house-ad h3 span { display: block; font-family: "Public Sans", sans-serif; font-size: .9rem; font-weight: 500; color: var(--ink-soft); margin-top: 3px; }
+      .house-ad .btn { margin-top: 0; }
+
+      footer.colophon { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 18px; font-size: .86rem; color: var(--ink-soft); }
+      footer.colophon p { margin: 6px 0; }
+      .report-bar { margin-top: 26px; text-align: center; }
+      .hidden { display: none !important; }
+
+      @media print {
+        nav.steps, .house-ad, .btn, .report-bar { display: none !important; }
+        body { background: #fff; }
+        .card { box-shadow: none; border: 0; padding: 10px 0; }
+        section.step { page-break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="intro">
+        <p class="brandline">Payroll Tax Reform · Free Tool</p>
+        <h1>Hiring your first person? <em>Run the numbers before you sign anything.</em></h1>
+        <p class="lede">Three steps, in order: <strong>1)</strong> check whether this worker is legally an employee or a contractor — and what a wrong call could cost you; <strong>2)</strong> see what the hire really costs on top of pay, using 2026 payroll tax figures; <strong>3)</strong> get your first-hire setup checklist and the payroll software that fits your situation.</p>
+      </header>
+
+      <nav class="steps" aria-label="Steps">
+        <a href="#step1"><span class="n">1</span><span>Classification check<small>Employee or contractor?</small></span></a>
+        <a href="#step2"><span class="n">2</span><span>True cost of the hire<small>2026 payroll tax math</small></span></a>
+        <a href="#step3"><span class="n">3</span><span>Setup &amp; software<small>Checklist + your match</small></span></a>
+      </nav>
+
+      <!-- ================= STEP 1 ================= -->
+      <section class="step" id="step1">
+        <div class="card">
+          <div class="step-head">
+            <div class="step-badge">1</div>
+            <div>
+              <h2>Employee or contractor?</h2>
+              <p class="step-sub">Calling a worker a “contractor” doesn’t make it so. The IRS and your state look at how the relationship actually works. Answer for the worker you’re about to hire — honestly, the way it will really run day to day.</p>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <label class="field">Where will this worker do the work?
+              <select id="state1"></select>
+              <span class="hint" id="abcNote"></span>
+            </label>
+            <label class="field">Pay for this worker (per year)
+              <span class="money"><input type="number" id="penWages" inputmode="decimal" min="0" step="500" value="45000" /></span>
+              <span class="hint">Used only to size the penalty estimate below. Step 2 keeps it in sync with the pay you enter there.</span>
+            </label>
+          </div>
+          <label class="field" style="max-width:280px">Years paid this way
+            <input type="number" id="penYears" inputmode="numeric" min="1" max="10" step="1" value="1" />
+            <span class="hint">Exposure grows every year the worker is misclassified.</span>
+          </label>
+
+          <div id="questions"></div>
+          <p class="progress-note" id="qProgress" role="status"></p>
+
+          <div id="classResult" class="hidden">
+            <div class="verdict" id="verdictBox">
+              <p class="risk" id="riskTitle"></p>
+              <p id="riskText"></p>
+            </div>
+            <div class="testrows" id="testRows"></div>
+
+            <h3>What a wrong call could cost — estimate</h3>
+            <p class="fineprint" style="margin:0">If the IRS (or your state) reclassifies this worker as an employee, you can owe back payroll taxes on every dollar paid. Estimated exposure on <strong class="num" id="penBaseLabel"></strong>:</p>
+            <table class="ledger" aria-label="Estimated penalty exposure">
+              <tbody id="penRows"></tbody>
+            </table>
+            <p class="fineprint">Every figure above is an <strong>estimate</strong>, not a bill. Actual assessments depend on your facts, whether information returns (Form 1099) were filed, and current interest rates. Interest compounds daily and failure-to-deposit penalties can add more.</p>
+            <div id="caBox"></div>
+
+            <div class="disclaimer">
+              <strong>Read this before you rely on it</strong>
+              This check is educational only. It is not legal or tax advice, and it does not determine any worker’s status. Classification turns on all the facts of your specific relationship. For a binding determination, file <strong>IRS Form SS-8</strong> — and before you classify anyone, talk to a CPA or an employment attorney. An hour of advice now is far cheaper than a reclassification audit later.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- House ad slot 1 — swap for AdSense unit later -->
+      <aside class="house-ad" data-ad-slot="after-classification">
+        <p class="ad-label">From Payroll Tax Reform</p>
+        <h3>2026 payroll tax rates &amp; deadlines <span>Every rate, wage base, and due date for the year — Social Security, Medicare, FUTA, SUTA, and filing deadlines in one reference.</span></h3>
+        <a class="btn" href="https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html">See the 2026 rates</a>
+      </aside>
+
+      <!-- ================= STEP 2 ================= -->
+      <section class="step" id="step2">
+        <div class="card">
+          <div class="step-head">
+            <div class="step-badge">2</div>
+            <div>
+              <h2>The true cost of this hire</h2>
+              <p class="step-sub">Pay is only the starting point. On top of it you owe employer payroll taxes, unemployment insurance, and workers’ comp — before benefits or equipment. Enter the pay and see the full 2026 picture.</p>
+            </div>
+          </div>
+
+          <label class="field" style="margin-top:10px">How will you pay them?</label>
+          <div class="seg" role="group" aria-label="Pay type">
+            <button type="button" id="paySalaryBtn" aria-pressed="true">Salary</button>
+            <button type="button" id="payHourlyBtn" aria-pressed="false">Hourly</button>
+          </div>
+
+          <div class="grid2">
+            <label class="field" id="salaryField">Annual salary
+              <span class="money"><input type="number" id="salary" inputmode="decimal" min="0" step="500" value="45000" /></span>
+            </label>
+            <label class="field hidden" id="hourlyField">Hourly rate
+              <span class="money"><input type="number" id="hourlyRate" inputmode="decimal" min="0" step="0.5" value="22" /></span>
+            </label>
+            <label class="field hidden" id="hoursField">Hours per week
+              <input type="number" id="hoursWeek" inputmode="decimal" min="0" max="80" step="1" value="40" />
+            </label>
+            <label class="field">State
+              <select id="state2"></select>
+            </label>
+          </div>
+
+          <h3>Employer cost assumptions <span style="font-family:'Public Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--ink-soft)">— estimates, adjust to your quotes</span></h3>
+          <div class="grid3">
+            <label class="field">SUTA rate (estimate)
+              <span class="pct"><input type="number" id="sutaRate" inputmode="decimal" min="0" step="0.1" /></span>
+              <span class="hint">Estimate — rates vary by state and by employer. New employers get a standard rate until they build history.</span>
+            </label>
+            <label class="field">SUTA wage base (estimate)
+              <span class="money"><input type="number" id="sutaBase" inputmode="decimal" min="0" step="100" /></span>
+              <span class="hint">SUTA is only charged on the first chunk of each worker’s wages. <a href="https://payrolltaxreform.com/blog/what-is-suta-state-unemployment-insurance.html">State-by-state SUTA details</a>.</span>
+            </label>
+            <label class="field">Workers’ comp (estimate)
+              <span class="pct"><input type="number" id="wcRate" inputmode="decimal" min="0" step="0.1" value="1.5" /></span>
+              <span class="hint">Percent of pay. Desk jobs run low; physical work runs much higher. Get a real quote.</span>
+            </label>
+          </div>
+          <div class="grid3">
+            <label class="field">Benefits (per year)
+              <span class="money"><input type="number" id="benefits" inputmode="decimal" min="0" step="100" value="0" /></span>
+              <span class="hint">Your share of health insurance and other benefits.</span>
+            </label>
+            <label class="field">Retirement match
+              <span class="pct"><input type="number" id="retPct" inputmode="decimal" min="0" step="0.5" value="0" /></span>
+              <span class="hint">Percent of pay, if you match a 401(k) or similar.</span>
+            </label>
+            <label class="field">Paid time off (days / year)
+              <input type="number" id="ptoDays" inputmode="decimal" min="0" step="1" value="0" />
+              <span class="hint">Costed at the worker’s daily pay rate.</span>
+            </label>
+          </div>
+          <label class="field" style="max-width:340px">Equipment &amp; setup (one-time, first year)
+            <span class="money"><input type="number" id="equip" inputmode="decimal" min="0" step="50" value="0" /></span>
+            <span class="hint">Computer, tools, software seats, workspace — year one only.</span>
+          </label>
+
+          <h3>Your full breakdown — 2026 figures</h3>
+          <table class="ledger" aria-label="True cost breakdown">
+            <tbody id="costRows"></tbody>
+          </table>
+          <div class="bigfigs">
+            <div class="bigfig"><div class="v num" id="figTotal">$0</div><div class="k">Total cost, year one</div></div>
+            <div class="bigfig"><div class="v num" id="figMonthly">$0</div><div class="k">Per month</div></div>
+            <div class="bigfig"><div class="v num" id="figMultiple">1.00×</div><div class="k">Cost for every $1 of pay</div></div>
+          </div>
+          <p class="fineprint">Built on 2026 figures: Social Security 6.2% on the first $184,500 of wages, Medicare 1.45% on all wages, FUTA 0.6% on the first $7,000 (a net $42 per employee per year after the standard state credit). SUTA and workers’ comp are your editable estimates. This is a planning estimate, not a tax filing.</p>
+        </div>
+      </section>
+
+      <!-- ================= STEP 3 ================= -->
+      <section class="step" id="step3">
+        <div class="card">
+          <div class="step-head">
+            <div class="step-badge">3</div>
+            <div>
+              <h2>Set it up right, once</h2>
+              <p class="step-sub">Becoming an employer means new accounts, new filings, and new deadlines. Here is the full first-hire setup list, in the order to do it — then the payroll software that fits your situation, so the filings mostly take care of themselves.</p>
+            </div>
+          </div>
+
+          <h3>First-hire setup checklist</h3>
+          <ol class="checklist">
+            <li>
+              <strong>Get an EIN</strong>
+              <p>Apply for a free Employer Identification Number from the IRS. You need it before you can run payroll, open tax accounts, or hire. Don’t pay a third-party site for one — it’s free.</p>
+            </li>
+            <li>
+              <strong>Register as an employer with your state</strong>
+              <p>Open a state withholding account and a state unemployment (SUTA) account. Some states combine them into one registration. <a href="https://payrolltaxreform.com/blog/what-is-suta-state-unemployment-insurance.html">How SUTA works, state by state</a>.</p>
+            </li>
+            <li>
+              <strong>Line up workers’ comp insurance</strong>
+              <p>Required for employers in nearly every state, often from the employee’s first day. Get quotes before the start date — rates depend heavily on the kind of work.</p>
+            </li>
+            <li>
+              <strong>Collect day-one paperwork</strong>
+              <p>Form W-4 (federal withholding), Form I-9 (work eligibility — complete by the first day, documents checked within 3 business days), your state’s withholding form, and a direct-deposit authorization if you’ll offer it.</p>
+            </li>
+            <li>
+              <strong>Report the new hire to your state</strong>
+              <p>Federal law requires reporting every new hire to your state’s registry within 20 days of the start date — some states give you less time. It’s a quick online form in most states.</p>
+            </li>
+            <li>
+              <strong>Enroll in EFTPS</strong>
+              <p>The free federal system for depositing payroll taxes. Enrollment credentials arrive by mail and can take about a week, so start this before your first payday, not after. <a href="https://payrolltaxreform.com/blog/how-to-pay-federal-payroll-taxes-eftps.html">How to pay federal payroll taxes with EFTPS</a>.</p>
+            </li>
+            <li>
+              <strong>Know your deposit schedule</strong>
+              <p>The IRS assigns you a monthly or semiweekly deposit schedule based on your lookback-period tax liability. Brand-new employers with no history generally start as monthly depositors — but the schedule is not optional, and late deposits draw penalties fast.</p>
+            </li>
+            <li>
+              <strong>File Form 941 every quarter</strong>
+              <p>Reports wages paid, income tax withheld, and both shares of Social Security and Medicare. Due the last day of the month after each quarter ends. <a href="https://payrolltaxreform.com/blog/how-to-file-form-941.html">How to file Form 941</a>.</p>
+            </li>
+            <li>
+              <strong>File Form 940 every year <span class="due">2026 form due Feb 1, 2027</span></strong>
+              <p>The annual FUTA return. It’s normally due January 31, but January 31, 2027 falls on a Sunday — so the 2026 Form 940 is due Monday, February 1, 2027. <a href="https://payrolltaxreform.com/blog/how-to-file-form-940.html">How to file Form 940</a>.</p>
+            </li>
+            <li>
+              <strong>Keep payroll records at least 4 years</strong>
+              <p>Employment tax records — returns, wage records, deposit receipts — must be kept for at least four years after the tax becomes due or is paid, whichever is later.</p>
+            </li>
+          </ol>
+
+          <h3>Your payroll software match</h3>
+          <label class="field">Which sounds most like you?
+            <select id="situation">
+              <option value="one">Just me and one W-2 employee</option>
+              <option value="contractors">Mostly contractors, not employees</option>
+              <option value="multistate">Workers in more than one state</option>
+              <option value="quickbooks">I already use QuickBooks Online</option>
+              <option value="global">My contractors are outside the US</option>
+            </select>
+          </label>
+
+          <div class="pick" id="pickBox"></div>
+
+          <h3>All six compared</h3>
+          <table class="vendors" aria-label="Payroll software comparison">
+            <thead><tr><th>Software</th><th>Best fit</th><th class="amt">Starting price</th><th></th></tr></thead>
+            <tbody id="vendorRows"></tbody>
+          </table>
+          <p class="fineprint">Prices are “starting at” the base plan as of November 2026 — check the vendor’s site for current pricing before you buy. Full comparison: <a href="https://payrolltaxreform.com/software.html">payroll software compared at Payroll Tax Reform</a>.</p>
+        </div>
+      </section>
+
+      <!-- House ad slot 2 — swap for AdSense unit later -->
+      <aside class="house-ad" data-ad-slot="after-checklist">
+        <p class="ad-label">From Payroll Tax Reform</p>
+        <h3>Not sure which payroll software fits? <span>Honest pricing and plain-English comparisons of the top payroll services for small employers.</span></h3>
+        <a class="btn" href="https://payrolltaxreform.com/software.html">Compare payroll software</a>
+      </aside>
+
+      <div class="report-bar">
+        <button type="button" class="btn" id="downloadReport">Download my results report</button>
+        <p class="fineprint">A printable summary of your classification result, cost breakdown, checklist, and software match — yours to keep or hand to your CPA.</p>
+      </div>
+
+      <footer class="colophon">
+        <p><strong>About this tool:</strong> The First Hire Tool is a free educational tool from <a href="https://payrolltaxreform.com/software.html">Payroll Tax Reform</a>. Figures use 2026 federal rates and wage bases; state figures are labeled estimates. Nothing here is legal, tax, or accounting advice.</p>
+        <p>Worker classification is fact-specific. For a binding determination, file IRS Form SS-8 or consult a CPA or employment attorney.</p>
+      </footer>
+    </div>
+
+    <script>
+      "use strict";
+      var $ = function (id) { return document.getElementById(id); };
+      var fmt = function (n) {
+        return "$" + Math.round(n).toLocaleString("en-US");
+      };
+      var fmt2 = function (n) {
+        return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      };
+
+      var STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+      var ABC_STATES = ["California","Massachusetts","New Jersey","Illinois","Connecticut","Vermont"];
+      var SS_WAGE_BASE = 184500;
+
+      /* SUTA new-employer estimates for states with well-known standard rates;
+         everything else uses the generic default. All values are editable. */
+      var SUTA_KNOWN = {
+        "California": { rate: 3.4, base: 7000 },
+        "Texas": { rate: 2.7, base: 9000 },
+        "Arizona": { rate: 2.29, base: 7000 },
+        "Florida": { rate: 2.7, base: 7000 }
+      };
+      var SUTA_DEFAULT = { rate: 2.7, base: 7000 };
+
+      function fillStates(sel, selected) {
+        sel.innerHTML = "";
+        STATES.forEach(function (s) {
+          var o = document.createElement("option");
+          o.value = s; o.textContent = s;
+          if (s === selected) o.selected = true;
+          sel.appendChild(o);
+        });
+      }
+      fillStates($("state1"), "California");
+      fillStates($("state2"), "California");
+
+      /* ---------------- Step 1: classification ---------------- */
+      var QUESTIONS = [
+        { id: "hours", cat: "behavioral", q: "Do you set this worker’s schedule or hours?", why: "Setting hours is classic employer control.", empWhen: "yes" },
+        { id: "howto", cat: "behavioral", q: "Do you tell them how to do the work — the methods, sequence, or procedures?", why: "Contractors decide how the work gets done; employees are told.", empWhen: "yes" },
+        { id: "training", cat: "behavioral", q: "Do you train them to do the job your way?", why: "Training someone in your methods points to employment.", empWhen: "yes" },
+        { id: "tools", cat: "financial", q: "Do you provide the tools, equipment, or software for the work?", why: "Contractors normally bring their own tools.", empWhen: "yes" },
+        { id: "expenses", cat: "financial", q: "Do you reimburse their business expenses?", why: "Reimbursement looks like an employer absorbing the cost of labor.", empWhen: "yes" },
+        { id: "profitloss", cat: "financial", q: "Can they make a profit — or take a loss — on this work?", why: "Real businesses can profit or lose. A guaranteed wage cannot.", empWhen: "no" },
+        { id: "otherclients", cat: "financial", q: "Do they do this kind of work for other clients, too?", why: "Working only for you looks like a job, not a business.", empWhen: "no" },
+        { id: "core", cat: "relationship", q: "Is this work a core part of what your business does or sells?", why: "If the work IS your product, the worker usually has to be an employee.", empWhen: "yes" },
+        { id: "ongoing", cat: "relationship", q: "Is the arrangement open-ended, rather than one project with an end date?", why: "Indefinite arrangements look like employment; projects look like contracting.", empWhen: "yes" },
+        { id: "benefits", cat: "relationship", q: "Do you give them employee-type benefits — PTO, health coverage, retirement?", why: "Benefits are one of the clearest employee signals there is.", empWhen: "yes" },
+        { id: "contract", cat: "relationship", q: "Is there a signed contract describing them as an independent contractor?", why: "Helpful evidence — but a contract alone never decides status if the reality looks like employment.", empWhen: "no" }
+      ];
+      var CAT_NAMES = {
+        behavioral: ["Behavioral control", "who directs the work"],
+        financial: ["Financial control", "who carries the money risk"],
+        relationship: ["Relationship of the parties", "how the arrangement looks"]
+      };
+      var answers = {};
+
+      function buildQuestions() {
+        var host = $("questions");
+        var lastCat = null;
+        QUESTIONS.forEach(function (item) {
+          if (item.cat !== lastCat) {
+            lastCat = item.cat;
+            var h = document.createElement("p");
+            h.className = "cat-label";
+            h.innerHTML = "";
+            h.textContent = CAT_NAMES[item.cat][0] + " ";
+            var s = document.createElement("span");
+            s.textContent = "— " + CAT_NAMES[item.cat][1];
+            h.appendChild(s);
+            host.appendChild(h);
+          }
+          var div = document.createElement("div");
+          div.className = "q";
+          var p = document.createElement("p");
+          p.textContent = item.q;
+          var why = document.createElement("span");
+          why.className = "why";
+          why.textContent = item.why;
+          p.appendChild(why);
+          div.appendChild(p);
+          var yn = document.createElement("div");
+          yn.className = "yn";
+          ["yes", "no"].forEach(function (v) {
+            var lab = document.createElement("label");
+            var inp = document.createElement("input");
+            inp.type = "radio";
+            inp.name = "q_" + item.id;
+            inp.value = v;
+            inp.addEventListener("change", function () {
+              answers[item.id] = v;
+              renderClassification();
+            });
+            lab.appendChild(inp);
+            lab.appendChild(document.createTextNode(v === "yes" ? "Yes" : "No"));
+            yn.appendChild(lab);
+          });
+          div.appendChild(yn);
+          host.appendChild(div);
+        });
+      }
+      buildQuestions();
+
+      function isEmp(item) { return answers[item.id] === item.empWhen; }
+      function answeredCount() {
+        return QUESTIONS.filter(function (i) { return answers[i.id]; }).length;
+      }
+      function catScore(cat) {
+        var items = QUESTIONS.filter(function (i) { return i.cat === cat && answers[i.id]; });
+        if (!items.length) return null;
+        var emp = items.filter(isEmp).length;
+        return { emp: emp, tot: items.length };
+      }
+      function abcProngs() {
+        // A: freedom from control. B: work outside the usual course of business. C: independently established trade.
+        var a = null, b = null, c = null;
+        var ctrl = ["hours", "howto", "training"].filter(function (id) { return answers[id]; });
+        if (ctrl.length) a = !ctrl.some(function (id) { return answers[id] === "yes"; });
+        if (answers.core) b = answers.core === "no";
+        var trade = ["otherclients", "profitloss"].filter(function (id) { return answers[id]; });
+        if (trade.length) c = trade.every(function (id) { return answers[id] === "yes"; });
+        return { A: a, B: b, C: c };
+      }
+
+      var lastClass = null; // snapshot for the report
+
+      function renderClassification() {
+        var done = answeredCount();
+        $("qProgress").textContent = done === 0
+          ? "Answer the 11 questions to see your risk rating."
+          : "Answered " + done + " of 11" + (done < 11 ? " — answer them all for the full picture." : " — full picture below.");
+        if (done === 0) { $("classResult").classList.add("hidden"); lastClass = null; return; }
+        $("classResult").classList.remove("hidden");
+
+        var empTot = QUESTIONS.filter(function (i) { return answers[i.id] && isEmp(i); }).length;
+        var pct = empTot / done;
+        var state = $("state1").value;
+        var abcApplies = ABC_STATES.indexOf(state) !== -1;
+        var prongs = abcProngs();
+        var abcFails = abcApplies ? ["A", "B", "C"].filter(function (k) { return prongs[k] === false; }).length : 0;
+
+        var level;
+        if (pct >= 0.55 || (abcApplies && abcFails >= 2 && pct >= 0.35)) level = "high";
+        else if (pct >= 0.30 || (abcApplies && abcFails >= 1)) level = "med";
+        else level = "low";
+
+        var box = $("verdictBox");
+        box.className = "verdict " + level;
+        var titles = { low: "Risk rating: Low", med: "Risk rating: Medium", high: "Risk rating: High" };
+        $("riskTitle").textContent = titles[level];
+        $("riskText").textContent =
+          level === "high"
+            ? "On your answers, this relationship looks like employment. Paying this worker as a contractor carries real reclassification risk — get advice before you pay them that way."
+            : level === "med"
+            ? "Your answers point in both directions. That gray zone is exactly where audits happen — a CPA or employment attorney can tell you which side you land on before the state does."
+            : "On your answers, this relationship looks like a genuine contractor arrangement. Keep the facts that way — if the day-to-day reality drifts toward control, the risk rating drifts with it.";
+
+        /* per-test rows */
+        var rows = "";
+        ["behavioral", "financial", "relationship"].forEach(function (cat) {
+          var sc = catScore(cat);
+          if (!sc) return;
+          var tag, word;
+          if (sc.emp * 2 > sc.tot) { tag = "emp"; word = "Points to employee"; }
+          else if (sc.emp * 2 < sc.tot) { tag = "con"; word = "Points to contractor"; }
+          else { tag = "mix"; word = "Mixed signals"; }
+          rows += '<div class="testrow"><span class="tag ' + tag + '">' + word + '</span><p><strong>IRS common-law test — ' + CAT_NAMES[cat][0].toLowerCase() + '</strong>' +
+            sc.emp + " of " + sc.tot + " answered factors in this group look like employment.</p></div>";
+        });
+        if (abcApplies) {
+          var prongText = ["A", "B", "C"].map(function (k) {
+            var names = { A: "A — free from your control", B: "B — work outside your core business", C: "C — an independent trade or business of their own" };
+            var v = prongs[k];
+            return names[k] + ": " + (v === null ? "not enough answers yet" : v ? "passes" : "FAILS");
+          }).join(" · ");
+          var abcTag = abcFails === 0 ? "con" : "emp";
+          var abcWord = abcFails === 0 ? "Passes all three prongs" : "Fails " + abcFails + " of 3 prongs";
+          rows += '<div class="testrow"><span class="tag ' + abcTag + '">' + abcWord + '</span><p><strong>State ABC test (' + state + ')</strong>' +
+            prongText + ". Under the ABC test a worker is an employee unless <em>all three</em> prongs pass — it is stricter than the IRS test, and failing one prong is enough.</p></div>";
+        } else {
+          rows += '<div class="testrow"><span class="tag mix">Not an ABC state</span><p><strong>State ABC test</strong>' +
+            state + " does not use the strict ABC test for unemployment purposes (that test applies in CA, MA, NJ, IL, CT, and VT). Your state applies its own standard, which usually tracks the IRS common-law factors above.</p></div>";
+        }
+        $("testRows").innerHTML = rows;
+
+        renderPenalty(state);
+        lastClass = {
+          level: level, empTot: empTot, done: done, state: state,
+          abcApplies: abcApplies, abcFails: abcFails
+        };
+      }
+
+      function renderPenalty(state) {
+        var W = Math.max(0, parseFloat($("penWages").value) || 0);
+        var Y = Math.min(10, Math.max(1, parseInt($("penYears").value, 10) || 1));
+        $("penBaseLabel").textContent = fmt(W) + " of wages per year over " + Y + (Y === 1 ? " year" : " years");
+
+        var ssBase = Math.min(W, SS_WAGE_BASE);
+        var ficaBoth = (0.124 * ssBase + 0.029 * W) * Y;          // 15.3% both shares (SS capped)
+        var ficaEmployer = (0.062 * ssBase + 0.0145 * W) * Y;     // 7.65% employer share
+        var ficaEmployee = ficaBoth - ficaEmployer;               // 7.65% employee share
+        var s3509 = (0.015 * W + 0.20 * ficaEmployee) * Y;        // §3509 reduced rates, 1099 filed
+        var futaNet = 42 * Y, futaGross = 336 * Y;
+
+        var lowSub = ficaEmployer + s3509 + futaNet;
+        var lowInterest = 0.10 * lowSub;
+        var lowTotal = lowSub + lowInterest;
+
+        var highSub = ficaBoth + 0.20 * W * Y + futaGross;
+        var highInterest = 0.10 * highSub;
+        var highTotal = highSub + highInterest;
+
+        var html = "";
+        html += '<tr><td>Back FICA — both shares at 15.3%<span class="note">Social Security 12.4% up to the $184,500 wage base, plus Medicare 2.9% on all wages. This is the IRS’s full starting position.</span></td><td class="amt">' + fmt(ficaBoth) + "</td></tr>";
+        html += '<tr><td>IRC §3509 reduced-rate assessment<span class="note">If you filed Form 1099 for this worker, §3509 cuts the bill: income-tax withholding at 1.5% of wages, plus 20% of the employee’s FICA share. If no 1099 was filed, these rates double.</span></td><td class="amt">' + fmt(s3509) + "</td></tr>";
+        html += '<tr><td>Back FUTA<span class="note">$42 per employee per year net of the standard state credit — up to $336 per year if that credit is lost because state unemployment tax wasn’t paid.</span></td><td class="amt">' + fmt(futaNet) + "–" + fmt(futaGross) + "</td></tr>";
+        html += '<tr><td>Interest &amp; penalties<span class="note">Rough estimate at 10% of the tax owed. Interest is set quarterly and compounds daily.</span></td><td class="amt">' + fmt(lowInterest) + "–" + fmt(highInterest) + "</td></tr>";
+        html += '<tr class="total"><td>Estimated total exposure</td><td class="amt">' + fmt(lowTotal) + " – " + fmt(highTotal) + "</td></tr>";
+        html += '<tr><td colspan="2" class="fineprint">Lower end: §3509 relief applies and the FUTA credit holds. Upper end: full FICA both shares, income-tax withholding assessed at an estimated 20% of wages, and the FUTA credit lost. State assessments, unemployment back-premiums, and benefit-plan claims would come on top of this.</td></tr>';
+        $("penRows").innerHTML = html;
+
+        if (state === "California") {
+          $("caBox").innerHTML = '<div class="disclaimer"><strong>California adds its own penalty</strong>' +
+            "California Labor Code §226.8 fines willful misclassification <strong>$5,000–$25,000 per violation</strong> — on top of the federal figures above and separate EDD back assessments for state unemployment and disability insurance. California also applies the strict ABC test, so the margin for error is smaller here than almost anywhere else.</div>";
+        } else {
+          $("caBox").innerHTML = "";
+        }
+        lastPenalty = { W: W, Y: Y, lowTotal: lowTotal, highTotal: highTotal };
+      }
+      var lastPenalty = null;
+
+      /* ---------------- Step 2: true cost ---------------- */
+      var payType = "salary";
+      var sutaTouched = false;
+      function setPayType(t) {
+        payType = t;
+        $("paySalaryBtn").setAttribute("aria-pressed", t === "salary" ? "true" : "false");
+        $("payHourlyBtn").setAttribute("aria-pressed", t === "hourly" ? "true" : "false");
+        $("salaryField").classList.toggle("hidden", t !== "salary");
+        $("hourlyField").classList.toggle("hidden", t !== "hourly");
+        $("hoursField").classList.toggle("hidden", t !== "hourly");
+        renderCost();
+      }
+      $("paySalaryBtn").addEventListener("click", function () { setPayType("salary"); });
+      $("payHourlyBtn").addEventListener("click", function () { setPayType("hourly"); });
+
+      function basePay() {
+        if (payType === "salary") return Math.max(0, parseFloat($("salary").value) || 0);
+        var r = Math.max(0, parseFloat($("hourlyRate").value) || 0);
+        var h = Math.max(0, parseFloat($("hoursWeek").value) || 0);
+        return r * h * 52;
+      }
+
+      function applySutaDefaults() {
+        if (sutaTouched) return;
+        var d = SUTA_KNOWN[$("state2").value] || SUTA_DEFAULT;
+        $("sutaRate").value = d.rate;
+        $("sutaBase").value = d.base;
+      }
+      ["sutaRate", "sutaBase"].forEach(function (id) {
+        $(id).addEventListener("input", function () { sutaTouched = true; renderCost(); });
+      });
+
+      var lastCost = null;
+      function renderCost() {
+        var base = basePay();
+        var ss = 0.062 * Math.min(base, SS_WAGE_BASE);
+        var med = 0.0145 * base;
+        var futa = 0.006 * Math.min(base, 7000);
+        var sutaRate = Math.max(0, parseFloat($("sutaRate").value) || 0);
+        var sutaBaseAmt = Math.max(0, parseFloat($("sutaBase").value) || 0);
+        var suta = (sutaRate / 100) * Math.min(base, sutaBaseAmt);
+        var wc = (Math.max(0, parseFloat($("wcRate").value) || 0) / 100) * base;
+        var benefits = Math.max(0, parseFloat($("benefits").value) || 0);
+        var retirement = (Math.max(0, parseFloat($("retPct").value) || 0) / 100) * base;
+        var ptoDays = Math.max(0, parseFloat($("ptoDays").value) || 0);
+        var pto = ptoDays * (base / 260);
+        var equip = Math.max(0, parseFloat($("equip").value) || 0);
+        var taxes = ss + med + futa + suta;
+        var total = base + taxes + wc + benefits + retirement + pto + equip;
+
+        function row(label, note, amt) {
+          return "<tr><td>" + label + (note ? '<span class="note">' + note + "</span>" : "") + '</td><td class="amt">' + fmt2(amt) + "</td></tr>";
+        }
+        var html = "";
+        html += row("Base pay", payType === "salary" ? "Annual salary" : "Hourly rate × hours × 52 weeks", base);
+        html += row("Social Security (employer share)", "6.2% on the first $184,500 of wages (2026 wage base)", ss);
+        html += row("Medicare (employer share)", "1.45% on all wages — no cap", med);
+        html += row("FUTA — federal unemployment", "0.6% on the first $7,000 = $42 net per employee per year", futa);
+        html += row("SUTA — state unemployment (estimate)", sutaRate + "% on the first " + fmt(sutaBaseAmt) + " of wages — estimate, varies by state", suta);
+        html += '<tr class="subtotal"><td>Employer payroll taxes, subtotal</td><td class="amt">' + fmt2(taxes) + "</td></tr>";
+        html += row("Workers’ comp (estimate)", "Your estimate, percent of pay", wc);
+        if (benefits > 0) html += row("Benefits", "Your yearly cost", benefits);
+        if (retirement > 0) html += row("Retirement match", "Your percent of pay", retirement);
+        if (ptoDays > 0) html += row("Paid time off", ptoDays + " days at the daily pay rate", pto);
+        if (equip > 0) html += row("Equipment &amp; setup", "One-time, first year", equip);
+        html += '<tr class="total"><td>Total cost, year one</td><td class="amt">' + fmt2(total) + "</td></tr>";
+        $("costRows").innerHTML = html;
+
+        $("figTotal").textContent = fmt(total);
+        $("figMonthly").textContent = fmt(total / 12);
+        $("figMultiple").textContent = base > 0 ? (total / base).toFixed(2) + "×" : "—";
+        lastCost = { base: base, ss: ss, med: med, futa: futa, suta: suta, wc: wc, benefits: benefits, retirement: retirement, pto: pto, equip: equip, taxes: taxes, total: total };
+
+        /* keep step 1's penalty wages in sync with the pay entered here */
+        if (base > 0) { $("penWages").value = Math.round(base); if (answeredCount() > 0) renderPenalty($("state1").value); }
+      }
+
+      ["salary", "hourlyRate", "hoursWeek", "wcRate", "benefits", "retPct", "ptoDays", "equip"].forEach(function (id) {
+        $(id).addEventListener("input", renderCost);
+      });
+      $("penWages").addEventListener("input", function () { if (answeredCount() > 0) renderPenalty($("state1").value); });
+      $("penYears").addEventListener("input", function () { if (answeredCount() > 0) renderPenalty($("state1").value); });
+
+      /* state sync between steps */
+      function syncState(from, to) {
+        $(to).value = $(from).value;
+        var abc = ABC_STATES.indexOf($(from).value) !== -1;
+        $("abcNote").textContent = abc
+          ? $(from).value + " uses the strict ABC test — all three prongs must pass for contractor status."
+          : "";
+        applySutaDefaults();
+        renderCost();
+        if (answeredCount() > 0) renderClassification();
+      }
+      $("state1").addEventListener("change", function () { syncState("state1", "state2"); });
+      $("state2").addEventListener("change", function () { syncState("state2", "state1"); });
+
+      /* ---------------- Step 3: software match ---------------- */
+      var QB_LINK = "https://quickbooks.intuit.com/partners/affiliates?cid=par_pim_xwpoB4IIUFeI";
+      var VENDORS = [
+        { key: "deel", name: "Deel", price: 29, fit: "Contractor-heavy teams, including contractors outside the US", url: "https://www.deel.com" },
+        { key: "surepayroll", name: "SurePayroll", price: 36, fit: "The lowest-cost full-service option for a single employee", url: "https://www.surepayroll.com" },
+        { key: "patriot", name: "Patriot Payroll", price: 42, fit: "Budget DIY payroll if you’re comfortable doing more yourself", url: "https://www.patriotsoftware.com" },
+        { key: "onpay", name: "OnPay", price: 55, fit: "Flat pricing that holds up well with workers in multiple states", url: "https://onpay.com" },
+        { key: "gusto", name: "Gusto", price: 55, fit: "The popular all-rounder as you grow past your first hire", url: "https://gusto.com" },
+        { key: "quickbooks", name: "QuickBooks Payroll Core", price: 56.50, fit: "Only worth it if you already run QuickBooks Online", url: QB_LINK }
+      ];
+      var PICKS = {
+        one: { key: "surepayroll", why: "With one W-2 employee, you need filings done correctly and nothing you won’t use. SurePayroll is the cheapest full-service route in — it runs the pay, deposits the taxes, and files the forms for you." },
+        contractors: { key: "deel", why: "If most of your people are contractors, a contractor-first platform fits better than traditional payroll: Deel is built around contractor agreements and payments, and its contractor plan is the lowest starting price on this list." },
+        multistate: { key: "onpay", why: "Every state a worker sits in means another tax account and another set of filings. OnPay’s flat starting price doesn’t stack per-state fees the way some rivals do, which keeps multi-state payroll predictable." },
+        quickbooks: { key: "quickbooks", why: "You already keep your books in QuickBooks Online, so payroll that lives in the same place saves real reconciliation time. QuickBooks Payroll Core only makes sense in your case — if you weren’t already on QuickBooks, the picks above are cheaper." },
+        global: { key: "deel", why: "Paying contractors in other countries means foreign payment rails and local paperwork. Deel is built for exactly that, and it’s the lowest starting price on this list." }
+      };
+      function vendorByKey(k) { return VENDORS.filter(function (v) { return v.key === k; })[0]; }
+
+      function renderPick() {
+        var sit = $("situation").value;
+        var pick = PICKS[sit];
+        var v = vendorByKey(pick.key);
+        $("pickBox").innerHTML =
+          '<p class="kicker">Your match</p><h3>' + v.name + '</h3>' +
+          '<p class="price">Starting at $' + (v.price % 1 ? v.price.toFixed(2) : v.price) + "/mo</p>" +
+          "<p>" + pick.why + "</p>" +
+          '<a class="btn" href="' + v.url + '" target="_blank" rel="noopener">Visit ' + v.name + "</a>" +
+          ' <a class="btn secondary" href="https://payrolltaxreform.com/software.html">Compare all options</a>';
+        lastPick = { situation: sit, vendor: v };
+      }
+      var lastPick = null;
+      $("situation").addEventListener("change", renderPick);
+
+      function renderVendors() {
+        $("vendorRows").innerHTML = VENDORS.map(function (v) {
+          return "<tr><td><strong>" + v.name + "</strong></td><td>" + v.fit + '</td><td class="amt">$' +
+            (v.price % 1 ? v.price.toFixed(2) : v.price) + '/mo</td><td><a href="' + v.url + '" target="_blank" rel="noopener">Visit</a></td></tr>';
+        }).join("");
+      }
+      renderVendors();
+      renderPick();
+
+      /* ---------------- report download ---------------- */
+      function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      $("downloadReport").addEventListener("click", function () {
+        var state = $("state1").value;
+        var lines = [];
+        lines.push("<h1>First Hire — Results Report</h1>");
+        lines.push("<p>Prepared with the First Hire Tool from Payroll Tax Reform (payrolltaxreform.com). Educational only — not legal or tax advice.</p>");
+        lines.push("<h2>1. Classification check</h2>");
+        if (lastClass) {
+          lines.push("<p><strong>Risk rating: " + lastClass.level.toUpperCase() + "</strong> — " + lastClass.empTot + " of " + lastClass.done + " factors answered point toward employment. Worker state: " + esc(state) + "." +
+            (lastClass.abcApplies ? " The state ABC test applies; prongs failed: " + lastClass.abcFails + " of 3." : " The state ABC test does not apply in this state.") + "</p>");
+          if (lastPenalty) lines.push("<p>Estimated misclassification exposure on " + fmt(lastPenalty.W) + " of wages per year over " + lastPenalty.Y + " year(s): <strong>" + fmt(lastPenalty.lowTotal) + " – " + fmt(lastPenalty.highTotal) + "</strong> (estimate)." + (state === "California" ? " California adds $5,000–$25,000 per violation under Labor Code §226.8." : "") + "</p>");
+          lines.push("<ul>");
+          QUESTIONS.forEach(function (item) {
+            if (answers[item.id]) lines.push("<li>" + esc(item.q) + " — <strong>" + (answers[item.id] === "yes" ? "Yes" : "No") + "</strong></li>");
+          });
+          lines.push("</ul>");
+        } else {
+          lines.push("<p>Classification questions were not answered.</p>");
+        }
+        lines.push("<h2>2. True cost of the hire (2026 figures)</h2>");
+        if (lastCost) {
+          lines.push("<table border='1' cellspacing='0' cellpadding='6'>");
+          lines.push("<tr><td>Base pay</td><td>" + fmt2(lastCost.base) + "</td></tr>");
+          lines.push("<tr><td>Social Security (6.2% to $184,500)</td><td>" + fmt2(lastCost.ss) + "</td></tr>");
+          lines.push("<tr><td>Medicare (1.45%)</td><td>" + fmt2(lastCost.med) + "</td></tr>");
+          lines.push("<tr><td>FUTA</td><td>" + fmt2(lastCost.futa) + "</td></tr>");
+          lines.push("<tr><td>SUTA (estimate)</td><td>" + fmt2(lastCost.suta) + "</td></tr>");
+          lines.push("<tr><td>Workers' comp (estimate)</td><td>" + fmt2(lastCost.wc) + "</td></tr>");
+          if (lastCost.benefits > 0) lines.push("<tr><td>Benefits</td><td>" + fmt2(lastCost.benefits) + "</td></tr>");
+          if (lastCost.retirement > 0) lines.push("<tr><td>Retirement match</td><td>" + fmt2(lastCost.retirement) + "</td></tr>");
+          if (lastCost.pto > 0) lines.push("<tr><td>Paid time off</td><td>" + fmt2(lastCost.pto) + "</td></tr>");
+          if (lastCost.equip > 0) lines.push("<tr><td>Equipment &amp; setup</td><td>" + fmt2(lastCost.equip) + "</td></tr>");
+          lines.push("<tr><td><strong>Total cost, year one</strong></td><td><strong>" + fmt2(lastCost.total) + "</strong></td></tr>");
+          lines.push("</table>");
+          lines.push("<p>Cost multiple: " + (lastCost.base > 0 ? (lastCost.total / lastCost.base).toFixed(2) + "× base pay" : "—") + ".</p>");
+        }
+        lines.push("<h2>3. First-hire setup checklist</h2>");
+        lines.push("<ol><li>Get an EIN (free, from the IRS)</li><li>Register as an employer with your state (withholding + SUTA accounts)</li><li>Line up workers' comp insurance</li><li>Collect day-one paperwork: Form W-4, Form I-9, state withholding form</li><li>Report the new hire to your state within 20 days</li><li>Enroll in EFTPS for federal tax deposits</li><li>Confirm your deposit schedule (monthly vs. semiweekly)</li><li>File Form 941 quarterly</li><li>File Form 940 annually — the 2026 form is due Feb 1, 2027</li><li>Keep payroll records at least 4 years</li></ol>");
+        if (lastPick) {
+          lines.push("<h2>Payroll software match</h2>");
+          lines.push("<p><strong>" + esc(lastPick.vendor.name) + "</strong> — starting at $" + (lastPick.vendor.price % 1 ? lastPick.vendor.price.toFixed(2) : lastPick.vendor.price) + "/mo. " + esc(lastPick.why) + "</p>");
+        }
+        lines.push("<p><em>Disclaimer: This report is educational only and is not legal or tax advice. Worker classification is fact-specific; for a binding determination file IRS Form SS-8 or consult a CPA or employment attorney. All penalty and state figures are estimates.</em></p>");
+
+        var doc = "<!doctype html><html lang='en'><head><meta charset='utf-8'><title>First Hire — Results Report</title><style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.55;color:#1b241e}table{border-collapse:collapse}td{padding:6px 10px}h1,h2{line-height:1.2}</style></head><body>" + lines.join("\n") + "</body></html>";
+        var blob = new Blob([doc], { type: "text/html" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "first-hire-results.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      });
+
+      /* ---------------- init ---------------- */
+      syncState("state1", "state2");
+      renderCost();
+    </script>
+  </body>
+</html>
