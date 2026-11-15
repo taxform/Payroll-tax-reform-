@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Payroll Compliance Audit — Is Your Payroll Compliant?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --panel:#fffdf8; --panel2:#ffffff; --ink:#16283a; --muted:#5a6b7c;
+  --line:#ddd5c4; --navy:#0f2a43; --navy2:#143656; --teal:#0e7a6d; --teal-d:#0a5f55;
+  --amber:#b97a0e; --amber-bg:#fdf3dd; --red:#b3362b; --red-bg:#fbeae8;
+  --green:#177245; --green-bg:#e6f4ec; --chip:#eef2f0;
+  --shadow:0 10px 30px rgba(15,42,67,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0d1620; --panel:#14222f; --panel2:#182837; --ink:#e9eef2; --muted:#a7b6c2;
+  --line:#2b3f52; --navy:#0a1c2e; --navy2:#102a44; --chip:#1d3247;
+  --amber-bg:#3a2d12; --red-bg:#3d1f1c; --green-bg:#16382a; --shadow:0 10px 30px rgba(0,0,0,.4); }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Libre Franklin",system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55;font-size:16px}
+button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+a{color:var(--teal-d)} @media(prefers-color-scheme:dark){a{color:#5ec9ba}}
+.wrap{max-width:1060px;margin:0 auto;padding:0 18px 64px}
+.hero{background:var(--navy);color:#eef4f8;margin:0 -18px;padding:34px 22px 30px;border-radius:0 0 22px 22px}
+@media(min-width:700px){.hero{margin:18px 0 0;padding:40px 38px 34px;border-radius:22px}}
+.hero .site{font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9fd8cd;margin:0 0 10px}
+.hero h1{font-family:"Fraunces",Georgia,serif;font-size:clamp(1.9rem,5vw,2.9rem);line-height:1.08;margin:0 0 12px;font-weight:700}
+.hero p.lede{font-size:1.06rem;color:#cfe0ea;max-width:44rem;margin:0 0 18px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px}
+.hstat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 14px;min-width:140px;flex:1}
+.hstat b{display:block;font-size:1.15rem;color:#fff}
+.hstat span{font-size:.8rem;color:#b9cfdd}
+.progress-wrap{margin:22px 0 6px}
+.progress-meta{display:flex;justify-content:space-between;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.progress{height:10px;background:var(--chip);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.progress i{display:block;height:100%;width:0;background:var(--teal);border-radius:99px;transition:width .35s ease}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:22px;margin-top:18px}
+.card h2{font-family:"Fraunces",Georgia,serif;font-size:1.45rem;margin:0 0 6px;line-height:1.2}
+.card h3{font-size:1.05rem;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.95rem}
+.grid2{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:720px){.grid2{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:5px}
+.field .hint{font-size:.82rem;color:var(--muted);margin-top:4px}
+.field input[type="number"],.field select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);font:inherit;font-size:1rem}
+.field input:focus,.field select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+.q{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px;background:var(--panel2)}
+.q-top{display:flex;gap:12px;align-items:flex-start}
+.q-num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;margin-top:2px}
+@media(prefers-color-scheme:dark){.q-num{background:var(--teal-d)}}
+.q h3{font-size:1rem;line-height:1.35}
+.q .why{font-size:.87rem;color:var(--muted);margin:4px 0 0}
+.q .why b{color:var(--ink)}
+.choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.choice{flex:1;min-width:96px}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice label{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border:1.5px solid var(--line);border-radius:10px;font-weight:700;cursor:pointer;min-height:44px;text-align:center;background:var(--panel)}
+.choice input:checked+label{border-color:var(--teal);background:var(--green-bg);color:var(--ink);box-shadow:inset 0 0 0 1px var(--teal)}
+.choice input:focus-visible+label{outline:2px solid var(--teal);outline-offset:2px}
+.cat{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-d)}
+@media(prefers-color-scheme:dark){.cat{color:#5ec9ba}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:13px 22px;font:inherit;font-weight:800;cursor:pointer;min-height:48px;text-decoration:none}
+.btn-primary{background:var(--teal);color:#fff;width:100%;font-size:1.05rem}
+.btn-primary:hover{background:var(--teal-d)}
+.btn-primary:disabled{background:#9db8b3;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn-navy{background:var(--navy);color:#fff}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.actions .btn{flex:1;min-width:200px}
+.err{display:none;background:var(--red-bg);border:1px solid var(--red);color:var(--ink);border-radius:10px;padding:12px 14px;margin-top:14px;font-weight:600}
+.ad-slot{margin-top:18px;border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);background:var(--panel)}
+.ad-slot small{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.ad-slot p{margin:0;font-size:.92rem}
+.ad-slot a{font-weight:700}
+/* Results */
+#results{display:none}
+.score-row{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:760px){.score-row{grid-template-columns:280px 1fr 1fr}}
+.score-box{text-align:center;border-radius:16px;padding:20px 14px;border:1px solid var(--line);background:var(--panel2)}
+.score-num{font-family:"Fraunces",Georgia,serif;font-size:4rem;line-height:1;font-weight:700}
+.score-box .of{color:var(--muted);font-weight:600}
+.risk{display:inline-block;margin-top:10px;padding:6px 16px;border-radius:99px;font-weight:800;font-size:.95rem}
+.risk.low{background:var(--green-bg);color:var(--green)} .risk.med{background:var(--amber-bg);color:var(--amber)} .risk.high{background:var(--red-bg);color:var(--red)}
+.meter{height:12px;border-radius:99px;background:var(--chip);overflow:hidden;margin-top:14px;border:1px solid var(--line)}
+.meter i{display:block;height:100%;width:0;transition:width .6s ease}
+.money-box{border-radius:16px;padding:20px;border:1px solid var(--line);background:var(--panel2)}
+.money-box .big{font-family:"Fraunces",Georgia,serif;font-size:2.3rem;line-height:1.05;font-weight:700}
+.money-box p{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+table.math{width:100%;border-collapse:collapse;margin-top:8px;font-size:.93rem}
+table.math th{text-align:left;padding:9px 8px;border-bottom:2px solid var(--line);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+table.math td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.math td.n,table.math th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.math tr.total td{font-weight:800;border-top:2px solid var(--ink);border-bottom:0;font-size:1rem}
+.formula{font-size:.85rem;color:var(--muted);display:block;margin-top:2px}
+.tfrp{border:2px solid var(--red);background:var(--red-bg);border-radius:14px;padding:16px 18px;margin-top:16px}
+.tfrp h3{color:var(--red);margin:0 0 6px}
+.tfrp p{margin:0;font-size:.95rem}
+.fix{list-style:none;margin:0;padding:0;counter-reset:fix}
+.fix li{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.fix li:last-child{border-bottom:0}
+.fix .rank{flex:0 0 auto;width:34px;height:34px;border-radius:10px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--navy)}
+.fix li.sev-high .rank{background:var(--red)} .fix li.sev-med .rank{background:var(--amber)}
+.fix h4{margin:0 0 3px;font-size:1rem}
+.fix p{margin:0;font-size:.92rem;color:var(--muted)}
+.fix .due{display:inline-block;margin-top:5px;font-size:.8rem;font-weight:800;padding:2px 9px;border-radius:99px;background:var(--chip);color:var(--ink)}
+.pass-list{columns:1;list-style:none;padding:0;margin:0}
+@media(min-width:720px){.pass-list{columns:2}}
+.pass-list li{padding:7px 0 7px 26px;position:relative;break-inside:avoid;font-size:.94rem}
+.pass-list li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:800}
+.rec{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:720px){.rec{grid-template-columns:1.2fr .8fr}}
+.rec-main{border:2px solid var(--teal);border-radius:16px;padding:20px;background:var(--panel2)}
+.rec-main .price{font-family:"Fraunces",Georgia,serif;font-size:1.8rem;font-weight:700}
+.rec-alt{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel2)}
+.rec-alt ul{margin:8px 0 0;padding-left:18px;font-size:.93rem}
+.rec-alt li{margin:5px 0}
+.disclaimer{border:1px solid var(--line);border-left:5px solid var(--amber);border-radius:12px;padding:16px 18px;background:var(--panel);margin-top:18px;font-size:.92rem}
+.disclaimer h3{margin:0 0 6px}
+.facts{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+@media(min-width:720px){.facts{grid-template-columns:repeat(3,1fr)}}
+.fact{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--panel2);font-size:.9rem}
+.fact b{display:block;font-size:1.02rem;margin-bottom:2px}
+.foot{margin-top:26px;color:var(--muted);font-size:.85rem;text-align:center}
+@media print{
+  body{background:#fff} .no-print{display:none!important}
+  .card,.score-box,.money-box{box-shadow:none;break-inside:avoid}
+  #results{display:block!important}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="site">Payroll Tax Reform · Free Employer Tool</p>
+    <h1>Is your payroll compliant?</h1>
+    <p class="lede">Answer 15 questions about how you run payroll. In about three minutes you get a compliance score, a risk rating, an estimated penalty exposure in dollars — with the math shown — and a fix-it plan ordered by what costs you most if you leave it.</p>
+    <div class="hero-stats">
+      <div class="hstat"><b>15 questions</b><span>Yes / No / Not sure</span></div>
+      <div class="hstat"><b>2026 figures</b><span>FICA, FUTA &amp; IRS penalty tiers</span></div>
+      <div class="hstat"><b>Free</b><span>No account, no sign-up</span></div>
+    </div>
+  </header>
+
+  <!-- Ad slot: house ad — structured for a future ad-network swap -->
+  <div class="ad-slot no-print" data-ad-slot="top" aria-label="Advertisement">
+    <small>Advertisement</small>
+    <p>Running payroll by hand? Compare full-service options on the <a href="https://payrolltaxreform.com/software.html">payroll software guide</a> — prices checked against vendor sites.</p>
+  </div>
+
+  <div class="progress-wrap no-print" id="progressWrap">
+    <div class="progress-meta"><span id="progressLabel">Step 1 of 2 — Your numbers</span><span id="progressPct">0%</span></div>
+    <div class="progress"><i id="progressBar"></i></div>
+  </div>
+
+  <!-- STEP 1: numbers -->
+  <section class="card no-print" id="step1">
+    <h2>First, your numbers</h2>
+    <p class="sub">These four figures drive the penalty math. Use your best estimate — the results page shows every calculation, so you can see exactly what each number does. Nothing is saved or sent anywhere; the audit runs entirely on this page.</p>
+    <div class="grid2">
+      <div class="field">
+        <label for="empCount">How many employees do you have?</label>
+        <input type="number" id="empCount" min="1" max="10000" step="1" value="3">
+        <div class="hint">W-2 employees on payroll right now.</div>
+      </div>
+      <div class="field">
+        <label for="qtrTax">Federal payroll tax per quarter (estimate)</label>
+        <input type="number" id="qtrTax" min="0" step="100" value="9000">
+        <div class="hint">Withheld income tax + both halves of FICA for one quarter — the total you deposit and report on Form 941. Not sure? Rough guide: about $2,500–$3,500 per employee per quarter at average wages.</div>
+      </div>
+      <div class="field">
+        <label for="contractorCount">How many people do you pay as 1099 contractors?</label>
+        <input type="number" id="contractorCount" min="0" max="10000" step="1" value="0">
+        <div class="hint">Anyone you pay without withholding payroll tax.</div>
+      </div>
+      <div class="field">
+        <label for="contractorPay">Average pay per contractor, per year</label>
+        <input type="number" id="contractorPay" min="0" step="500" value="30000">
+        <div class="hint">Used only to size misclassification exposure, at the 7.65% employer FICA rate.</div>
+      </div>
+      <div class="field">
+        <label for="depositLate">If deposits have been late, how late were they?</label>
+        <select id="depositLate">
+          <option value="0.02">1–5 days late — 2% tier</option>
+          <option value="0.05">6–15 days late — 5% tier</option>
+          <option value="0.10" selected>16+ days late — 10% tier</option>
+          <option value="0.15">Still unpaid 10+ days after an IRS notice — 15% tier</option>
+        </select>
+        <div class="hint">The IRS failure-to-deposit tiers. Pick the closest match; the math updates on the results page.</div>
+      </div>
+      <div class="field">
+        <label for="monthsLate">If a Form 941 was late, how many months late?</label>
+        <select id="monthsLate">
+          <option value="1">1 month (or part of a month)</option>
+          <option value="2" selected>2 months</option>
+          <option value="3">3 months</option>
+          <option value="4">4 months</option>
+          <option value="5">5 months or more — filing penalty maxes out</option>
+        </select>
+        <div class="hint">Failure-to-file runs 5% per month, capped at 25%. Failure-to-pay runs 0.5% per month.</div>
+      </div>
+      <div class="field">
+        <label for="usesQBO">Do you already use QuickBooks Online for bookkeeping?</label>
+        <select id="usesQBO"><option value="no" selected>No</option><option value="yes">Yes</option></select>
+        <div class="hint">Only used to match payroll software to your setup.</div>
+      </div>
+      <div class="field">
+        <label for="multiState">Do you have employees in more than one state?</label>
+        <select id="multiState"><option value="no" selected>No — one state</option><option value="yes">Yes — two or more states</option></select>
+        <div class="hint">Multi-state payroll means multiple SUTA accounts and filing calendars.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: questions -->
+  <section class="card no-print" id="step2">
+    <h2>The 15-question audit</h2>
+    <p class="sub">Answer for how payroll actually ran over the last four quarters — not how it is supposed to run. “Not sure” counts as a gap: if you cannot confirm it, an examiner will not assume it.</p>
+    <div id="questions"></div>
+    <div class="err" id="formErr" role="alert"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="scoreBtn" type="button">See my score &amp; fix-it plan →</button>
+    </div>
+    <p class="sub" style="margin-top:12px">Key dates this audit uses: monthly depositors owe each month's tax by the <b>15th of the following month</b>; semiweekly depositors: paydays Wed–Fri are due the following Wednesday, paydays Sat–Tue are due the following Friday; Form 940 for 2026 is due <b>February 1, 2027</b>.</p>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" aria-live="polite">
+    <div class="card">
+      <h2>Your audit results</h2>
+      <p class="sub" id="resultDate"></p>
+      <div class="score-row">
+        <div class="score-box">
+          <div class="score-num" id="scoreNum">–</div>
+          <div class="of">out of 100</div>
+          <div><span class="risk" id="riskBadge">—</span></div>
+          <div class="meter"><i id="scoreMeter"></i></div>
+        </div>
+        <div class="money-box">
+          <div class="cat">Estimated penalty exposure</div>
+          <div class="big" id="exposureBig">$0</div>
+          <p id="exposureNote">Estimate only — built from the IRS penalty tiers and your numbers, with the full math below. Interest, which the IRS adds on top, is not included.</p>
+        </div>
+        <div class="money-box">
+          <div class="cat">What is driving it</div>
+          <div class="big" id="driverBig" style="font-size:1.35rem;line-height:1.3">—</div>
+          <p id="driverNote"></p>
+        </div>
+      </div>
+
+      <div class="tfrp" id="tfrpBox" style="display:none">
+        <h3>⚠ Trust Fund Recovery Penalty — this one is personal</h3>
+        <p id="tfrpText"></p>
+      </div>
+
+      <h3 style="margin-top:24px">The math behind your estimate</h3>
+      <p class="sub">Every line shows its formula. Change your numbers at the top and re-run the audit to see a line move.</p>
+      <div style="overflow-x:auto">
+      <table class="math" id="mathTable">
+        <thead><tr><th>Exposure item</th><th>How it is worked out</th><th class="n">Estimate</th></tr></thead>
+        <tbody id="mathBody"></tbody>
+      </table>
+      </div>
+      <p class="sub" style="margin-top:10px">2026 rates used: employer FICA 7.65% (Social Security 6.2% on wages up to the $184,500 wage base, plus Medicare 1.45% on all wages). Net FUTA after the state credit is 0.6% of the first $7,000 per employee — <b>$42 per employee per year</b>. FUTA deposits are due quarterly once your undeposited FUTA tax tops <b>$500</b>. State penalties vary by state and are labeled as estimates wherever they appear.</p>
+    </div>
+
+    <div class="ad-slot no-print" data-ad-slot="results" aria-label="Advertisement">
+      <small>Advertisement</small>
+      <p>Most findings below disappear when deposits and filings run automatically. See the <a href="https://payrolltaxreform.com/software.html">payroll software comparison</a>.</p>
+    </div>
+
+    <div class="card">
+      <h2>Your fix-it plan — in this order</h2>
+      <p class="sub">Ordered by penalty risk: the items that grow fastest, or reach your personal bank account, come first. Work top-down.</p>
+      <ol class="fix" id="fixList"></ol>
+      <div id="passBlock" style="margin-top:18px">
+        <h3>Already in good shape</h3>
+        <ul class="pass-list" id="passList"></ul>
+      </div>
+      <div class="actions no-print">
+        <button class="btn btn-navy" id="downloadBtn" type="button">⬇ Download my report (printable)</button>
+        <button class="btn btn-ghost" id="redoBtn" type="button">Start over</button>
+      </div>
+      <p class="sub no-print" style="margin-top:10px">The download is a complete report file (score, exposure math, fix-it plan, and disclaimer) you can save, print, or hand to your CPA.</p>
+    </div>
+
+    <div class="card">
+      <h2>Payroll software matched to your situation</h2>
+      <p class="sub" id="recWhy"></p>
+      <div class="rec">
+        <div class="rec-main">
+          <div class="cat">Best match for you</div>
+          <h3 id="recName" style="font-size:1.3rem;margin-top:4px">—</h3>
+          <div class="price" id="recPrice">—</div>
+          <p id="recDesc" style="margin:8px 0 14px"></p>
+          <a class="btn btn-primary" id="recLink" href="https://payrolltaxreform.com/software.html" target="_blank" rel="noopener" style="width:auto">Visit vendor site →</a>
+          <p class="sub" style="margin-top:10px">Starting price shown — check the vendor's site for current pricing. Per-employee fees usually apply on top of the base price.</p>
+        </div>
+        <div class="rec-alt">
+          <h3>All six compared</h3>
+          <ul>
+            <li><b>Deel</b> — starting at $29/mo</li>
+            <li><b>SurePayroll</b> — starting at $36/mo</li>
+            <li><b>Patriot</b> — starting at $42/mo</li>
+            <li><b>OnPay</b> — starting at $55/mo</li>
+            <li><b>Gusto</b> — starting at $55/mo</li>
+            <li><b>QuickBooks Payroll Core</b> — starting at $56.50/mo, best if you already run QuickBooks Online</li>
+          </ul>
+          <p style="font-size:.92rem;margin-top:10px"><a href="https://payrolltaxreform.com/software.html" target="_blank" rel="noopener">Compare them side by side on the software page →</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>The rules behind this audit</h2>
+      <div class="facts">
+        <div class="fact"><b>Deposit schedule — the $50,000 lookback</b>Look at the four quarters ending June 30 of the prior year. Total Form 941 tax of $50,000 or less → monthly depositor (due the 15th of the following month). More than $50,000 → semiweekly: paydays Wed–Fri are due the following Wednesday; paydays Sat–Tue are due the following Friday.</div>
+        <div class="fact"><b>Failure-to-deposit tiers</b>2% at 1–5 days late · 5% at 6–15 days · 10% at 16+ days (or not paid within 10 days of the first IRS notice) · 15% if still unpaid 10+ days after notice. Applied to the undeposited amount, per deposit.</div>
+        <div class="fact"><b>Filing &amp; payment penalties</b>Failure to file Form 941: 5% of net tax per month, up to 25%. Failure to pay: 0.5% per month, up to 25%. When both run in the same month, the filing penalty is reduced so the combined rate is 5% — this estimate keeps them separate, which makes it conservative on the high side.</div>
+      </div>
+      <p style="font-size:.94rem;margin-top:14px">Go deeper: <a href="https://payrolltaxreform.com/blog/how-to-file-form-941.html" target="_blank" rel="noopener">How to file Form 941</a> · <a href="https://payrolltaxreform.com/blog/how-to-file-form-940.html" target="_blank" rel="noopener">How to file Form 940</a> · <a href="https://payrolltaxreform.com/blog/how-to-pay-federal-payroll-taxes-eftps.html" target="_blank" rel="noopener">Paying through EFTPS</a> · <a href="https://payrolltaxreform.com/blog/what-is-suta-state-unemployment-insurance.html" target="_blank" rel="noopener">What SUTA is and how it works</a></p>
+    </div>
+
+    <div class="disclaimer">
+      <h3>Disclaimer — read this before acting</h3>
+      <p style="margin:0">This audit is an <b>educational self-check only</b>. It is not legal advice, tax advice, or a compliance determination, and it does not create any professional relationship. Penalty figures are estimates built from published IRS rates and the numbers you entered; your actual liability depends on your deposit history, filing record, state, and facts this tool cannot see, and the IRS and states assess penalties case by case. Before acting on any finding — especially worker classification or unpaid trust fund taxes — consult a CPA or an employment attorney. For a binding answer on whether a worker is an employee or a contractor, you or the worker can file <b>IRS Form SS-8</b> and let the IRS determine it.</p>
+    </div>
+
+    <p class="foot">Payroll Compliance Audit · A free tool from <a href="https://payrolltaxreform.com/" target="_blank" rel="noopener">PayrollTaxReform.com</a> · Figures use 2026 federal rates and IRS penalty tiers · Your answers never leave this page.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var L941="https://payrolltaxreform.com/blog/how-to-file-form-941.html";
+var L940="https://payrolltaxreform.com/blog/how-to-file-form-940.html";
+var LEFTPS="https://payrolltaxreform.com/blog/how-to-pay-federal-payroll-taxes-eftps.html";
+var LSUTA="https://payrolltaxreform.com/blog/what-is-suta-state-unemployment-insurance.html";
+var LSOFT="https://payrolltaxreform.com/software.html";
+
+/* Each question: good = the compliant answer. For the contractor question the compliant answer is "no". */
+var QUESTIONS=[
+ {id:"schedule",cat:"Federal deposits",weight:8,good:"yes",
+  q:"Do you know which federal deposit schedule applies to your business — monthly or semiweekly?",
+  why:"The schedule comes from the <b>$50,000 lookback rule</b>: total Form 941 tax of $50,000 or less in the lookback period means monthly (due the 15th of the following month); over $50,000 means semiweekly (Wednesday/Friday rule). Guessing wrong makes every deposit late.",
+  fix:"Work out your schedule from the lookback period today, write it on the payroll calendar, and re-check it every November for the next year.",
+  due:"This week",link:LEFTPS,linkText:"How EFTPS deposits work"},
+ {id:"deposits",cat:"Federal deposits",weight:14,good:"yes",critical:true,
+  q:"Are your federal payroll tax deposits made on time, every single pay period?",
+  why:"Late deposits trigger the failure-to-deposit penalty — <b>2% at 1–5 days, 5% at 6–15 days, 10% at 16+ days, 15%</b> after notice — on the full undeposited amount, every time it happens.",
+  fix:"Deposit any missed amounts immediately — the penalty tier stops climbing once the money is in. Then automate deposits so the date never depends on memory.",
+  due:"Today — penalties grow by the day",link:LEFTPS,linkText:"Paying through EFTPS, step by step"},
+ {id:"eftps",cat:"Federal deposits",weight:6,good:"yes",
+  q:"Are you enrolled in EFTPS and making deposits through it?",
+  why:"Federal deposits must be made electronically. EFTPS is the IRS's free system, and its confirmation numbers are your proof of timely payment if a deposit is ever disputed.",
+  fix:"Enroll in EFTPS (the PIN arrives by mail, so allow about a week) and deposit through it every period. Keep every confirmation number with your payroll records.",
+  due:"Enroll this week",link:LEFTPS,linkText:"EFTPS enrollment guide"},
+ {id:"f941",cat:"Federal filings",weight:12,good:"yes",critical:true,
+  q:"Were all four quarterly Forms 941 filed on time in the last year?",
+  why:"A late Form 941 costs <b>5% of the net tax per month, up to 25%</b>, plus 0.5% per month for failure to pay. Four quarters a year means four chances to be late.",
+  fix:"File any missing 941s now — filing late stops the 5%-per-month filing penalty from growing, even if you cannot pay in full yet. Then calendar all four due dates (Apr 30, Jul 31, Oct 31, Jan 31).",
+  due:"File missing quarters this week",link:L941,linkText:"How to file Form 941"},
+ {id:"f940",cat:"Federal filings",weight:8,good:"yes",
+  q:"Was Form 940 (the annual FUTA return) filed on time — due February 1, 2027 for 2026?",
+  why:"Form 940 reports federal unemployment tax: a net <b>$42 per employee per year</b> after the state credit. Deposits are due quarterly once undeposited FUTA tops $500, and losing the state credit for late SUTA payments can raise the rate sharply.",
+  fix:"File Form 940 if it is outstanding, and confirm your FUTA deposits were made in any quarter your liability passed $500.",
+  due:"Before the next deadline passes",link:L940,linkText:"How to file Form 940"},
+ {id:"suta",cat:"State taxes",weight:8,good:"yes",
+  q:"Are your state unemployment (SUTA) payments and wage reports current in every state where you have employees?",
+  why:"SUTA funds your unemployment rate. Late payments can forfeit part of your FUTA credit — turning the net $42 per employee into far more — and states add their own penalties and interest. State penalties vary.",
+  fix:"Bring every SUTA account current and file any missing wage reports. Paying SUTA late or not at all also shrinks the credit that keeps your federal FUTA rate at 0.6%.",
+  due:"This month",link:LSUTA,linkText:"What SUTA is and how it works"},
+ {id:"workerscomp",cat:"Workplace coverage",weight:7,good:"yes",critical:true,
+  q:"Do you carry workers' compensation coverage for your employees, as your state requires?",
+  why:"Almost every state requires coverage from the first employee. Operating without it can mean stop-work orders, state fines, and personal liability for an injured worker's full medical costs and lost wages.",
+  fix:"Bind a workers' compensation policy now if you do not have one, and confirm every employee's classification code on the policy matches the work they actually do.",
+  due:"Immediately if uninsured",link:LSOFT,linkText:"Payroll services that bundle coverage"},
+ {id:"newhire",cat:"Hiring paperwork",weight:5,good:"yes",
+  q:"Do you report every new hire to your state within the required window (20 days under federal rules; some states are shorter)?",
+  why:"New-hire reporting is mandatory in all 50 states. It is easy to miss, it is checked, and states can fine per unreported employee.",
+  fix:"Report any unreported hires today and add new-hire reporting to your first-day checklist so it happens before the first paycheck, not after.",
+  due:"This week",link:LSUTA,linkText:"State employer obligations explained"},
+ {id:"i9",cat:"Hiring paperwork",weight:7,good:"yes",
+  q:"Do you have a properly completed Form I-9 on file for every employee — Section 1 by day one, Section 2 within three business days?",
+  why:"I-9 paperwork errors are among the most common findings in government audits, and fines apply per form — including for employees who were fully authorized to work.",
+  fix:"Audit your I-9 file: one form per employee, no missing signatures or dates, stored separately from personnel files. Correct errors by signing and dating the correction — never backdate.",
+  due:"This month",link:L941,linkText:"Quarterly filing & record basics"},
+ {id:"classification",cat:"Worker classification",weight:10,good:"no",critical:true,
+  q:"Do you pay anyone as a 1099 contractor who works like an employee — your schedule, your tools, mainly or only for you?",
+  why:"That pattern is the classic misclassification profile. Reclassification can mean back employer FICA (7.65%), FUTA, plus penalties and interest — and state agencies apply even stricter tests than the IRS in many states.",
+  fix:"Review every contractor against the IRS control test. Where a worker looks like an employee, reclassify going forward and talk to a CPA or employment attorney about the back period — and note Form SS-8 in the disclaimer below for a binding determination.",
+  due:"Review this month — exposure grows each pay period",link:LSOFT,linkText:"Services that handle classification & contractor pay"},
+ {id:"overtime",cat:"Pay practices",weight:6,good:"yes",
+  q:"Do you pay overtime correctly — at least 1.5× the regular rate for hours over 40 in a workweek, for every non-exempt employee?",
+  why:"Overtime errors are the most common wage claim against small employers. Liability can reach back two to three years of unpaid overtime, doubled as liquidated damages in many cases, plus the employee's legal fees.",
+  fix:"Recheck how the regular rate is calculated (it must include bonuses and shift differentials, not just base pay) and audit the last few pay periods for anyone who crossed 40 hours.",
+  due:"Next payroll run",link:L941,linkText:"Getting pay calculations right"},
+ {id:"records",cat:"Records",weight:4,good:"yes",
+  q:"Do you keep complete payroll records — pay rates, hours, tax filings, deposit confirmations — for at least four years?",
+  why:"The IRS requires employment tax records to be kept at least four years after the tax becomes due or is paid. In any dispute, missing records are decided against the employer.",
+  fix:"Set a single home for payroll records — filings, EFTPS confirmations, time records, and pay registers — and keep everything at least four years.",
+  due:"This month",link:L941,linkText:"What to keep, per the 941 guide"},
+ {id:"w4",cat:"Hiring paperwork",weight:2,good:"yes",
+  q:"Do you have a current Form W-4 on file for every employee, and withhold from it?",
+  why:"Withholding from an old, missing, or never-collected W-4 means withholding at the wrong rate — and the employer answers for under-withholding.",
+  fix:"Collect a W-4 from anyone missing one (withhold as single with no adjustments until you have it) and re-issue W-4s each January for anyone claiming exempt.",
+  due:"Next payroll run",link:L941,linkText:"Withholding basics in the 941 guide"},
+ {id:"reconcile",cat:"Federal filings",weight:2,good:"yes",
+  q:"Do you reconcile your payroll records to each Form 941 before filing it?",
+  why:"A 941 that does not match your deposits and wage records is the most common trigger for an IRS notice — and notices are how small discrepancies become penalty cases.",
+  fix:"Before each filing, tie the quarter's deposits and wage totals to the 941 line by line. Keep the reconciliation with the filed return.",
+  due:"Every quarter, before filing",link:L941,linkText:"How to file Form 941"},
+ {id:"w2",cat:"Year-end",weight:1,good:"yes",
+  q:"Were W-2s issued to employees and filed with the Social Security Administration by January 31?",
+  why:"Late or incorrect W-2s carry per-form penalties that scale with how late they are corrected — and employees cannot file their own returns without them.",
+  fix:"Calendar January 31 as a hard deadline, verify names and Social Security numbers against source documents in December, and correct errors with Form W-2c as soon as they surface.",
+  due:"Every January 31",link:L940,linkText:"Year-end forms: 940 & W-2 season"}
+];
+
+var answers={};
+var qWrap=document.getElementById("questions");
+QUESTIONS.forEach(function(item,idx){
+  var div=document.createElement("div"); div.className="q";
+  var opts=[["yes","Yes"],["no","No"],["unsure","Not sure"]];
+  var choices=opts.map(function(o){
+    return '<span class="choice"><input type="radio" name="q_'+item.id+'" id="q_'+item.id+'_'+o[0]+'" value="'+o[0]+'"><label for="q_'+item.id+'_'+o[0]+'">'+o[1]+'</label></span>';
+  }).join("");
+  div.innerHTML='<div class="q-top"><div class="q-num">'+(idx+1)+'</div><div><div class="cat">'+item.cat+'</div><h3>'+item.q+'</h3><p class="why">'+item.why+'</p></div></div><div class="choices" role="radiogroup" aria-label="Question '+(idx+1)+'">'+choices+'</div>';
+  qWrap.appendChild(div);
+});
+qWrap.addEventListener("change",function(e){
+  var name=e.target.name||""; if(name.indexOf("q_")!==0) return;
+  answers[name.slice(2)]=e.target.value; updateProgress();
+});
+function num(id,def){ var v=parseFloat(document.getElementById(id).value); return isNaN(v)||v<0?def:v; }
+function updateProgress(){
+  var done=Object.keys(answers).length;
+  var pct=Math.round(done/QUESTIONS.length*100);
+  document.getElementById("progressBar").style.width=pct+"%";
+  document.getElementById("progressPct").textContent=pct+"%";
+  document.getElementById("progressLabel").textContent = done===0 ? "Step 1 of 2 — Your numbers, then the audit" : ("Step 2 of 2 — "+done+" of "+QUESTIONS.length+" answered");
+}
+["empCount","qtrTax","contractorCount","contractorPay","depositLate","monthsLate","usesQBO","multiState"].forEach(function(id){
+  document.getElementById(id).addEventListener("change",function(){ if(document.getElementById("results").style.display==="block"){ runAudit(false); } });
+});
+
+function fmt(n){ return "$"+Math.round(n).toLocaleString("en-US"); }
+
+function compute(){
+  var emp=Math.max(1,Math.round(num("empCount",3)));
+  var qtr=num("qtrTax",9000);
+  var cCount=Math.round(num("contractorCount",0));
+  var cPay=num("contractorPay",30000);
+  var tier=parseFloat(document.getElementById("depositLate").value);
+  var months=parseInt(document.getElementById("monthsLate").value,10);
+  var score=0, fails=[], passes=[];
+  QUESTIONS.forEach(function(item){
+    var a=answers[item.id];
+    if(a===item.good){ score+=item.weight; passes.push(item); }
+    else if(a==="unsure"){ score+=item.weight*0.25; fails.push({item:item,unsure:true}); }
+    else { fails.push({item:item,unsure:false}); }
+  });
+  score=Math.round(score);
+  var aDep=answers.deposits, a941=answers.f941, a940=answers.f940, aSuta=answers.suta, aClass=answers.classification;
+  var rows=[], total=0;
+  /* Failure to deposit */
+  if(aDep!=="yes"){
+    var ftd=qtr*tier;
+    total+=ftd;
+    rows.push({name:"Failure to deposit — federal payroll tax",formula:fmt(qtr)+" quarterly tax × "+Math.round(tier*100)+"% tier ("+(tier===0.02?"1–5 days late":tier===0.05?"6–15 days late":tier===0.10?"16+ days late":"15% — unpaid after IRS notice")+") × 1 quarter",amount:ftd});
+  }
+  /* Failure to file 941 */
+  if(a941!=="yes"){
+    var ftfRate=Math.min(0.05*months,0.25);
+    var ftf=qtr*ftfRate; total+=ftf;
+    rows.push({name:"Failure to file — Form 941",formula:fmt(qtr)+" × 5% per month × "+months+" month"+(months>1?"s":"")+" = "+Math.round(ftfRate*100)+"% (capped at 25%)",amount:ftf});
+    var ftp=qtr*0.005*months; total+=ftp;
+    rows.push({name:"Failure to pay — Form 941 tax",formula:fmt(qtr)+" × 0.5% per month × "+months+" month"+(months>1?"s":""),amount:ftp});
+  }
+  /* FUTA */
+  var futaTax=emp*42;
+  if(a940!=="yes"){
+    total+=futaTax;
+    rows.push({name:"FUTA tax at risk — Form 940",formula:emp+" employee"+(emp>1?"s":"")+" × $42 net FUTA per employee per year (0.6% of first $7,000)"+(futaTax>500?" — over $500, so quarterly deposits were due":""),amount:futaTax});
+  }
+  /* SUTA state estimate */
+  if(aSuta!=="yes"){
+    var sutaEst=300; total+=sutaEst;
+    rows.push({name:"State SUTA penalties & interest — estimate",formula:"State penalties vary by state; a typical late-payment penalty plus interest on one quarter is estimated here at $300 (plausible range $150–$600). Your state's figure may be higher or lower.",amount:sutaEst});
+  }
+  /* Misclassification */
+  var misclass=0;
+  if(aClass==="yes"||aClass==="unsure"){
+    var workers=Math.max(1,cCount);
+    misclass=workers*0.0765*cPay;
+    if(aClass==="unsure"){ misclass=misclass*0.5; }
+    total+=misclass;
+    rows.push({name:"Worker misclassification — back employer FICA (estimate)",formula:workers+" contractor"+(workers>1?"s":"")+" × "+fmt(cPay)+" avg annual pay × 7.65% employer FICA"+(aClass==="unsure"?" × 50% (you answered “not sure,” so exposure is halved)":"")+" — one year only; multiple years, FUTA, and penalties add more",amount:misclass});
+  }
+  /* Risk rating */
+  var criticalFail = (aDep==="no")||(a941==="no")||(aClass==="yes")||(answers.workerscomp==="no");
+  var risk, riskClass;
+  if(score>=85 && !criticalFail){ risk="Low risk"; riskClass="low"; }
+  else if(score>=60 && !criticalFail){ risk="Medium risk"; riskClass="med"; }
+  else if(score>=60 && criticalFail){ risk="Medium–High risk"; riskClass="med"; }
+  else { risk="High risk"; riskClass="high"; }
+  if(aDep==="no"&&a941==="no"){ risk="High risk"; riskClass="high"; }
+  /* Driver */
+  var driver="No single driver", driverNote="No penalty items were triggered by your answers.";
+  if(rows.length){
+    var top=rows.slice().sort(function(x,y){return y.amount-x.amount;})[0];
+    driver=top.name.split(" — ")[0];
+    driverNote="Largest single item: "+fmt(top.amount)+" of your "+fmt(total)+" estimate. Fix order below follows the money and the deadlines.";
+  }
+  /* Fix plan sorted by weight (penalty risk) */
+  var fixFails=fails.slice().sort(function(x,y){return y.item.weight-x.item.weight;});
+  /* TFRP */
+  var tfrp=null;
+  if(aDep!=="yes"){
+    tfrp="If payroll taxes were withheld from employees' pay but not paid over, the IRS can assess the Trust Fund Recovery Penalty: 100% of the unpaid trust fund taxes — the withheld income tax and the employee share of FICA — against the business and against owners, officers, and anyone else responsible for paying, personally. On your numbers, one quarter's tax is "+fmt(qtr)+", so up to roughly that amount per unpaid quarter could follow you personally, separate from the business. This amount is not added to the total above, because it is the same tax pursued a second way — not a second tax.";
+  }
+  return {emp:emp,qtr:qtr,cCount:cCount,score:score,risk:risk,riskClass:riskClass,rows:rows,total:total,fixFails:fixFails,passes:passes,driver:driver,driverNote:driverNote,tfrp:tfrp};
+}
+
+function recommend(r){
+  var qbo=document.getElementById("usesQBO").value==="yes";
+  var multi=document.getElementById("multiState").value==="yes";
+  if(qbo) return {name:"QuickBooks Payroll Core",price:"$56.50/mo",why:"You already run QuickBooks Online — keeping payroll inside the same system removes the reconciliation gaps this audit flags.",desc:"Payroll built into QuickBooks Online: automatic tax calculations, filings, and deposits that post straight to your books, so Form 941 totals and your ledger cannot drift apart.",url:"https://quickbooks.intuit.com/partners/affiliates?cid=par_pim_xwpoB4IIUFeI",label:"Visit QuickBooks Payroll →"};
+  if(answers.classification==="yes"||r.cCount>=3) return {name:"Deel",price:"$29/mo",why:"Your answers show contractor volume or classification risk — the fix starts with paying and classifying people correctly in one system.",desc:"Built for contractor-heavy teams: compliant contractor agreements, 1099 handling, and a path to convert contractors to employees when the work pattern says they should be.",url:"https://www.deel.com/",label:"Visit Deel →"};
+  if(multi) return {name:"OnPay",price:"$55/mo",why:"You have employees in more than one state — multi-state tax accounts, rates, and filings are where manual payroll breaks first.",desc:"Full-service payroll with multi-state filings included in one flat price, including SUTA registrations and year-end forms — no per-state add-on fees stacking up.",url:"https://www.onpay.com/",label:"Visit OnPay →"};
+  if(r.emp===1) return {name:"SurePayroll",price:"$36/mo",why:"With one employee, you need deposits and filings handled automatically at the lowest sensible cost — not a platform built for 50 people.",desc:"A long-running full-service option for very small employers: it calculates, deposits, and files federal and state payroll taxes for you, including Forms 941 and 940.",url:"https://www.surepayroll.com/",label:"Visit SurePayroll →"};
+  if(r.emp<=15) return {name:"Patriot",price:"$42/mo",why:"For a small single-state team, Patriot's full-service tier takes deposits and filings off your plate at a mid-range price.",desc:"Full-service payroll with federal, state, and local tax filing included — deposits and quarterly forms handled for you, which closes the top findings in most audits like yours.",url:"https://www.patriotsoftware.com/",label:"Visit Patriot →"};
+  return {name:"Gusto",price:"$55/mo",why:"At your team size, you need payroll, benefits, and hiring paperwork (I-9s, W-4s, new-hire reporting) running in one place.",desc:"Payroll plus onboarding paperwork and benefits administration in one system — new-hire reporting, W-4s, and I-9 workflows are built into the hiring flow.",url:LSOFT,label:"See Gusto on the software page →"};
+}
+
+var lastResult=null;
+function runAudit(scroll){
+  var missing=QUESTIONS.filter(function(q){return !answers[q.id];});
+  var err=document.getElementById("formErr");
+  if(missing.length){ err.style.display="block"; err.textContent="Please answer all 15 questions — "+missing.length+" remaining. The first unanswered one is question "+(QUESTIONS.indexOf(missing[0])+1)+"."; missing[0] && document.getElementsByName("q_"+missing[0].id)[0].focus(); return false; }
+  err.style.display="none";
+  var r=compute(); lastResult=r;
+  document.getElementById("resultDate").textContent="Completed "+new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+" · Based on "+r.emp+" employee"+(r.emp>1?"s":"")+" and "+fmt(r.qtr)+" of federal payroll tax per quarter · All dollar figures are estimates.";
+  document.getElementById("scoreNum").textContent=r.score;
+  var badge=document.getElementById("riskBadge"); badge.textContent=r.risk; badge.className="risk "+(r.riskClass==="low"?"low":r.riskClass==="med"?"med":"high");
+  var meter=document.getElementById("scoreMeter"); meter.style.width=r.score+"%"; meter.style.background=r.riskClass==="low"?"var(--green)":r.riskClass==="med"?"var(--amber)":"var(--red)";
+  document.getElementById("scoreNum").style.color=r.riskClass==="low"?"var(--green)":r.riskClass==="med"?"var(--amber)":"var(--red)";
+  document.getElementById("exposureBig").textContent=fmt(r.total);
+  document.getElementById("driverBig").textContent=r.driver;
+  document.getElementById("driverNote").textContent=r.driverNote;
+  var tb=document.getElementById("mathBody"); tb.innerHTML="";
+  if(!r.rows.length){ tb.innerHTML='<tr><td colspan="3">No penalty items triggered — your answers show deposits, filings, FUTA, SUTA, and classification all handled. Keep the records that prove it.</td></tr>'; }
+  r.rows.forEach(function(row){
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td><b>"+row.name+"</b></td><td><span class='formula'>"+row.formula+"</span></td><td class='n'>"+fmt(row.amount)+"</td>";
+    tb.appendChild(tr);
+  });
+  if(r.rows.length){ var tr=document.createElement("tr"); tr.className="total"; tr.innerHTML="<td colspan='2'>Total estimated exposure (interest not included)</td><td class='n'>"+fmt(r.total)+"</td>"; tb.appendChild(tr); }
+  var tf=document.getElementById("tfrpBox");
+  if(r.tfrp){ tf.style.display="block"; document.getElementById("tfrpText").textContent=r.tfrp; } else { tf.style.display="none"; }
+  var fl=document.getElementById("fixList"); fl.innerHTML="";
+  if(!r.fixFails.length){ fl.innerHTML='<li><div><h4>Nothing to fix — maintain the system</h4><p>Re-run this audit every quarter after Form 941 is filed. Compliance drifts when people, states, or pay patterns change, not all at once.</p></div></li>'; }
+  r.fixFails.forEach(function(f,i){
+    var li=document.createElement("li"); li.className=f.item.weight>=10?"sev-high":(f.item.weight>=6?"sev-med":"");
+    li.innerHTML='<div class="rank">'+(i+1)+'</div><div><h4>'+f.item.q+(f.unsure?' <span style="color:var(--amber)">(you answered “not sure”)</span>':"")+'</h4><p>'+f.item.fix+'</p><span class="due">'+f.item.due+'</span> &nbsp;<a href="'+f.item.link+'" target="_blank" rel="noopener" style="font-size:.88rem;font-weight:700">'+f.item.linkText+' →</a></div>';
+    fl.appendChild(li);
+  });
+  var pl=document.getElementById("passList"); pl.innerHTML="";
+  document.getElementById("passBlock").style.display=r.passes.length?"block":"none";
+  r.passes.forEach(function(item){ var li=document.createElement("li"); li.textContent=item.q; pl.appendChild(li); });
+  var rec=recommend(r);
+  document.getElementById("recWhy").textContent=rec.why;
+  document.getElementById("recName").textContent=rec.name;
+  document.getElementById("recPrice").innerHTML="Starting at "+rec.price;
+  document.getElementById("recDesc").textContent=rec.desc;
+  var rl=document.getElementById("recLink"); rl.href=rec.url; rl.textContent=rec.label;
+  var res=document.getElementById("results"); res.style.display="block";
+  document.getElementById("progressLabel").textContent="Audit complete";
+  document.getElementById("progressBar").style.width="100%"; document.getElementById("progressPct").textContent="100%";
+  if(scroll!==false){ res.scrollIntoView({behavior:"smooth",block:"start"}); }
+  return true;
+}
+document.getElementById("scoreBtn").addEventListener("click",function(){ runAudit(true); });
+
+function buildReport(){
+  var r=lastResult; if(!r) return null;
+  var rowsHtml=r.rows.map(function(row){return "<tr><td><b>"+row.name+"</b><br><small>"+row.formula+"</small></td><td style='text-align:right'>"+fmt(row.amount)+"</td></tr>";}).join("");
+  var fixHtml=r.fixFails.map(function(f,i){return "<li><b>"+(i+1)+". "+f.item.q+"</b><br>"+f.item.fix+" <i>("+f.item.due+")</i></li>";}).join("");
+  var rec=recommend(r);
+  return "<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Payroll Compliance Audit Report</title><style>body{font-family:Georgia,serif;max-width:760px;margin:32px auto;padding:0 20px;color:#16283a;line-height:1.55}h1{font-size:26px}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #ccc;padding:8px}ol li{margin:10px 0}.box{border:2px solid #0f2a43;border-radius:10px;padding:16px;margin:16px 0}</style></head><body>"
+  +"<h1>Payroll Compliance Audit — Report</h1><p>Completed "+new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+" · "+r.emp+" employees · "+fmt(r.qtr)+" federal payroll tax per quarter · From PayrollTaxReform.com</p>"
+  +"<div class='box'><p style='font-size:20px;margin:0'><b>Compliance score: "+r.score+" / 100 — "+r.risk+"</b></p><p style='font-size:20px;margin:6px 0 0'><b>Estimated penalty exposure: "+fmt(r.total)+"</b> (estimate only; interest not included)</p></div>"
+  +(r.tfrp?"<div class='box' style='border-color:#b3362b'><b>Trust Fund Recovery Penalty:</b> "+r.tfrp+"</div>":"")
+  +"<h2>How the estimate was worked out</h2><table>"+rowsHtml+"<tr><td><b>Total estimated exposure</b></td><td style='text-align:right'><b>"+fmt(r.total)+"</b></td></tr></table>"
+  +"<h2>Fix-it plan, in order</h2><ol style='list-style:none;padding:0'>"+(fixHtml||"<li>Nothing to fix — re-run this audit every quarter.</li>")+"</ol>"
+  +"<h2>Matched payroll software</h2><p><b>"+rec.name+"</b> — starting at "+rec.price+" (check the vendor's site for current pricing). "+rec.desc+"</p>"
+  +"<h2>Disclaimer</h2><p>This report is an educational self-check only. It is not legal advice, tax advice, or a compliance determination. Penalty figures are estimates built from published IRS rates and the numbers entered; actual liability depends on your deposit history, filing record, state, and facts the tool cannot see. Consult a CPA or an employment attorney before acting, especially on worker classification or unpaid trust fund taxes. For a binding worker-classification determination, you or the worker can file IRS Form SS-8.</p>"
+  +"</body></html>";
+}
+document.getElementById("downloadBtn").addEventListener("click",function(){
+  var html=buildReport(); if(!html) return;
+  var blob=new Blob([html],{type:"text/html"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="payroll-compliance-audit-report.html";
+  document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},400);
+});
+document.getElementById("redoBtn").addEventListener("click",function(){
+  answers={};
+  var radios=document.querySelectorAll('input[type="radio"]'); for(var i=0;i<radios.length;i++){ radios[i].checked=false; }
+  lastResult=null; document.getElementById("results").style.display="none"; updateProgress();
+  document.getElementById("step1").scrollIntoView({behavior:"smooth"});
+});
+updateProgress();
+})();
+</script>
+</body>
+</html>
