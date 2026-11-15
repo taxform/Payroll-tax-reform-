@@ -1,5 +1,26 @@
 [
   {
+    "title": "How to File W-2s for 2026 (Due February 1, 2027): Employer Checklist",
+    "url": "/blog/how-to-file-w-2-forms-2026.html",
+    "badge": "W-2 guide",
+    "excerpt": "Due February 1, 2027 to employees and the SSA, e-file rule for 10+ returns, box-by-box guide, reconciliation to Form 941, and penalties.",
+    "date": "2026-11-15"
+  },
+  {
+    "title": "Texas Payroll Taxes 2026: Employer Guide (No State Income Tax — What You Still Owe)",
+    "url": "/blog/texas-payroll-taxes-employer-guide.html",
+    "badge": "Texas guide",
+    "excerpt": "No state income tax, UI 2.7% for new employers on the first $9,000, C-3 deadlines, TWC registration, and a worked $60,000 example.",
+    "date": "2026-11-15"
+  },
+  {
+    "title": "California Payroll Taxes 2026: Employer Guide (Withholding, SUI, SDI)",
+    "url": "/blog/california-payroll-taxes-employer-guide.html",
+    "badge": "California guide",
+    "excerpt": "UI 1.5%–6.2% on the first $7,000, ETT 0.1%, SDI 1.3% with no wage cap, PIT withholding, DE 9 deadlines, and a worked example.",
+    "date": "2026-11-15"
+  },
+  {
     "title": "How to File Form 940 (2026): FUTA Guide for Employers",
     "url": "/blog/how-to-file-form-940.html",
     "badge": "Form 940 guide",
@@ -24,14 +45,14 @@
     "title": "2026 Payroll Tax Changes: What Employers Need to Know",
     "url": "/blog/2026-payroll-tax-changes.html",
     "badge": "Federal update",
-    "excerpt": "The 2026 wage base, FICA figures, and FUTA rules \u2014 plus the three January traps that catch employers every year.",
+    "excerpt": "The 2026 wage base, FICA figures, and FUTA rules — plus the three January traps that catch employers every year.",
     "date": "2026-11-03"
   },
   {
     "title": "The True Cost of an Employee",
     "url": "/blog/true-cost-of-an-employee.html",
     "badge": "Hiring budgets",
-    "excerpt": "Why a $60,000 salary costs roughly $65,000+ in mandatory taxes alone \u2014 worked line by line.",
+    "excerpt": "Why a $60,000 salary costs roughly $65,000+ in mandatory taxes alone — worked line by line.",
     "date": "2026-11-03"
   },
   {
@@ -52,14 +73,14 @@
     "title": "Hiring Your First Employee? The First-Payroll Checklist",
     "url": "/blog/first-payroll-checklist.html",
     "badge": "New employers",
-    "excerpt": "EIN, state registration, W-4, I-9, EFTPS \u2014 the 8 steps to a legal first paycheck.",
+    "excerpt": "EIN, state registration, W-4, I-9, EFTPS — the 8 steps to a legal first paycheck.",
     "date": "2026-11-03"
   },
   {
     "title": "5 Payroll Software Mistakes Small Businesses Make",
     "url": "/blog/payroll-software-mistakes.html",
     "badge": "Software",
-    "excerpt": "Wrong tier, multi-state gaps, no auto-filing \u2014 the setup errors behind most payroll penalties.",
+    "excerpt": "Wrong tier, multi-state gaps, no auto-filing — the setup errors behind most payroll penalties.",
     "date": "2026-11-03"
   }
 ]
