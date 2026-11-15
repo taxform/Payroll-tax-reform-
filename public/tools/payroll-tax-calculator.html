@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Payroll Tax Calculator — 2026 Take-Home Pay &amp; Employer Cost</title>
+<meta name="description" content="Free 2026 payroll tax calculator. Estimate federal withholding, Social Security, Medicare, take-home pay per paycheck, and total employer cost." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600;6..72,700;6..72,800&family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f5f7; --surface:#ffffff; --surface2:#eef2f5; --ink:#13233d; --muted:#5b6b82; --faint:#8494ab;
+    --border:#d9e1ea; --navy:#122a4a; --navy2:#0d1f38;
+    --accent:#0a6b4f; --accent-ink:#ffffff; --accent-soft:#e2f0ea;
+    --gold:#b7791f; --gold-soft:#fdf0d5;
+    --red:#b42318; --blue:#1d5fa8; --teal:#0e7a7b; --plum:#6b4fa1;
+    --shadow:0 10px 30px rgba(18,42,74,.08), 0 2px 6px rgba(18,42,74,.06);
+    --radius:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0c1422; --surface:#142238; --surface2:#1a2c47; --ink:#eaf0f8; --muted:#a7b7cc; --faint:#7f93ad;
+      --border:#2a3d5c; --navy:#eaf0f8; --navy2:#ffffff;
+      --accent:#2fbf8f; --accent-ink:#06281c; --accent-soft:#12362a;
+      --gold:#e8b44a; --gold-soft:#3a2f14;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);font-weight:600}
+  button,select,input{font:inherit}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:44px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px 56px}
+  /* Header */
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap}
+  .site-link{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted);text-decoration:none}
+  .site-link strong{color:var(--ink)}
+  .pill{font-size:.78rem;font-weight:700;background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 25%, transparent);padding:7px 11px;border-radius:999px}
+  h1{font-family:"Newsreader",Georgia,serif;font-size:clamp(2.1rem,5vw,3.4rem);line-height:.98;letter-spacing:-.02em;margin:14px 0 12px;font-weight:800;max-width:820px}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:1.08rem;color:var(--muted);max-width:720px;margin:0 0 8px}
+  .lede strong{color:var(--ink)}
+  .quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0 26px}
+  .qs{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px}
+  .qs b{display:block;font-family:"IBM Plex Mono",monospace;font-size:1.05rem;line-height:1.1}
+  .qs span{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  @media(max-width:700px){.quick-stats{grid-template-columns:1fr 1fr}}
+  /* Layout */
+  .layout{display:grid;grid-template-columns:430px 1fr;gap:18px;align-items:start}
+  @media(max-width:920px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .form-card{padding:20px;position:sticky;top:14px}
+  @media(max-width:920px){.form-card{position:static}}
+  .form-card h2,.results h2{font-size:1rem;letter-spacing:.06em;text-transform:uppercase;margin:0 0 4px}
+  .form-card p.sub{color:var(--muted);font-size:.9rem;margin:0 0 16px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--surface2);padding:5px;border-radius:12px;margin-bottom:18px}
+  .seg button{border:0;background:transparent;border-radius:9px;padding:10px 8px;font-weight:700;cursor:pointer;color:var(--muted);min-height:44px}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12);border:1px solid var(--border)}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:.92rem;margin-bottom:6px}
+  .field label small{font-weight:500;color:var(--muted)}
+  .field .hint{font-size:.82rem;color:var(--muted);margin-top:5px}
+  .input-row{display:flex;gap:8px}
+  .input-wrap{position:relative;flex:1}
+  .input-wrap .prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint);font-weight:700;pointer-events:none}
+  .input-wrap .suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--faint);font-weight:700;pointer-events:none}
+  input[type="number"],input[type="text"],select{width:100%;background:var(--surface);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;font-weight:600}
+  .input-wrap input{padding-left:28px}
+  .input-wrap input.has-suffix{padding-left:12px;padding-right:32px}
+  input:focus,select:focus,button:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%, transparent);outline-offset:1px;border-color:var(--accent)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:420px){.grid2{grid-template-columns:1fr}}
+  details.advanced{border-top:1px dashed var(--border);margin-top:6px;padding-top:12px}
+  details.advanced summary{font-weight:800;cursor:pointer;padding:6px 0;min-height:36px}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .presets span{width:100%;font-size:.8rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .chip{border:1.5px solid var(--border);background:var(--surface2);color:var(--ink);border-radius:999px;padding:9px 13px;font-weight:700;font-size:.88rem;cursor:pointer;min-height:40px}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  /* Results */
+  .results{display:flex;flex-direction:column;gap:18px}
+  .hero-result{padding:22px;background:var(--navy);color:#fff;border-radius:var(--radius);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  @media (prefers-color-scheme: dark){.hero-result{background:#1b3a2f}}
+  .hero-result::after{content:"";position:absolute;right:-40px;top:-50px;width:210px;height:210px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .hero-result .label{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;font-weight:800;opacity:.85}
+  .net-big{font-family:"Newsreader",Georgia,serif;font-size:clamp(2.6rem,6vw,4rem);line-height:1;font-weight:800;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+  .net-sub{opacity:.9;font-size:.95rem}
+  .hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;position:relative;z-index:1}
+  @media(max-width:560px){.hero-grid{grid-template-columns:1fr 1fr}}
+  .hg{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:11px 12px}
+  .hg b{display:block;font-size:1.02rem;font-variant-numeric:tabular-nums}
+  .hg span{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;opacity:.85;font-weight:700}
+  .panel{padding:20px}
+  .panel h3{margin:0 0 6px;font-size:1.05rem}
+  .panel p.note{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  /* Stacked bar */
+  .bar{display:flex;height:22px;border-radius:999px;overflow:hidden;background:var(--surface2);border:1px solid var(--border)}
+  .bar div{height:100%;min-width:0;transition:width .35s ease}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:12px}
+  @media(max-width:520px){.legend{grid-template-columns:1fr}}
+  .legend div{display:flex;align-items:center;gap:8px;font-size:.9rem}
+  .dot{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+  .legend b{margin-left:auto;font-variant-numeric:tabular-nums}
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th,td{padding:10px 8px;text-align:right;border-bottom:1px solid var(--border);vertical-align:top}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  tr.total td{font-weight:800;border-top:2px solid var(--ink);border-bottom:0;font-size:1.02rem}
+  tr.sub td{color:var(--muted);font-size:.92rem}
+  .table-scroll{overflow-x:auto}
+  @media(max-width:560px){
+    .pay-table thead{display:none}
+    .pay-table tr{display:grid;grid-template-columns:1fr 1fr;padding:8px 0;border-bottom:1px solid var(--border)}
+    .pay-table td{border:0;padding:4px 6px;text-align:left}
+    .pay-table td:nth-child(2){text-align:right}
+    .pay-table td:nth-child(3){grid-column:1/-1;color:var(--muted);font-size:.88rem}
+  }
+  .employer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.employer-grid{grid-template-columns:1fr}}
+  .emp-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:13px}
+  .emp-box b{font-size:1.15rem;display:block}
+  .emp-box span{font-size:.85rem;color:var(--muted);font-weight:600}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--ink);min-height:48px}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn:active{transform:translateY(1px)}
+  .copied{font-size:.9rem;color:var(--accent);font-weight:700;align-self:center}
+  /* Content sections */
+  .section{margin-top:34px}
+  .section h2{font-family:"Newsreader",Georgia,serif;font-size:1.9rem;line-height:1.1;margin:0 0 8px}
+  .section>p{color:var(--muted);max-width:760px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .step .num{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:10px}
+  @media(prefers-color-scheme:dark){.step .num{background:var(--accent);color:#06281c}}
+  .step h3{margin:0 0 6px;font-size:1rem}
+  .step p{margin:0;color:var(--muted);font-size:.93rem}
+  .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:820px){.ref-grid{grid-template-columns:1fr}}
+  .faq details{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px 16px;margin-bottom:10px}
+  .faq summary{font-weight:800;cursor:pointer;padding:12px 0;min-height:44px}
+  .faq p{color:var(--muted);margin:0 0 14px}
+  .callout{background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 35%, transparent);border-radius:14px;padding:18px}
+  .callout h3{margin:0 0 6px}
+  .callout p{margin:0;color:var(--ink)}
+  /* Ads + Pro */
+  .byline{font-size:.86rem;color:var(--muted);margin:2px 0 0}
+  .byline strong{color:var(--ink)}
+  .ad-slot{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:10px 14px 14px;margin:18px 0}
+  .ad-slot .ad-label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:800;text-align:center;margin-bottom:8px}
+  .ad-creative{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .ad-creative h4{margin:0 0 3px;font-size:1.02rem;line-height:1.25}
+  .ad-creative p{margin:0;color:var(--muted);font-size:.9rem;max-width:620px}
+  .ad-creative .ad-cta{white-space:nowrap;background:var(--navy);color:#fff;text-decoration:none;font-weight:800;padding:11px 16px;border-radius:10px;min-height:44px;display:inline-flex;align-items:center}
+  @media(prefers-color-scheme:dark){.ad-creative .ad-cta{background:var(--accent);color:#06281c}}
+  .ad-slot.inline{margin:0}
+  .ad-slot.compact .ad-creative h4{font-size:.98rem}
+  .pro-strip{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--navy);color:#fff;border-radius:14px;padding:14px 16px;margin:0 0 18px}
+  @media(prefers-color-scheme:dark){.pro-strip{background:#1b3a2f}}
+  .pro-strip p{margin:0;font-size:.95rem;max-width:680px}
+  .pro-strip p strong{color:#fff}
+  .pro-strip .pro-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn.light{background:#fff;color:#122a4a;border-color:#fff}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(10,20,35,.62);display:none;place-items:center;padding:16px;z-index:50}
+  .modal-backdrop.open{display:grid}
+  .modal{background:var(--surface);color:var(--ink);border-radius:16px;max-width:520px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
+  .modal h3{font-family:"Newsreader",Georgia,serif;font-size:1.6rem;margin:0 0 8px;line-height:1.1}
+  .modal p{color:var(--muted);margin:0 0 12px}
+  footer{margin-top:40px;border-top:1px solid var(--border);padding-top:20px;color:var(--muted);font-size:.9rem}
+  footer nav{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+  footer nav a{min-height:36px;display:inline-flex;align-items:center}
+  .disclaimer{font-size:.84rem;line-height:1.6}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="site-link" href="https://payrolltaxreform.com/"><strong>PayrollTaxReform.com</strong> &nbsp;·&nbsp; Free payroll tool</a>
+    <span class="pill">2026 rates · Updated for tax year 2026</span>
+  </div>
+
+  <h1>What’s actually left <em>after payroll tax?</em></h1>
+  <p class="lede">Enter a salary or hourly wage and see the full picture for 2026 — <strong>federal withholding, Social Security, Medicare, take-home pay per paycheck, and what it costs your employer on top.</strong> No sign-up. The math updates as you type.</p>
+  <p class="byline">By the <strong>Payroll Tax Reform</strong> editorial team · Last checked <strong>November 15, 2026</strong> against IRS Rev. Proc. 2025-32 and the SSA 2026 wage base. Free to use — supported by ads. <a href="#pro">Ad-free version coming soon →</a></p>
+
+  <div class="quick-stats" aria-label="2026 key figures">
+    <div class="qs"><b>$184,500</b><span>Social Security wage base</span></div>
+    <div class="qs"><b>7.65%</b><span>Employee FICA (6.2% + 1.45%)</span></div>
+    <div class="qs"><b>$16,100</b><span>Standard deduction · Single</span></div>
+    <div class="qs"><b>$42</b><span>Max net FUTA per employee</span></div>
+  </div>
+
+  <div class="pro-strip">
+    <p><strong>Tired of ads?</strong> An ad-free paid tier is in the works. For now, the calculator stays free — the ads on this page are what keep it that way.</p>
+    <div class="pro-actions">
+      <button type="button" class="btn light" data-remove-ads>Remove ads</button>
+    </div>
+  </div>
+
+  <!-- AD SLOT: leaderboard. House promotion until network ads fill this unit. -->
+  <div class="ad-slot" role="complementary" aria-label="Advertisement">
+    <div class="ad-label">Advertisement</div>
+    <div class="ad-creative">
+      <div>
+        <h4>Payroll deadlines sneak up fast. The 2026 calendar doesn’t have to.</h4>
+        <p>Deposit schedules, Form 941 and 940 due dates, and every federal rate for 2026 — on one page you can bookmark and check before each run.</p>
+      </div>
+      <a class="ad-cta" href="https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html">See the 2026 deadlines</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- FORM -->
+    <section class="card form-card" aria-label="Calculator inputs">
+      <h2>Your pay</h2>
+      <p class="sub">Try the presets below, or enter your own numbers.</p>
+
+      <div class="seg" role="group" aria-label="Employment type">
+        <button type="button" id="segEmployee" aria-pressed="true">W-2 Employee</button>
+        <button type="button" id="segSelf" aria-pressed="false">Self-Employed</button>
+      </div>
+
+      <div class="field">
+        <label for="payBasis">I want to enter pay as…</label>
+        <select id="payBasis">
+          <option value="annual" selected>Annual salary</option>
+          <option value="percheck">Amount per paycheck</option>
+          <option value="hourly">Hourly wage</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="payAmount"><span id="payAmountLabel">Annual salary</span></label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="payAmount" value="75000" min="0" step="any" inputmode="decimal"></div>
+      </div>
+
+      <div class="field" id="hoursField" hidden>
+        <label for="hoursPerWeek">Hours per week</label>
+        <input type="number" id="hoursPerWeek" value="40" min="0" max="168" step="any" inputmode="decimal">
+        <div class="hint">Annual pay is figured as hourly wage × hours × 52 weeks.</div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="payFreq">Pay frequency</label>
+          <select id="payFreq">
+            <option value="52">Weekly · 52</option>
+            <option value="26" selected>Biweekly · 26</option>
+            <option value="24">Semi-monthly · 24</option>
+            <option value="12">Monthly · 12</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filingStatus">Filing status</label>
+          <select id="filingStatus">
+            <option value="single" selected>Single</option>
+            <option value="mfj">Married filing jointly</option>
+            <option value="hoh">Head of household</option>
+            <option value="mfs">Married filing separately</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="kids">Children under 17 <small>W-4</small></label>
+          <input type="number" id="kids" value="0" min="0" max="20" step="1" inputmode="numeric">
+          <div class="hint">$2,000 each in the W-4 estimate.</div>
+        </div>
+        <div class="field">
+          <label for="otherDeps">Other dependents</label>
+          <input type="number" id="otherDeps" value="0" min="0" max="20" step="1" inputmode="numeric">
+          <div class="hint">$500 each in the W-4 estimate.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="retirementPct">Pre-tax retirement <small>401(k) / 403(b)</small></label>
+        <div class="input-wrap"><input class="has-suffix" type="number" id="retirementPct" value="0" min="0" max="100" step="any" inputmode="decimal"><span class="suffix">%</span></div>
+        <div class="hint">Lowers federal income tax, but not Social Security or Medicare wages.</div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="healthPerCheck">Health / HSA <small>per check</small></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="healthPerCheck" value="0" min="0" step="any" inputmode="decimal"></div>
+          <div class="hint">Cafeteria-plan amounts lower both income tax and FICA wages.</div>
+        </div>
+        <div class="field">
+          <label for="stateRate">State tax rate</label>
+          <div class="input-wrap"><input class="has-suffix" type="number" id="stateRate" value="0" min="0" max="20" step="any" inputmode="decimal"><span class="suffix">%</span></div>
+          <div class="hint">Set 0% if you’re in a no-income-tax state (TX, FL, WA, NV &amp; others).</div>
+        </div>
+      </div>
+
+      <details class="advanced">
+        <summary>More options — YTD wages, extra withholding &amp; more</summary>
+        <div style="height:8px"></div>
+        <div class="field">
+          <label for="ytdWages">Wages already paid this year <small>YTD</small></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="ytdWages" value="0" min="0" step="any" inputmode="decimal"></div>
+          <div class="hint">Used for the Social Security cap — once YTD + new wages pass $184,500, that tax stops.</div>
+        </div>
+        <div class="field">
+          <label for="otherPretax">Other pre-tax deductions <small>per check</small></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="otherPretax" value="0" min="0" step="any" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="extraWithholding">Extra federal withholding <small>per check</small></label>
+          <div class="input-wrap"><span class="prefix">$</span><input type="number" id="extraWithholding" value="0" min="0" step="any" inputmode="decimal"></div>
+          <div class="hint">The extra amount from Step 4(c) of Form W-4, if you filled one in.</div>
+        </div>
+        <div class="field" id="sutaField">
+          <label for="sutaRate">Employer SUTA estimate</label>
+          <div class="input-wrap"><input class="has-suffix" type="number" id="sutaRate" value="2.7" min="0" max="15" step="any" inputmode="decimal"><span class="suffix">%</span></div>
+          <div class="hint">New-employer rate in many states, on the first $7,000 unless your state base differs. Edit to match your state.</div>
+        </div>
+      </details>
+
+      <div class="presets">
+        <span>Quick examples</span>
+        <button type="button" class="chip" data-preset="p50">$50k · Single</button>
+        <button type="button" class="chip" data-preset="p75">$75k · Single</button>
+        <button type="button" class="chip" data-preset="p110">$110k · Joint, 2 kids</button>
+        <button type="button" class="chip" data-preset="hourly">$25/hr · Full-time</button>
+        <button type="button" class="chip" data-preset="p200">$200k · Head of household</button>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <div class="results">
+      <section class="hero-result" aria-live="polite">
+        <div class="label" id="netLabel">Your take-home pay · per biweekly paycheck</div>
+        <div class="net-big" id="netPerCheck">$0</div>
+        <div class="net-sub" id="netSub">—</div>
+        <div class="hero-grid">
+          <div class="hg"><b id="netAnnual">$0</b><span>Take-home / year</span></div>
+          <div class="hg"><b id="netMonthly">$0</b><span>Take-home / month</span></div>
+          <div class="hg"><b id="effRate">0%</b><span>Effective tax rate</span></div>
+          <div class="hg"><b id="margRate">—</b><span>Marginal bracket</span></div>
+          <div class="hg"><b id="totalTaxAnnual">$0</b><span>Total tax / year</span></div>
+          <div class="hg"><b id="grossAnnualOut">$0</b><span>Gross pay / year</span></div>
+        </div>
+      </section>
+
+      <section class="card panel">
+        <h3>Where each paycheck goes</h3>
+        <p class="note" id="barNote">Share of gross pay, per paycheck.</p>
+        <div class="bar" role="img" aria-label="Paycheck breakdown bar" id="bar">
+          <div id="barNet" style="background:var(--accent)"></div>
+          <div id="barFed" style="background:var(--navy)"></div>
+          <div id="barSS" style="background:var(--blue)"></div>
+          <div id="barMed" style="background:var(--teal)"></div>
+          <div id="barState" style="background:var(--gold)"></div>
+          <div id="barDed" style="background:var(--plum)"></div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <section class="card panel">
+        <h3>Paycheck breakdown</h3>
+        <p class="note">Annual figures use the 2026 federal brackets and standard deduction for your filing status. Per-check figures are the annual amounts spread evenly across your pay periods.</p>
+        <div class="table-scroll">
+          <table class="pay-table">
+            <thead><tr><th>Item</th><th>Per paycheck</th><th>Per year</th></tr></thead>
+            <tbody id="breakdownBody"></tbody>
+          </table>
+        </div>
+        <div style="height:14px"></div>
+        <div class="actions">
+          <button type="button" class="btn primary" id="copyBtn">Copy this summary</button>
+          <button type="button" class="btn" id="resetBtn">Reset to $75,000 example</button>
+          <span class="copied" id="copiedMsg" hidden>Copied ✓</span>
+        </div>
+      </section>
+
+      <!-- AD SLOT: in-results rectangle. House promotion until network ads fill this unit. -->
+      <div class="ad-slot inline compact" role="complementary" aria-label="Advertisement">
+        <div class="ad-label">Advertisement</div>
+        <div class="ad-creative">
+          <div>
+            <h4>Doing payroll by hand? That’s the expensive way.</h4>
+            <p>Compare the payroll services small employers actually use — pricing, tax filing, and direct deposit side by side.</p>
+          </div>
+          <a class="ad-cta" href="https://payrolltaxreform.com/software.html">Compare payroll software</a>
+        </div>
+      </div>
+
+      <section class="card panel" id="employerPanel">
+        <h3 id="employerTitle">What your employer pays on top</h3>
+        <p class="note" id="employerNote">Your salary isn’t the full cost of employing you. Employers match Social Security and Medicare, and pay federal (FUTA) and state (SUTA) unemployment tax on the first dollars you earn.</p>
+        <div class="employer-grid" id="employerGrid"></div>
+        <p class="note" style="margin-top:14px" id="employerTotal"></p>
+      </section>
+
+      <div class="callout">
+        <h3>Running payroll for a small team?</h3>
+        <p>See the full 2026 rates, wage bases, and deposit deadlines in one place — then use this calculator to sanity-check any paycheck before you run it. <a href="https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html">Open the 2026 payroll tax rates &amp; deadlines guide →</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <h2>How this calculator does the math</h2>
+    <p>It follows the same order a payroll system does. Small choices — like whether a deduction is pre-tax — change which taxes it lowers, so the order matters.</p>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Start with gross, subtract pre-tax</h3><p>Retirement contributions lower the wages taxed for federal income tax. Health and HSA amounts taken through a cafeteria plan lower both income-tax wages and FICA wages.</p></div>
+      <div class="step"><div class="num">2</div><h3>Apply FICA — Social Security &amp; Medicare</h3><p>Social Security is 6.2% on the first $184,500 of wages in 2026 (max $11,439). Medicare is 1.45% on every dollar, plus 0.9% extra on wages above $200,000 single / $250,000 joint.</p></div>
+      <div class="step"><div class="num">3</div><h3>Apply federal brackets, then credits</h3><p>What’s left after pre-tax deductions and the standard deduction runs through the 2026 marginal brackets. Dependent amounts from Form W-4 then reduce the withholding estimate, and any extra withholding you entered is added per check.</p></div>
+    </div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section class="section">
+    <h2>2026 numbers this calculator uses</h2>
+    <p>From IRS Revenue Procedure 2025-32 and the Social Security Administration’s 2026 wage base announcement. Check the full guide on PayrollTaxReform.com for deposit schedules and Form 941 / 940 deadlines.</p>
+    <div class="ref-grid">
+      <div class="card panel">
+        <h3>Standard deduction — 2026</h3>
+        <table>
+          <tbody>
+            <tr><td>Single</td><td><strong>$16,100</strong></td></tr>
+            <tr><td>Married filing jointly</td><td><strong>$32,200</strong></td></tr>
+            <tr><td>Head of household</td><td><strong>$24,150</strong></td></tr>
+            <tr><td>Married filing separately</td><td><strong>$16,100</strong></td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:18px">FICA — 2026</h3>
+        <table>
+          <tbody>
+            <tr><td>Social Security</td><td><strong>6.2% to $184,500</strong></td></tr>
+            <tr><td>Medicare</td><td><strong>1.45% · no cap</strong></td></tr>
+            <tr><td>Additional Medicare</td><td><strong>+0.9% over threshold</strong></td></tr>
+            <tr><td>Employer match</td><td><strong>Another 7.65%</strong></td></tr>
+            <tr><td>Self-employment tax</td><td><strong>15.3% on 92.35% of net</strong></td></tr>
+            <tr><td>FUTA (employer only)</td><td><strong>0.6% net on first $7,000</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card panel">
+        <h3>Federal brackets — 2026 (taxable income)</h3>
+        <div class="field" style="max-width:280px">
+          <label for="bracketStatus">Show brackets for</label>
+          <select id="bracketStatus">
+            <option value="single" selected>Single</option>
+            <option value="mfj">Married filing jointly</option>
+            <option value="hoh">Head of household</option>
+            <option value="mfs">Married filing separately</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Rate</th><th>Taxable income</th></tr></thead>
+          <tbody id="bracketBody"></tbody>
+        </table>
+        <p class="note" style="margin-top:10px">Brackets are marginal: only the slice of income inside each band is taxed at that band’s rate — never your whole income at your top rate.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq">
+    <h2>Common questions</h2>
+    <div style="height:10px"></div>
+    <details>
+      <summary>Why is my first paycheck with a new job sometimes taxed differently?</summary>
+      <p>Payroll annualizes each check — it taxes a biweekly check as if you’ll earn that amount 26 times. A mid-year start, a bonus check, or a short first check can therefore be withheld at a rate that doesn’t match your final tax bill. The difference is settled when you file.</p>
+    </details>
+    <details>
+      <summary>Does a 401(k) contribution lower Social Security and Medicare tax?</summary>
+      <p>No. Traditional 401(k) and 403(b) contributions lower federal (and usually state) income-tax wages, but Social Security and Medicare are still calculated on your pay before the retirement contribution. Health premiums and HSA contributions through a cafeteria plan are different — they lower both.</p>
+    </details>
+    <details>
+      <summary>When does Social Security tax stop during the year?</summary>
+      <p>Once your 2026 wages pass $184,500, the 6.2% Social Security tax stops for the rest of the year — that’s a maximum of $11,439 from an employee. Medicare’s 1.45% never stops, and the extra 0.9% Medicare tax starts on wages above $200,000 (single) or $250,000 (joint) in this estimate.</p>
+    </details>
+    <details>
+      <summary>What does my employer pay that I don’t see on my pay stub?</summary>
+      <p>A matching 7.65% for Social Security and Medicare, plus unemployment taxes: FUTA at a net 0.6% on the first $7,000 of wages ($42 maximum per employee per year, after the usual state credit) and SUTA, which varies by state and employer. That’s why the calculator shows total employer cost separately.</p>
+    </details>
+    <details>
+      <summary>I’m self-employed — why is the tax so much higher?</summary>
+      <p>You pay both halves of FICA as self-employment tax: 15.3% total, applied to 92.35% of your net self-employment income. The silver lining is that half of that tax is deductible when figuring your federal income tax, which this calculator applies automatically in Self-Employed mode.</p>
+    </details>
+    <details>
+      <summary>Is this my exact withholding?</summary>
+      <p>No — it’s a careful estimate. Exact withholding depends on your full Form W-4, pay dates, year-to-date amounts, benefits, garnishments, and your state’s own tables. Use it to plan and to spot-check a pay stub, not as a substitute for your payroll provider or a tax professional.</p>
+    </details>
+  </section>
+
+  <!-- REMOVE ADS -->
+  <section class="section" id="pro">
+    <h2>Remove ads — coming soon</h2>
+    <p>This calculator is free to run, and the ads on this page are what keep it that way. An ad-free paid tier is on the way for people who use it every pay run and would rather have a clean page — it isn’t available yet, and there’s nothing to buy today. When it launches, it will remove every ad on this page. Same math either way.</p>
+    <p><button type="button" class="btn primary" data-remove-ads>Remove ads</button></p>
+    <p style="color:var(--muted);font-size:.9rem;margin-top:14px">Questions about advertising on this page? Businesses: <a href="mailto:support@payrolltaxreform.com?subject=Advertising%20on%20the%20payroll%20calculator">advertise here — placements from $79/month</a>.</p>
+  </section>
+
+  <footer>
+    <nav>
+      <a href="https://payrolltaxreform.com/">PayrollTaxReform.com — Home</a>
+      <a href="https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html">2026 Rates &amp; Deadlines</a>
+      <a href="https://payrolltaxreform.com/blog/how-to-file-form-941.html">How to File Form 941</a>
+      <a href="https://payrolltaxreform.com/blog/how-to-file-form-940.html">How to File Form 940</a>
+    </nav>
+    <p class="disclaimer"><strong>Estimate only — not tax advice.</strong> This calculator uses 2026 federal brackets and standard deductions (IRS Rev. Proc. 2025-32), the 2026 Social Security wage base of $184,500, and standard FICA rates. It applies the standard deduction only and does not model itemized deductions, tax credits beyond the W-4 dependent amounts you enter, the Alternative Minimum Tax, or any state’s full bracket system — the state figure uses the single rate you enter. Results are for planning and education. For filing or payroll decisions, confirm with your payroll provider or a qualified tax professional.</p>
+    <p>Free tool from <a href="https://payrolltaxreform.com/">PayrollTaxReform.com</a> — plain-English payroll tax help for small businesses and the people they pay.</p>
+  </footer>
+</div>
+
+<div class="modal-backdrop" id="proModal" role="dialog" aria-modal="true" aria-labelledby="proModalTitle" hidden>
+  <div class="modal">
+    <h3 id="proModalTitle">Ad-free tier — coming soon</h3>
+    <p>We’re building a paid ad-free version of this calculator, but it isn’t available yet — there’s no checkout to complete today. For now, the calculator stays free, supported by the ads on this page.</p>
+    <p>Want to hear when it launches? Email <a href="mailto:support@payrolltaxreform.com?subject=Ad-free%20calculator%20—%20notify%20me">support@payrolltaxreform.com</a> and we’ll let you know.</p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="proModalClose">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SS_WAGE_BASE = 184500, SS_RATE = 0.062, MED_RATE = 0.0145, ADDL_MED_RATE = 0.009;
+  var FUTA_BASE = 7000, FUTA_NET = 0.006;
+
+  var BRACKETS = {
+    single: { deduction: 16100, addlMedThreshold: 200000, bands: [[12400,0.10],[50400,0.12],[105700,0.22],[201775,0.24],[256225,0.32],[640600,0.35],[Infinity,0.37]] },
+    mfj:    { deduction: 32200, addlMedThreshold: 250000, bands: [[24800,0.10],[100800,0.12],[211400,0.22],[403550,0.24],[512450,0.32],[768700,0.35],[Infinity,0.37]] },
+    hoh:    { deduction: 24150, addlMedThreshold: 200000, bands: [[17700,0.10],[67450,0.12],[105700,0.22],[201775,0.24],[256200,0.32],[640600,0.35],[Infinity,0.37]] },
+    mfs:    { deduction: 16100, addlMedThreshold: 125000, bands: [[12400,0.10],[50400,0.12],[105700,0.22],[201775,0.24],[256225,0.32],[384350,0.35],[Infinity,0.37]] }
+  };
+  var FREQ_LABEL = { "52":"weekly", "26":"biweekly", "24":"semi-monthly", "12":"monthly" };
+
+  var mode = "employee"; // or "self"
+  var $ = function(id){ return document.getElementById(id); };
+  function num(id, fallback){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : (fallback||0); }
+  function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+  function money2(n){ return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function pct(n){ return (n*100).toFixed(1).replace(/\.0$/,"") + "%"; }
+
+  function taxFromBands(taxable, bands){
+    var tax = 0, prev = 0, marginal = bands[0][1];
+    for (var i=0;i<bands.length;i++){
+      var cap = bands[i][0], rate = bands[i][1];
+      if (taxable > prev){
+        var slice = Math.min(taxable, cap) - prev;
+        tax += slice * rate;
+        marginal = rate;
+        prev = cap;
+      } else break;
+    }
+    if (taxable <= 0) marginal = bands[0][1];
+    return { tax: tax, marginal: marginal };
+  }
+
+  function calculate(){
+    var periods = parseInt($("payFreq").value, 10) || 26;
+    var basis = $("payBasis").value;
+    var amount = num("payAmount");
+    var grossAnnual;
+    if (basis === "annual") grossAnnual = amount;
+    else if (basis === "percheck") grossAnnual = amount * periods;
+    else grossAnnual = amount * num("hoursPerWeek", 40) * 52;
+
+    var statusKey = $("filingStatus").value;
+    var cfg = BRACKETS[statusKey];
+    var kids = Math.floor(num("kids")), otherDeps = Math.floor(num("otherDeps"));
+    var w4Credit = kids * 2000 + otherDeps * 500;
+
+    var retireAnnual = grossAnnual * (Math.min(num("retirementPct"),100)/100);
+    var healthAnnual = num("healthPerCheck") * periods;
+    var otherPretaxAnnual = num("otherPretax") * periods;
+    var pretaxTotal = retireAnnual + healthAnnual + otherPretaxAnnual;
+    var ytd = num("ytdWages");
+    var stateRate = Math.min(num("stateRate"), 50)/100;
+    var extraPerCheck = num("extraWithholding");
+
+    var ssAnnual, medAnnual, addlMedAnnual, fedAnnual, seHalfDeduction = 0, ficaWages;
+
+    if (mode === "employee"){
+      ficaWages = Math.max(0, grossAnnual - healthAnnual - otherPretaxAnnual);
+      var ssRemaining = Math.max(0, SS_WAGE_BASE - ytd);
+      var ssWages = Math.min(Math.max(0, ficaWages), ssRemaining);
+      // If YTD already includes part of this job's wages the simple cap above is the intended estimate behaviour.
+      ssAnnual = ssWages * SS_RATE;
+      medAnnual = ficaWages * MED_RATE;
+      addlMedAnnual = Math.max(0, ficaWages - cfg.addlMedThreshold) * ADDL_MED_RATE;
+      var fedTaxable = Math.max(0, grossAnnual - pretaxTotal - cfg.deduction);
+      var fed = taxFromBands(fedTaxable, cfg.bands);
+      fedAnnual = Math.max(0, fed.tax - w4Credit);
+      var marginal = fed.marginal;
+      var stateTaxable = Math.max(0, grossAnnual - pretaxTotal);
+      var stateAnnual = stateTaxable * stateRate;
+      var totalTax = fedAnnual + ssAnnual + medAnnual + addlMedAnnual + stateAnnual + extraPerCheck * periods;
+      var netAnnual = grossAnnual - pretaxTotal - totalTax;
+
+      render({
+        periods: periods, grossAnnual: grossAnnual, pretaxTotal: pretaxTotal,
+        retireAnnual: retireAnnual, healthAnnual: healthAnnual, otherPretaxAnnual: otherPretaxAnnual,
+        fedAnnual: fedAnnual, ssAnnual: ssAnnual, medAnnual: medAnnual, addlMedAnnual: addlMedAnnual,
+        stateAnnual: stateAnnual, extraAnnual: extraPerCheck * periods,
+        totalTax: totalTax, netAnnual: netAnnual, marginal: marginal,
+        fedTaxable: fedTaxable, ficaWages: ficaWages, seHalfDeduction: 0
+      });
+
+      // Employer
+      var empSS = ssAnnual, empMed = medAnnual;
+      var futa = Math.min(grossAnnual, FUTA_BASE) * FUTA_NET;
+      var sutaRate = Math.min(num("sutaRate"), 50)/100;
+      var suta = Math.min(grossAnnual, FUTA_BASE) * sutaRate;
+      var empTotalTax = empSS + empMed + futa + suta;
+      var totalCost = grossAnnual + empTotalTax;
+      $("employerTitle").textContent = "What your employer pays on top";
+      $("employerNote").textContent = "Your salary isn’t the full cost of employing you. Employers match Social Security and Medicare, and pay federal (FUTA) and state (SUTA) unemployment tax on the first $" + FUTA_BASE.toLocaleString() + " you earn.";
+      $("employerGrid").innerHTML =
+        box(money(empSS), "Employer Social Security / year") +
+        box(money(empMed), "Employer Medicare / year") +
+        box(money(futa), "FUTA / year · 0.6% net on first $7,000") +
+        box(money(suta), "SUTA estimate / year · " + pct(sutaRate) + " on first $7,000") +
+        box(money(totalCost), "Total cost to employ you / year") +
+        box(money(totalCost/12), "Total employer cost / month");
+      $("employerTotal").innerHTML = "On a <strong>" + money(grossAnnual) + "</strong> salary, the employer adds about <strong>" + money(empTotalTax) + "</strong> a year in payroll taxes — a true cost of <strong>" + money(totalCost) + "</strong>, or " + money(totalCost/periods) + " per pay period.";
+    } else {
+      // Self-employed: gross entered is net self-employment income
+      var seBase = grossAnnual * 0.9235;
+      ficaWages = seBase;
+      var ssWagesSE = Math.min(seBase, Math.max(0, SS_WAGE_BASE - ytd));
+      ssAnnual = ssWagesSE * (SS_RATE*2);
+      medAnnual = seBase * (MED_RATE*2);
+      addlMedAnnual = Math.max(0, seBase - cfg.addlMedThreshold) * ADDL_MED_RATE;
+      var seTax = ssAnnual + medAnnual + addlMedAnnual;
+      seHalfDeduction = seTax / 2;
+      var fedTaxableSE = Math.max(0, grossAnnual - seHalfDeduction - retireAnnual - cfg.deduction);
+      var fedSE = taxFromBands(fedTaxableSE, cfg.bands);
+      fedAnnual = Math.max(0, fedSE.tax - w4Credit);
+      var stateAnnualSE = Math.max(0, grossAnnual - retireAnnual) * stateRate;
+      var totalTaxSE = fedAnnual + seTax + stateAnnualSE;
+      var netAnnualSE = grossAnnual - retireAnnual - totalTaxSE;
+
+      render({
+        periods: periods, grossAnnual: grossAnnual, pretaxTotal: retireAnnual,
+        retireAnnual: retireAnnual, healthAnnual: 0, otherPretaxAnnual: 0,
+        fedAnnual: fedAnnual, ssAnnual: ssAnnual, medAnnual: medAnnual, addlMedAnnual: addlMedAnnual,
+        stateAnnual: stateAnnualSE, extraAnnual: 0,
+        totalTax: totalTaxSE, netAnnual: netAnnualSE, marginal: fedSE.marginal,
+        fedTaxable: fedTaxableSE, ficaWages: ficaWages, seHalfDeduction: seHalfDeduction, isSE: true, seTax: seTax
+      });
+
+      $("employerTitle").textContent = "Self-employment tax — you pay both halves";
+      $("employerNote").textContent = "There’s no employer match when you work for yourself — you pay the employee and employer shares together (15.3%). Half of that tax is deductible for income tax, which is already reflected above.";
+      $("employerGrid").innerHTML =
+        box(money(ssAnnual), "Social Security · 12.4% (both halves)") +
+        box(money(medAnnual + addlMedAnnual), "Medicare · 2.9% + any additional 0.9%") +
+        box(money(seTax), "Total self-employment tax / year") +
+        box(money(seHalfDeduction), "Deductible half — lowers income tax") +
+        box(money(grossAnnual/4), "Rough quarterly estimate base (income ÷ 4)") +
+        box(money(totalTaxSE/4), "Estimated tax due per quarter (all taxes)");
+      $("employerTotal").innerHTML = "Budget about <strong>" + money(totalTaxSE/4) + "</strong> per quarter for estimated taxes on <strong>" + money(grossAnnual) + "</strong> of net self-employment income — confirm due dates in the <a href=\"https://payrolltaxreform.com/research/2026-payroll-tax-rates-deadlines.html\">2026 deadlines guide</a>.";
+    }
+  }
+
+  function box(value, label){ return '<div class="emp-box"><b>' + value + '</b><span>' + label + '</span></div>'; }
+
+  var lastResult = null;
+  function render(r){
+    lastResult = r;
+    var per = function(v){ return v / r.periods; };
+    var freqWord = FREQ_LABEL[String(r.periods)] || "pay";
+    $("netLabel").textContent = (mode === "self" ? "What you keep · per " + freqWord + " period (smoothed)" : "Your take-home pay · per " + freqWord + " paycheck");
+    $("netPerCheck").textContent = money2(per(r.netAnnual));
+    $("netSub").textContent = money(r.grossAnnual) + " gross → " + money(r.netAnnual) + " take-home for the year, after " + money(r.totalTax) + " in tax" + (r.pretaxTotal ? " and " + money(r.pretaxTotal) + " in pre-tax deductions" : "") + ".";
+    $("netAnnual").textContent = money(r.netAnnual);
+    $("netMonthly").textContent = money(r.netAnnual/12);
+    var eff = r.grossAnnual > 0 ? (r.totalTax / r.grossAnnual) : 0;
+    $("effRate").textContent = pct(eff);
+    $("margRate").textContent = pct(r.marginal);
+    $("totalTaxAnnual").textContent = money(r.totalTax);
+    $("grossAnnualOut").textContent = money(r.grossAnnual);
+
+    // Bar + legend
+    var parts = [
+      { key:"barNet", label:"Take-home pay", color:"var(--accent)", value:r.netAnnual },
+      { key:"barFed", label:"Federal income tax", color:"var(--navy)", value:r.fedAnnual + (r.extraAnnual||0) },
+      { key:"barSS", label: mode==="self" ? "Social Security (SE)" : "Social Security", color:"var(--blue)", value:r.ssAnnual },
+      { key:"barMed", label:"Medicare" + (r.addlMedAnnual>0 ? " incl. additional" : ""), color:"var(--teal)", value:r.medAnnual + r.addlMedAnnual },
+      { key:"barState", label:"State tax (your rate)", color:"var(--gold)", value:r.stateAnnual },
+      { key:"barDed", label:"Pre-tax deductions", color:"var(--plum)", value:r.pretaxTotal }
+    ];
+    var legendHtml = "";
+    parts.forEach(function(p){
+      var share = r.grossAnnual > 0 ? Math.max(0, p.value / r.grossAnnual) : 0;
+      $(p.key).style.width = (share*100).toFixed(2) + "%";
+      if (p.value > 0.5 || p.key === "barNet"){
+        legendHtml += '<div><span class="dot" style="background:' + p.color + '"></span>' + p.label + '<b>' + money(per(p.value)) + ' · ' + pct(share) + '</b></div>';
+      } else {
+        $(p.key).style.width = "0%";
+      }
+    });
+    $("legend").innerHTML = legendHtml;
+    $("barNote").textContent = "Per " + freqWord + " period — amounts and share of gross pay.";
+
+    // Breakdown table
+    function row(label, annual, cls){
+      return '<tr' + (cls ? ' class="'+cls+'"' : '') + '><td>' + label + '</td><td>' + money2(per(annual)) + '</td><td>' + money2(annual) + '</td></tr>';
+    }
+    var html = "";
+    html += row("Gross pay", r.grossAnnual);
+    if (r.retireAnnual > 0) html += row("Less: retirement (pre-tax)", -r.retireAnnual, "sub");
+    if (r.healthAnnual > 0) html += row("Less: health / HSA (pre-tax)", -r.healthAnnual, "sub");
+    if (r.otherPretaxAnnual > 0) html += row("Less: other pre-tax deductions", -r.otherPretaxAnnual, "sub");
+    if (r.seHalfDeduction > 0) html += row("Half of SE tax deducted for income tax", -r.seHalfDeduction, "sub");
+    html += row(mode==="self" ? "Federal income tax (after half-SE deduction)" : "Federal income tax withholding", -r.fedAnnual);
+    if (r.extraAnnual > 0) html += row("Extra federal withholding (W-4)", -r.extraAnnual);
+    html += row(mode==="self" ? "Social Security — self-employment (12.4%)" : "Social Security — 6.2%" + (r.ssAnnual >= 11439 - 1 ? " · at the 2026 cap" : ""), -r.ssAnnual);
+    html += row(mode==="self" ? "Medicare — self-employment (2.9%)" : "Medicare — 1.45%", -r.medAnnual);
+    if (r.addlMedAnnual > 0) html += row("Additional Medicare — 0.9%", -r.addlMedAnnual);
+    if (r.stateAnnual > 0) html += row("State tax — at the rate you entered", -r.stateAnnual);
+    html += '<tr class="total"><td>Take-home pay</td><td>' + money2(per(r.netAnnual)) + '</td><td>' + money2(r.netAnnual) + '</td></tr>';
+    $("breakdownBody").innerHTML = html;
+  }
+
+  function renderBrackets(){
+    var key = $("bracketStatus").value;
+    var cfg = BRACKETS[key];
+    var prev = 0, html = "";
+    cfg.bands.forEach(function(b){
+      var range = b[0] === Infinity ? money(prev) + " and up" : money(prev) + " – " + money(b[0]);
+      html += "<tr><td><strong>" + Math.round(b[1]*100) + "%</strong></td><td>" + range + "</td></tr>";
+      prev = b[0] === Infinity ? prev : b[0];
+    });
+    $("bracketBody").innerHTML = html;
+  }
+
+  function setMode(m){
+    mode = m;
+    $("segEmployee").setAttribute("aria-pressed", m==="employee" ? "true" : "false");
+    $("segSelf").setAttribute("aria-pressed", m==="self" ? "true" : "false");
+    $("payAmountLabel").textContent = m==="self"
+      ? ($("payBasis").value==="hourly" ? "Hourly rate" : $("payBasis").value==="percheck" ? "Net earnings per period" : "Net self-employment income (annual)")
+      : ($("payBasis").value==="hourly" ? "Hourly wage" : $("payBasis").value==="percheck" ? "Gross pay per paycheck" : "Annual salary");
+    $("sutaField").style.display = m==="self" ? "none" : "";
+    calculate();
+  }
+
+  function onBasis(){
+    var b = $("payBasis").value;
+    $("hoursField").hidden = b !== "hourly";
+    setMode(mode);
+  }
+
+  // Presets
+  var PRESETS = {
+    p50:  { mode:"employee", basis:"annual", amount:50000, freq:"26", status:"single", kids:0, deps:0, retire:0, health:0, state:0 },
+    p75:  { mode:"employee", basis:"annual", amount:75000, freq:"26", status:"single", kids:0, deps:0, retire:0, health:0, state:0 },
+    p110: { mode:"employee", basis:"annual", amount:110000, freq:"26", status:"mfj", kids:2, deps:0, retire:6, health:150, state:5 },
+    hourly:{ mode:"employee", basis:"hourly", amount:25, hours:40, freq:"26", status:"single", kids:0, deps:0, retire:0, health:0, state:0 },
+    p200: { mode:"employee", basis:"annual", amount:200000, freq:"24", status:"hoh", kids:1, deps:0, retire:10, health:200, state:5 }
+  };
+  function applyPreset(p){
+    $("payBasis").value = p.basis;
+    $("payAmount").value = p.amount;
+    if (p.hours) $("hoursPerWeek").value = p.hours;
+    $("payFreq").value = p.freq;
+    $("filingStatus").value = p.status;
+    $("bracketStatus").value = p.status;
+    $("kids").value = p.kids; $("otherDeps").value = p.deps;
+    $("retirementPct").value = p.retire; $("healthPerCheck").value = p.health;
+    $("stateRate").value = p.state; $("ytdWages").value = 0; $("otherPretax").value = 0; $("extraWithholding").value = 0;
+    onBasis(); setMode(p.mode); renderBrackets(); calculate();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.querySelectorAll("[data-preset]").forEach(function(btn){
+    btn.addEventListener("click", function(){ applyPreset(PRESETS[btn.getAttribute("data-preset")]); });
+  });
+
+  // Events
+  ["payAmount","hoursPerWeek","payFreq","filingStatus","kids","otherDeps","retirementPct","healthPerCheck","stateRate","ytdWages","otherPretax","extraWithholding","sutaRate"].forEach(function(id){
+    $(id).addEventListener("input", calculate);
+    $(id).addEventListener("change", calculate);
+  });
+  $("payBasis").addEventListener("change", onBasis);
+  $("filingStatus").addEventListener("change", function(){ $("bracketStatus").value = $("filingStatus").value; renderBrackets(); });
+  $("bracketStatus").addEventListener("change", renderBrackets);
+  $("segEmployee").addEventListener("click", function(){ setMode("employee"); });
+  $("segSelf").addEventListener("click", function(){ setMode("self"); });
+  $("resetBtn").addEventListener("click", function(){ applyPreset(PRESETS.p75); });
+
+  $("copyBtn").addEventListener("click", function(){
+    if (!lastResult) return;
+    var r = lastResult;
+    var lines = [
+      "Payroll Tax Calculator — 2026 estimate (PayrollTaxReform.com)",
+      "Gross pay: " + money(r.grossAnnual) + " / year",
+      "Take-home: " + money2(r.netAnnual / r.periods) + " per pay period · " + money(r.netAnnual) + " / year",
+      "Federal income tax: " + money(r.fedAnnual) + " / year",
+      "Social Security: " + money(r.ssAnnual) + " / year",
+      "Medicare: " + money(r.medAnnual + r.addlMedAnnual) + " / year",
+      (r.stateAnnual > 0 ? "State tax: " + money(r.stateAnnual) + " / year\n" : ""),
+      "Total tax: " + money(r.totalTax) + " / year · Effective rate " + pct(r.grossAnnual ? r.totalTax/r.grossAnnual : 0) + " · Marginal bracket " + pct(r.marginal),
+      "Estimate only — not tax advice."
+    ].join("\n");
+    function done(){ $("copiedMsg").hidden = false; setTimeout(function(){ $("copiedMsg").hidden = true; }, 2200); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lines).then(done).catch(done);
+    } else { done(); }
+  });
+
+  // --- Remove ads: the ad-free paid tier isn't live yet, so this only opens a coming-soon message ---
+  function openPro(){ var m = $("proModal"); m.hidden = false; m.classList.add("open"); $("proModalClose").focus(); }
+  function closePro(){ var m = $("proModal"); m.classList.remove("open"); m.hidden = true; }
+  document.querySelectorAll("[data-remove-ads]").forEach(function(b){ b.addEventListener("click", openPro); });
+  $("proModalClose").addEventListener("click", closePro);
+  $("proModal").addEventListener("click", function(e){ if (e.target === $("proModal")) closePro(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePro(); });
+
+  renderBrackets();
+  calculate();
+})();
+</script>
+</body>
+</html>
