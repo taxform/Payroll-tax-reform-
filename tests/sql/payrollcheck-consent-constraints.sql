@@ -55,3 +55,35 @@ BEGIN
  EXCEPTION WHEN check_violation THEN NULL;
  END;
 END $$;
+
+-- Revocation must invalidate the active-grant query and allow a new approval.
+UPDATE payrollcheck.client_grants
+ SET status='revoked',revoked_by_subject='owner1',revoked_at=now()
+ WHERE grant_id='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+DO $$
+DECLARE n bigint;
+BEGIN
+ SELECT count(*) INTO n FROM payrollcheck.client_grants
+ WHERE firm_tenant_id='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+ AND business_tenant_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+ AND status='active';
+ IF n<>0 THEN RAISE EXCEPTION 'revoked consent remains active'; END IF;
+END $$;
+INSERT INTO payrollcheck.client_grants(
+ grant_id,firm_tenant_id,business_tenant_id,scopes,status,
+ requested_by_subject,approved_by_subject,approved_at
+) VALUES (
+ 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+ 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+ 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+ ARRAY['review_finding'],'active','requester2','owner2',now()
+);
+DO $$
+DECLARE n bigint;
+BEGIN
+ SELECT count(*) INTO n FROM payrollcheck.client_grants
+ WHERE firm_tenant_id='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+ AND business_tenant_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+ AND status='active';
+ IF n<>1 THEN RAISE EXCEPTION 'reapproved consent not uniquely active'; END IF;
+END $$;
