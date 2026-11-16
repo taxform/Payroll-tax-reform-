@@ -19,7 +19,7 @@ INSERT INTO payrollcheck.client_grants(grant_id,firm_tenant_id,business_tenant_i
 SELECT set_config('payrollcheck.test_auth_uid','11111111-1111-4111-8111-111111111111',true);
 SET LOCAL ROLE payrollcheck_rls_fixture;
 DO $$ BEGIN
- IF (SELECT count(*) FROM payrollcheck.reports)<>1 THEN RAISE EXCEPTION 'owner A isolation failed'; END IF;
+ IF (SELECT array_agg(report_id ORDER BY report_id) FROM payrollcheck.reports) IS DISTINCT FROM ARRAY['50000000-0000-4000-8000-000000000001'::uuid] THEN RAISE EXCEPTION 'owner A exact report isolation failed'; END IF;
 END $$;
 RESET ROLE;
 SELECT set_config('payrollcheck.test_auth_uid','22222222-2222-4222-8222-222222222222',true);
@@ -31,7 +31,7 @@ RESET ROLE;
 SELECT set_config('payrollcheck.test_auth_uid','33333333-3333-4333-8333-333333333333',true);
 SET LOCAL ROLE payrollcheck_rls_fixture;
 DO $$ BEGIN
- IF (SELECT count(*) FROM payrollcheck.reports)<>1 THEN RAISE EXCEPTION 'firm grant isolation failed'; END IF;
+ IF (SELECT array_agg(report_id ORDER BY report_id) FROM payrollcheck.reports) IS DISTINCT FROM ARRAY['50000000-0000-4000-8000-000000000001'::uuid] THEN RAISE EXCEPTION 'firm exact client report isolation failed'; END IF;
 END $$;
 RESET ROLE;
 SELECT set_config('payrollcheck.test_auth_uid','44444444-4444-4444-8444-444444444444',true);
@@ -47,5 +47,14 @@ SET LOCAL ROLE payrollcheck_rls_fixture;
 DO $$ BEGIN
  IF (SELECT count(*) FROM payrollcheck.reports)<>0 THEN RAISE EXCEPTION 'revocation isolation failed'; END IF;
 END $$;
+RESET ROLE;
+-- A grant for reviewing findings alone must not authorize reading reports.
+UPDATE payrollcheck.client_grants SET status='active',revoked_by_subject=NULL,revoked_at=NULL,scopes=ARRAY['review_finding']
+ WHERE grant_id='60000000-0000-4000-8000-000000000001';
+SELECT set_config('payrollcheck.test_auth_uid','33333333-3333-4333-8333-333333333333',true);
+SET LOCAL ROLE payrollcheck_rls_fixture;
+DO $ BEGIN
+ IF EXISTS (SELECT 1 FROM payrollcheck.reports) THEN RAISE EXCEPTION 'review-only scope incorrectly authorized report'; END IF;
+END $;
 RESET ROLE;
 ROLLBACK;
