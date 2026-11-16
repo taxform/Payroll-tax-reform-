@@ -281,3 +281,7 @@
 - Rechecked dedicated Supabase development project: all five private tables have RLS and FORCE RLS, zero policies, and no anon/authenticated SELECT or authenticated INSERT/UPDATE grants.
 - Added reusable read-only drift check `docs/sql/payrollcheck-dev-security-regression-check.sql` (`6f4d236`). This verifies closed access, not positive per-tenant access.
 - Still blocked from customer use: no authorized tenant RLS policies, live user enrollment, real API/session binding or database role/transaction design.
+
+## Tenant RLS authorization specification — 2026-11-16
+- Added `docs/payrollcheck-tenant-rls-access-spec.md` (`6c1a5be`) specifying business-only report access, firm-client active `view_report` consent, revocation, MFA, identity, audit and cross-tenant tests.
+- Design only: no RLS policy/grant/schema/user data changes made. Next work is a disposable Postgres RLS implementation and positive/negative isolation tests, then review before any dedicated dev deployment.
