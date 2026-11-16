@@ -47,3 +47,12 @@ test('rejects inconsistent SQL rows instead of trusting query adapter output',as
   await assert.rejects(()=>load({...options(),query:async(sql,params)=>sql.includes(scenario.match)?{rows:scenario.rows}:query(sql,params)}),/invalid_.*_row/);
  }
 });
+
+test('rejects duplicate or oversized consent scopes in trusted SQL rows',async()=>{
+ for(const scopes of [['view_report','view_report'],['view_report','review_finding','view_report']]){
+  await assert.rejects(()=>load({...options(),query:async(sql,params)=>{
+   if(sql.includes('payrollcheck.client_grants'))return {rows:[{firm_tenant_id:firmUuid,business_tenant_id:businessUuid,scopes,status:'active',requested_by_subject:'admin1',approved_by_subject:'owner1',revoked_by_subject:null}]};
+   return query(sql,params);
+  }}),/invalid_grant_row/);
+ }
+});
