@@ -132,3 +132,9 @@
 - Added end-to-end *prototype* tests covering accounting firm pending/approved/revoked grants and scope restrictions (commit `8f34e83`).
 - Reject unsupported report actions before any trusted-record lookup; added negative test (commits `508168c`, `ca898ae`). Latest CI pending.
 - These are in-memory tests only, not a real OIDC provider, database transaction, or browser test. Milestone 1 manual QA and Milestone 2 production implementation remain incomplete.
+
+## Authenticated endpoint integration contract — 2026-11-15
+- Verified previous report-boundary CI passed (GitHub Actions run 43807265164).
+- Added regression cases for duplicate active firm grants, ambiguous memberships/reports and malformed trusted record containers (commit `f1dfba2`).
+- Documented a future server endpoint's verified OIDC, transactional database, RLS, revocation and audit requirements (commit `e3e0a12`).
+- Latest CI pending. No HTTP endpoint, real database, OIDC integration or deployment exists. Manual browser QA remains open.
