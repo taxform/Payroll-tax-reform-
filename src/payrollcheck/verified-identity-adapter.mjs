@@ -6,7 +6,7 @@ const nonempty=x=>typeof x==='string'&&x.length>0&&x.length<=255;
 export function mapVerifiedIdentity({claims,expectedIssuer,expectedAudience,nowSeconds}={}){
  if(!claims||typeof claims!=='object'||Array.isArray(claims)||!nonempty(expectedIssuer)||!nonempty(expectedAudience)||!Number.isSafeInteger(nowSeconds)||nowSeconds<0)return null;
  if(claims.iss!==expectedIssuer||!((typeof claims.aud==='string'&&claims.aud===expectedAudience)||(Array.isArray(claims.aud)&&claims.aud.includes(expectedAudience))))return null;
- if(!nonempty(claims.sub)||!id(claims.sid)||!Number.isSafeInteger(claims.exp)||claims.exp<=nowSeconds||!Number.isSafeInteger(claims.iat)||claims.iat>nowSeconds||claims.iat<0)return null;
+ if(!id(claims.sub)||!id(claims.sid)||!Number.isSafeInteger(claims.exp)||claims.exp<=nowSeconds||!Number.isSafeInteger(claims.iat)||claims.iat>nowSeconds||claims.iat<0)return null;
  if(Array.isArray(claims.aud)&&(claims.aud.length>1||claims.azp!==undefined)&&claims.azp!==expectedAudience)return null;
  if(claims.email_verified===false||claims.active===false)return null;
  return Object.freeze({userId:claims.sub,sessionId:claims.sid,verified:true,active:true});
