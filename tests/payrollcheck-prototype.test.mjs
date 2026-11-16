@@ -32,3 +32,10 @@ test('pre-payroll review retains 8 checklist items and no approval claims',()=>{
  assert.match(prepay,/does not connect to payroll providers/);
  assert.match(prepay,/items\.length/);
 });
+
+test('unknown penalty tier and invalid amounts do not display misleading $0 assessment',()=>{
+ assert.match(audit,/Select a delay tier to illustrate a possible amount/);
+ assert.match(audit,/Enter a valid amount between/);
+ assert.match(audit,/input\.validity\.valid/);
+ assert.match(audit,/illustrative only/);
+});
