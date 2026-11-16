@@ -22,7 +22,7 @@ export function revokeClientGrant({grant,actor}={}){
  return {ok:true,reason:'revoked',grant:{...copy(grant),status:'revoked',revokedBy:actor.userId}};
 }
 export function grantAllows({grant,firmTenantId,businessTenantId,action}={}){
- return isGrant(grant)&&grant.status==='active'&&validId(firmTenantId)&&validId(businessTenantId)&&grant.firmTenantId===firmTenantId&&grant.businessTenantId===businessTenantId&&scopes.has(action)&&grant.scopes.includes(action);
+ return isGrant(grant)&&grant.status==='active'&&validId(grant.approvedBy)&&grant.revokedBy===null&&validId(firmTenantId)&&validId(businessTenantId)&&grant.firmTenantId===firmTenantId&&grant.businessTenantId===businessTenantId&&scopes.has(action)&&grant.scopes.includes(action);
 }
 function isBusinessOwner(actor,tenantId){return actor&&actor.active===true&&actor.role==='business_owner'&&validId(actor.userId)&&actor.tenantId===tenantId}
-function isGrant(g){return g&&validId(g.firmTenantId)&&validId(g.businessTenantId)&&g.firmTenantId!==g.businessTenantId&&validId(g.requestedBy)&&Array.isArray(g.scopes)&&g.scopes.length>0&&g.scopes.length<=scopes.size&&new Set(g.scopes).size===g.scopes.length&&g.scopes.every(s=>scopes.has(s))&&['pending','active','revoked'].includes(g.status)}
+function isGrant(g){return g&&validId(g.firmTenantId)&&validId(g.businessTenantId)&&g.firmTenantId!==g.businessTenantId&&validId(g.requestedBy)&&Array.isArray(g.scopes)&&g.scopes.length>0&&g.scopes.length<=scopes.size&&new Set(g.scopes).size===g.scopes.length&&g.scopes.every(s=>scopes.has(s))&&['pending','active','revoked'].includes(g.status)&&((g.status==='pending'&&g.approvedBy===null&&g.revokedBy===null)||(g.status==='active'&&validId(g.approvedBy)&&g.revokedBy===null)||(g.status==='revoked'&&validId(g.revokedBy)&&(g.approvedBy===null||validId(g.approvedBy))))}
