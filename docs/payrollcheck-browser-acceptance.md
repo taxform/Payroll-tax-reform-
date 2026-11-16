@@ -25,5 +25,13 @@
 - [ ] Confirm no data in localStorage/sessionStorage, no cookies created by demo module, no live account login or payment action.
 - [ ] Confirm `noindex,nofollow` on both previews.
 
+
+## Universal Payroll Connect CSV preview
+- [ ] Open `/payrollcheck/connect/` in desktop Chrome and mobile Safari; confirm module loads without a console syntax error.
+- [ ] Select **Load sample data**, then **Review sample summary**; confirm fabricated company, period, pay, headcount and states appear.
+- [ ] Upload a fabricated CSV with CRLF and escaped quotes; confirm parsing succeeds and no network upload occurs.
+- [ ] Try malformed quoted fields, embedded newlines, duplicate headers, more than one data row, impossible dates and files over 64 KiB; confirm clear rejection and no crash.
+- [ ] Confirm the provider selector never initiates a real OAuth connection and the page explicitly identifies the import as a prototype.
+
 ## Exit gate
 Record each result as PASS/FAIL/BLOCKED and attach evidence. **Milestone 1 remains open until browser checks actually pass.** Automated CI is necessary but not sufficient.
