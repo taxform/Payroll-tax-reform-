@@ -255,3 +255,9 @@
 - `payrollcheck.memberships.auth_user_id` nullable UUID references `auth.users(id)`; unique partial index per tenant/user. No existing memberships or Auth users were modified.
 - Live verification: UUID column and index present; zero membership rows; FORCE RLS remains enabled; authenticated role has no SELECT access.
 - Remaining: real verified login/session, MFA enrollment, trusted membership provisioning, server-side access checks and tenant isolation tests. No production access.
+
+## Supabase tenant membership lookup scaffold — 2026-11-16
+- Added `src/payrollcheck/supabase-tenant-membership.mjs` (`085959c`) and synthetic tests `tests/payrollcheck-supabase-tenant-membership.test.mjs` (`f8c0842`).
+- Adapter requires trusted, verified Supabase UUID and tenant UUID, parameterized SQL, exactly one active membership, and allowed role; fails closed for missing, duplicate, malformed or mismatched records.
+- This is **not** a live login, RLS policy, actual database connection, JWT verification, or authorization endpoint. Current dev database intentionally denies all application access; do not use a bypass-RLS connection as a workaround.
+- Previous CI on `2f99b61` passed; new commit tests pending at time of update.
