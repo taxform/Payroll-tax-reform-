@@ -209,3 +209,8 @@
 - Verified disposable PostgreSQL 16 RLS schema test succeeded on commit `af7d4ca` (run 43808641430); earlier workflow-only commit failed before SQL test file existed.
 - Added PostgreSQL SQL integration checks for duplicate active consent, duplicate scopes, and active grants lacking approval (commit `eeb9231`), wired into isolated PostgreSQL CI (commit `d81d241`). Latest CI pending.
 - These tests use synthetic records in a disposable database. Production RLS policies, JWT signature validation, sessions, app service, persistent audit, real user access and deployment remain absent.
+
+## PostgreSQL consent revocation regression — 2026-11-16
+- Confirmed disposable PostgreSQL consent constraint test succeeded (run 43808761792).
+- Extended SQL integration coverage to revoke an active consent, assert it disappears from active grants, then approve a replacement grant for the same firm/business pair (`e92df99`). CI pending.
+- Production login still blocked on explicit identity-provider selection and MFA/session security design; no provider chosen or connected.
