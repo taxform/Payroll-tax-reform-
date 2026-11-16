@@ -9,7 +9,7 @@ const row={membership_id:membershipId,tenant_id:tenantId,auth_user_id:userId,rol
 const base=()=>({accessToken:'synthetic-token',tenantId,getVerifiedUser:async()=>user,requireAal2:async()=>true,query:async()=>({rows:[row]})});
 test('requires verified user, MFA and tenant membership',async()=>{
  const r=await authorize(base());
- assert.equal(r.ok,true);assert.equal(r.principal.tenantId,tenantId);
+ assert.equal(r.ok,true,JSON.stringify(r));assert.equal(r.principal.tenantId,tenantId);
  assert.equal(r.principal.authUserId,userId);
 });
 test('denies absent verified user, anonymous, unconfirmed, MFA failure',async()=>{
