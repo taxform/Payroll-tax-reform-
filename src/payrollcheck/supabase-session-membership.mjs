@@ -4,7 +4,7 @@
 // requireAal2 must independently verify the authenticated session's MFA assurance.
 // Database query must run with reviewed tenant-scoped RLS, never service_role/BYPASSRLS.
 import {loadVerifiedTenantMembership} from './supabase-tenant-membership.mjs';
-const uuid=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
+const uuid=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
 const deny=reason=>Object.freeze({ok:false,reason});
 export async function authorizeSupabaseTenantSession({
  accessToken,tenantId,getVerifiedUser,requireAal2,query
