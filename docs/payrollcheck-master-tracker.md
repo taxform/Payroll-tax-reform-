@@ -32,6 +32,7 @@
 - [x] Trusted-record authorization adapter with unique-record and revoked-consent tests (not connected to a database or session provider).
 - [x] Privacy-minimized authorization audit event model and tests (no persistence or event delivery).
 - [x] Unapplied deny-by-default PostgreSQL schema proposal and security review checklist (not an approved database design or migration).
+- [x] Static schema guard tests check all draft tables have forced RLS and no grant/policy statements; does not replace PostgreSQL integration tests.
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -104,3 +105,8 @@
 - Verified CI passed for audit event model and tests (GitHub Actions run 43806779678).
 - Drafted unapplied PostgreSQL tables for tenants, memberships, reports, grants and access audit, with forced RLS and intentionally no policies (commits `18e2880`, `33ea8c0`). No database or runtime was connected.
 - Blockers: identity/backend/database selection, reviewed RLS policies, PostgreSQL integration tests, manual browser QA and independent security review.
+
+## Schema verification session — 2026-11-15
+- Confirmed prior PostgreSQL proposal and tracker CI passed (run 43806861478).
+- Added static schema guard tests (commit `6cc582d`), latest CI pending.
+- Remaining: real database tests, session verification, RLS policies, manual browser QA and independent security review.
