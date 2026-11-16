@@ -226,3 +226,9 @@
 - Added development-only Supabase project URL validation and tests (`9d380ca`, `cc54567`). Production and non-Supabase URLs are rejected. Latest CI pending.
 - No connected Supabase project, server-side JWT cryptographic verifier, real user login, MFA enrollment, session cookies or deployment.
 - Next owner action: create/authorize a Supabase development project and supply only its public project URL; never share service-role keys or passwords in chat.
+
+## Connected Supabase discovery — 2026-11-16
+- Supabase connection verified; one project `First`, reference `sfsazfknbhnnyvavfmhv`, US East, healthy PostgreSQL 17. No tables returned in `public` or `payrollcheck` schemas.
+- Public project URL: `https://sfsazfknbhnnyvavfmhv.supabase.co`. **Do not assume this is a dedicated PayrollCheck development project**: existing project is named First.
+- Security advisor flags `public.rls_auto_enable()` SECURITY DEFINER as callable by anon and authenticated. Review before any sensitive data; do not change without owner approval.
+- No SQL migrations or Supabase settings changed. Ask whether to use First or create a separate development project before applying PayrollCheck schema.
