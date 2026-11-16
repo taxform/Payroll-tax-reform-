@@ -138,3 +138,9 @@
 - Added regression cases for duplicate active firm grants, ambiguous memberships/reports and malformed trusted record containers (commit `f1dfba2`).
 - Documented a future server endpoint's verified OIDC, transactional database, RLS, revocation and audit requirements (commit `e3e0a12`).
 - Latest CI pending. No HTTP endpoint, real database, OIDC integration or deployment exists. Manual browser QA remains open.
+
+## Malformed role hardening — 2026-11-15
+- Previous authorization regression CI passed (run 43807339956).
+- Changed stored report authorization to deny non-string membership roles instead of risking a thrown exception (commit `a8a8367`).
+- Added malformed-role regression tests (commit `a6f5752`); latest CI pending.
+- Still prototype-only. No live authentication, production database, real payroll data or deployment.
