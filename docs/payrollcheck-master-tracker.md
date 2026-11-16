@@ -285,3 +285,9 @@
 ## Tenant RLS authorization specification — 2026-11-16
 - Added `docs/payrollcheck-tenant-rls-access-spec.md` (`6c1a5be`) specifying business-only report access, firm-client active `view_report` consent, revocation, MFA, identity, audit and cross-tenant tests.
 - Design only: no RLS policy/grant/schema/user data changes made. Next work is a disposable Postgres RLS implementation and positive/negative isolation tests, then review before any dedicated dev deployment.
+
+## Disposable tenant RLS policy tests — 2026-11-16
+- Added isolated-only SQL policy fixture `tests/sql/payrollcheck-report-rls-fixture.sql` (`7d6e79b`, corrected `210fe52`) and isolation/revocation tests `tests/sql/payrollcheck-report-rls-isolation.sql` (`290789a`).
+- Updated disposable PostgreSQL CI workflow (`1c4b36f`) to run fixture and tests. CI was in progress at tracker update.
+- Fixture uses a custom PostgreSQL setting for synthetic identity and intentionally broad supporting-table SELECT policies. **Not secure for direct SQL clients and never to be applied to Supabase dev/production.**
+- Remaining: review trustworthy transaction-bound identity, least-privilege supporting-table access, RLS policies, actual verified Supabase Auth and tenant-consent lifecycle, then independently test before dev migration.
