@@ -19,7 +19,7 @@ export async function loadReportAuthorizationRecords({query,userId,reportId,reso
  const grants=requiredRows(await query(
   "SELECT firm_tenant_id, business_tenant_id, scopes, status, requested_by_subject, approved_by_subject, approved_at, revoked_by_subject, revoked_at FROM payrollcheck.client_grants WHERE business_tenant_id=$1 AND status='active' LIMIT 501",[report.business_tenant_id]),501);
  if(memberships.some(m=>!m||m.subject_id!==userId||!uuid(m.tenant_id)||!['business_owner','accounting_admin','accounting_reviewer'].includes(m.role)||m.active!==true))throw Error('invalid_membership_row');
- if(grants.some(g=>!g||!uuid(g.firm_tenant_id)||g.business_tenant_id!==report.business_tenant_id||g.status!=='active'||!Array.isArray(g.scopes)||!g.scopes.length||g.scopes.some(s=>!['view_report','review_finding'].includes(s))||!id(g.requested_by_subject)||!id(g.approved_by_subject)||g.revoked_by_subject!==null))throw Error('invalid_grant_row');
+ if(grants.some(g=>!g||!uuid(g.firm_tenant_id)||g.business_tenant_id!==report.business_tenant_id||g.status!=='active'||!Array.isArray(g.scopes)||!g.scopes.length||g.scopes.length>2||new Set(g.scopes).size!==g.scopes.length||g.scopes.some(s=>!['view_report','review_finding'].includes(s))||!id(g.requested_by_subject)||!id(g.approved_by_subject)||g.revoked_by_subject!==null))throw Error('invalid_grant_row');
  const tenantIds=new Map();
  const usedTenantIds=new Set();
  for(const tenantUuid of new Set([report.business_tenant_id,...memberships.map(m=>m.tenant_id),...grants.flatMap(g=>[g.firm_tenant_id,g.business_tenant_id])])){
