@@ -31,6 +31,7 @@
 - [x] Trusted-context report-access boundary prototype and regression tests (not a deployed API, and session verification/database persistence not implemented).
 - [x] Trusted-record authorization adapter with unique-record and revoked-consent tests (not connected to a database or session provider).
 - [x] Privacy-minimized authorization audit event model and tests (no persistence or event delivery).
+- [x] Unapplied deny-by-default PostgreSQL schema proposal and security review checklist (not an approved database design or migration).
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -98,3 +99,8 @@
 - Confirmed GitHub Actions success for stored-report authorization adapter and tracker (run 43806621802).
 - Added privacy-minimized report access audit event model and regression tests (commits `48eb0e1`, `ff794fd`). CI pending.
 - No live backend, audit storage, verified session service or customer-data handling. Next: verify CI and choose server identity/database architecture before implementing real enforcement.
+
+## Follow-up development session — 2026-11-15
+- Verified CI passed for audit event model and tests (GitHub Actions run 43806779678).
+- Drafted unapplied PostgreSQL tables for tenants, memberships, reports, grants and access audit, with forced RLS and intentionally no policies (commits `18e2880`, `33ea8c0`). No database or runtime was connected.
+- Blockers: identity/backend/database selection, reviewed RLS policies, PostgreSQL integration tests, manual browser QA and independent security review.
