@@ -30,6 +30,7 @@
 - [x] Pure client-consent approval/revocation prototype and tests (not persisted or wired to authenticated server requests).
 - [x] Trusted-context report-access boundary prototype and regression tests (not a deployed API, and session verification/database persistence not implemented).
 - [x] Trusted-record authorization adapter with unique-record and revoked-consent tests (not connected to a database or session provider).
+- [x] Privacy-minimized authorization audit event model and tests (no persistence or event delivery).
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -92,3 +93,8 @@
 - Trusted-context report-access boundary commits `11c48b6` and `b937a8b` (CI pending).
 - Report-boundary CI passed (run 43806452238). Trusted-record adapter commits `b903c3b` and `ec999f4` (CI pending).
 - **Next action:** verify latest CI; run manual browser QA; choose identity provider/backend, then implement real server session validation and database enforcement. Do not close Milestone 1 until complete.
+
+## Latest work session — 2026-11-15
+- Confirmed GitHub Actions success for stored-report authorization adapter and tracker (run 43806621802).
+- Added privacy-minimized report access audit event model and regression tests (commits `48eb0e1`, `ff794fd`). CI pending.
+- No live backend, audit storage, verified session service or customer-data handling. Next: verify CI and choose server identity/database architecture before implementing real enforcement.
