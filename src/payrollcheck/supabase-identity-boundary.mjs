@@ -6,10 +6,10 @@ const uuid=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 const id=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x);
 const deny=reason=>Object.freeze({ok:false,reason});
 export async function verifySupabasePayrollSession({
- accessToken,verifyAccessToken,resolveInternalUserId,expectedIssuer,nowSeconds
+ accessToken,verifyAccessToken,resolveInternalUserId,verifyEmailConfirmed,expectedIssuer,nowSeconds
 }={}){
  if(typeof accessToken!=='string'||!accessToken||accessToken.length>16384||
- typeof verifyAccessToken!=='function'||typeof resolveInternalUserId!=='function'||
+ typeof verifyAccessToken!=='function'||typeof resolveInternalUserId!=='function'||typeof verifyEmailConfirmed!=='function'||
  typeof expectedIssuer!=='string'||!/^https:\/\/.+\/auth\/v1$/.test(expectedIssuer)||
  !Number.isSafeInteger(nowSeconds))return deny('invalid_auth_config');
  try{
@@ -19,10 +19,11 @@ export async function verifySupabasePayrollSession({
    claims.iss!==expectedIssuer||claims.aud!=='authenticated'||
    !uuid(claims.sub)||!uuid(claims.session_id)||
    claims.role!=='authenticated'||claims.aal!=='aal2'||
-   !claims.email||claims.email_confirmed_at===null||claims.email_confirmed_at===undefined||
+   typeof claims.email!=='string'||!claims.email||
    !Number.isSafeInteger(claims.iat)||claims.iat>nowSeconds||
    !Number.isSafeInteger(claims.exp)||claims.exp<=nowSeconds||
    claims.exp<=claims.iat)return deny('invalid_or_insufficient_identity');
+  if(await verifyEmailConfirmed(claims.sub)!==true)return deny('unconfirmed_email');
   const userId=await resolveInternalUserId(claims.sub);
   if(!id(userId))return deny('unknown_internal_identity');
   return Object.freeze({ok:true,session:Object.freeze({
