@@ -144,3 +144,9 @@
 - Changed stored report authorization to deny non-string membership roles instead of risking a thrown exception (commit `a8a8367`).
 - Added malformed-role regression tests (commit `a6f5752`); latest CI pending.
 - Still prototype-only. No live authentication, production database, real payroll data or deployment.
+
+## Direct report authorization role hardening — 2026-11-15
+- Confirmed previous role hardening CI success (run 43807458016).
+- Hardened the direct report access boundary to handle non-string role values without throwing (commit `619b1c2`).
+- Added direct-boundary regression tests for malformed roles (commit `05d7021`).
+- Latest CI pending; this is still a pure prototype without production OIDC, database or HTTP route.
