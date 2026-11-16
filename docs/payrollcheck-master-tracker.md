@@ -249,3 +249,9 @@
 - Added `docs/sql/payrollcheck-private-schema-dev-lockdown.sql` commit `54d0ace` and applied `payrollcheck_dev_private_schema_lockdown` to dedicated development project `izqzclahjijkhyxvhtif`.
 - Live SQL verification: all five tables retain RLS enabled + FORCE RLS and zero policies; `anon` and `authenticated` have neither schema USAGE nor table SELECT privileges. No data inserted.
 - This is defense in depth, not completed authentication or tenant isolation. Server-side JWT verification, reviewed per-tenant policies, live access audit and real endpoint remain unimplemented. Production remains untouched.
+
+## Supabase Auth identity link — 2026-11-16
+- Applied development migration `payrollcheck_dev_auth_identity_link` to dedicated Supabase project; SQL source in `docs/sql/payrollcheck-dev-auth-identity-link.sql`, commit `5d09cee`.
+- `payrollcheck.memberships.auth_user_id` nullable UUID references `auth.users(id)`; unique partial index per tenant/user. No existing memberships or Auth users were modified.
+- Live verification: UUID column and index present; zero membership rows; FORCE RLS remains enabled; authenticated role has no SELECT access.
+- Remaining: real verified login/session, MFA enrollment, trusted membership provisioning, server-side access checks and tenant isolation tests. No production access.
