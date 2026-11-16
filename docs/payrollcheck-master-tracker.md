@@ -220,3 +220,9 @@
 - Added server-only Supabase identity boundary requiring independently verified JWT claims, AAL2 MFA, trusted email confirmation lookup, and trusted UUID-to-internal-user mapping (commits `6bc604a`, `ea7f10c`).
 - Added synthetic identity tests (`36a5fc3`) and integration decision/security checklist (`86097d6`). CI pending.
 - No Supabase project, cryptographic JWT verifier, actual user login, sessions, production database, live payroll or deployment connected. Owner must approve provider account connection before live integration.
+
+## Supabase development configuration gate — 2026-11-16
+- Confirmed latest Supabase identity prototype smoke tests passed on commit `66a1ab6`.
+- Added development-only Supabase project URL validation and tests (`9d380ca`, `cc54567`). Production and non-Supabase URLs are rejected. Latest CI pending.
+- No connected Supabase project, server-side JWT cryptographic verifier, real user login, MFA enrollment, session cookies or deployment.
+- Next owner action: create/authorize a Supabase development project and supply only its public project URL; never share service-role keys or passwords in chat.
