@@ -156,3 +156,9 @@
 - Updated **unapplied draft** PostgreSQL schema to include a report client identifier, consent action scopes, and a partial unique index preventing multiple simultaneously active grants for the same firm/business pair (commit `25eecd5`).
 - Added static schema guard regression tests for the above constraints (commit `971035f`). Latest CI pending.
 - Schema remains design-only and unreviewed: no database instance, real OIDC integration, migration execution or PostgreSQL runtime tests. Database UUID identifiers still require a reviewed mapping to current prototype IDs.
+
+## Fail-closed authenticated boundary hardening — 2026-11-16
+- Confirmed draft SQL schema guard CI passed (run 43807675228).
+- Wrapped trusted-record authorization in a fail-closed error boundary so unexpected record adapter exceptions cannot expose internal exception text (commit `0b20070`).
+- Added regression tests for a throwing trusted-record getter and malformed membership roles (commit `fb88e87`). Latest CI pending.
+- This remains a non-cryptographic, in-memory authorization prototype; no real OIDC, database, server endpoint or payroll processing is deployed.
