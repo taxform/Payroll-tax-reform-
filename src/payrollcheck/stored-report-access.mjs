@@ -15,7 +15,7 @@ export function authorizeStoredReportAccess({session, memberships, reports, gran
  if(activeMemberships.length!==1)return deny('missing_or_ambiguous_membership');
  const membership=activeMemberships[0];
  if(membership.role==='business_owner')return authorizeReportRequest({session,membership,report,action});
- if(!membership.role?.startsWith('accounting_'))return deny('unsupported_role');
+ if(typeof membership.role!=='string'||!membership.role.startsWith('accounting_'))return deny('unsupported_role');
  const matchingGrants=grants.filter(g=>g&&g.firmTenantId===membership.tenantId&&g.businessTenantId===report.businessTenantId&&g.status==='active');
  if(matchingGrants.length!==1)return deny('missing_or_ambiguous_grant');
  return authorizeReportRequest({session,membership,report,grant:matchingGrants[0],action});
