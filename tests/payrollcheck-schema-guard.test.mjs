@@ -21,3 +21,12 @@ test('draft has tenant and consent state constraints',()=>{
  assert.match(sql,/status='revoked'/);
  assert.match(sql,/REFERENCES payrollcheck\.tenants\(tenant_id\)/);
 });
+
+test('draft schema captures report client identity and scoped consent',()=>{
+ assert.match(sql,/client_id text NOT NULL CHECK/);
+ assert.match(sql,/scopes text\[\] NOT NULL CHECK/);
+ assert.match(sql,/scopes <@ ARRAY\['view_report','review_finding'\]/);
+ assert.match(sql,/array_position\(scopes,NULL\) IS NULL/);
+ assert.match(sql,/CREATE UNIQUE INDEX client_grants_one_active_per_pair/);
+ assert.match(sql,/WHERE status='active'/);
+});
