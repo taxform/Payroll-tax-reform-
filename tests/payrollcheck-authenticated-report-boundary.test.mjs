@@ -25,3 +25,24 @@ test('does not permit cross-tenant report access',async()=>{
  const loadTrustedRecords=async()=>({...records,reports:[{id:'report1',businessTenantId:'businessB',active:true}]});
  assert.equal((await check(input({loadTrustedRecords}))).allowed,false);
 });
+
+test('accounting firm requires approved, scoped, non-revoked consent end to end',async()=>{
+ const {requestClientGrant,approveClientGrant,revokeClientGrant}=await import('../src/payrollcheck/client-consent.mjs');
+ const requested=requestClientGrant({firmTenantId:'firmA',businessTenantId:'businessA',requestedBy:'admin1',scopes:['view_report']}).grant;
+ const owner={userId:'owner1',tenantId:'businessA',role:'business_owner',active:true};
+ const approved=approveClientGrant({grant:requested,actor:owner}).grant;
+ const firmRecords=(grant)=>({
+  memberships:[{userId:'user1',tenantId:'firmA',role:'accounting_reviewer',active:true}],
+  reports:[{id:'report1',businessTenantId:'businessA',clientId:'clientA',active:true}],
+  grants:[grant]
+ });
+ const call=(grant,action='view_report')=>check(input({action,loadTrustedRecords:async()=>firmRecords(grant)}));
+ assert.equal((await call(requested)).allowed,false);
+ assert.equal((await call(approved)).allowed,true);
+ assert.equal((await call(approved,'review_finding')).allowed,false);
+ assert.equal((await call(revokeClientGrant({grant:approved,actor:owner}).grant)).allowed,false);
+});
+test('does not allow unverified session or callback failure to grant access',async()=>{
+ assert.equal((await check(input({verifiedClaims:{...claims,iss:'https://attacker.example'}}))).allowed,false);
+ assert.equal((await check(input({loadTrustedRecords:async()=>{throw Error('db unavailable')}}))).allowed,false);
+});
