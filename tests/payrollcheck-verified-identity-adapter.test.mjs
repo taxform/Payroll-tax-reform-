@@ -15,3 +15,11 @@ test('multiple audiences require explicit authorized party',()=>{
  assert.equal(map(input({claims:{...claims,aud:['payrollcheck-api','other']}})),null);
  assert.ok(map(input({claims:{...claims,aud:['payrollcheck-api','other'],azp:'payrollcheck-api'}})));
 });
+
+test('rejects not-before and inconsistent or invalid claim timestamps',()=>{
+ for(const patch of [{nbf:1501},{nbf:'1500'},{nbf:-1},{exp:1000},{iat:-1},{auth_time:1501},{auth_time:'1000'}])assert.equal(map(input({claims:{...claims,...patch}})),null);
+ assert.ok(map(input({claims:{...claims,nbf:1500,auth_time:1000}})));
+});
+test('rejects malformed or duplicate audiences',()=>{
+ for(const aud of [[],['payrollcheck-api','payrollcheck-api'],['payrollcheck-api',7],['payrollcheck-api','']])assert.equal(map(input({claims:{...claims,aud,azp:'payrollcheck-api'}})),null);
+});
