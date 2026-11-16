@@ -78,3 +78,13 @@ test('rejects malformed trusted record collections and unsupported roles',async(
   assert.equal((await check(input({loadTrustedRecords:async()=>stored}))).allowed,false);
  }
 });
+
+test('malformed role types fail closed without throwing',async()=>{
+ for(const role of [42,{},[],true]){
+  const decision=await check(input({loadTrustedRecords:async()=>({
+   ...records,memberships:[{userId:'user1',tenantId:'businessA',role,active:true}]
+  })}));
+  assert.equal(decision.allowed,false);
+  assert.equal(decision.reason,'unsupported_role');
+ }
+});
