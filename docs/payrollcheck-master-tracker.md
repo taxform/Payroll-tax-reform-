@@ -29,6 +29,7 @@
 - [x] Pure authorization-policy prototype and tests (not deployed enforcement).
 - [x] Pure client-consent approval/revocation prototype and tests (not persisted or wired to authenticated server requests).
 - [x] Trusted-context report-access boundary prototype and regression tests (not a deployed API, and session verification/database persistence not implemented).
+- [x] Trusted-record authorization adapter with unique-record and revoked-consent tests (not connected to a database or session provider).
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -89,4 +90,5 @@
 - Hardened consent prototype to reject forged active approval metadata at `9eeeff1`; added regression tests at `e145318` (new CI pending).
 - Consent-hardening CI passed (run 43805823509).
 - Trusted-context report-access boundary commits `11c48b6` and `b937a8b` (CI pending).
-- **Next action:** verify report-boundary CI; run manual browser QA; choose identity provider/backend, then implement real server session validation and database enforcement. Do not close Milestone 1 until complete.
+- Report-boundary CI passed (run 43806452238). Trusted-record adapter commits `b903c3b` and `ec999f4` (CI pending).
+- **Next action:** verify latest CI; run manual browser QA; choose identity provider/backend, then implement real server session validation and database enforcement. Do not close Milestone 1 until complete.
