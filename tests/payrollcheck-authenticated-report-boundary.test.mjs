@@ -46,3 +46,11 @@ test('does not allow unverified session or callback failure to grant access',asy
  assert.equal((await check(input({verifiedClaims:{...claims,iss:'https://attacker.example'}}))).allowed,false);
  assert.equal((await check(input({loadTrustedRecords:async()=>{throw Error('db unavailable')}}))).allowed,false);
 });
+
+test('unsupported action never triggers trusted record query',async()=>{
+ let called=false;
+ const decision=await check(input({action:'delete_report',loadTrustedRecords:async()=>{called=true;return records;}}));
+ assert.equal(decision.allowed,false);
+ assert.equal(decision.reason,'unsupported_action');
+ assert.equal(called,false);
+});
