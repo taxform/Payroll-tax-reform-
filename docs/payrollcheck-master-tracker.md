@@ -19,7 +19,7 @@
 - [x] Add CSV regression tests for quoting, malformed input, overflow, dates and duplicate fields; parser hardening committed. Parser fix passed GitHub Actions run 43804119997.
 - [x] Display fabricated X-Ray findings on both static dashboards using local browser-only demonstration data.
 - [x] Dashboard demo reads shared synthetic fixtures; automated tests check fixture finding codes against the actual X-Ray engine (browser does not calculate live reports).
-- [ ] Manual browser accessibility, mobile, error-state and quality-gate verification.
+- [x] Add automated smoke checks for sample metric consistency, responsive CSS, keyboard focus, and demo error messaging (CI verification pending).\n- [ ] Manual browser accessibility, mobile, error-state and quality-gate verification (not yet performed).
 **Exit:** All prototype tests green, demo workflow documented and manually checked.
 
 ## Milestone 2 — Production identity and data isolation (NOT STARTED)
@@ -74,4 +74,4 @@
 - Branch: `feature/payrollcheck-free-audit`
 - Last code additions before tracker: `2fcb613` security plan; `89faa656` access-policy tests; `83d966d` access-policy helper.
 - CSV parser fix passed CI at `5207f32`; fixture browser module added at `8453cca` (CI pending).
-- **Next action:** verify new fixture CI, then perform manual browser accessibility, responsive and error-state QA. Browser rendering uses fixture data only, not live payroll.
+- Dashboard sample metrics corrected at `a479758` and responsive/focus CSS added at `09e95b4`; QA smoke tests at `2d07949` (CI pending).\n- **Next action:** verify latest QA CI; then manually inspect mobile and desktop rendering, keyboard behavior, and fixture-loading failure state before closing Milestone 1.
