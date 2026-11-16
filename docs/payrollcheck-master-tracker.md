@@ -244,3 +244,8 @@
 - Verified five empty tables in private `payrollcheck` schema: tenants, memberships, reports, client_grants, access_audit.
 - Independently queried pg_catalog: all five have RLS enabled and forced, with zero policies. Supabase advisor reports expected informational `rls_enabled_no_policy` notices, not an authorization bypass.
 - No authentication users, customer data, API access grants, production deployment, payment integration, or real payroll ingestion. Next: design and test explicit RLS policies and secure identity binding, without loosening access prematurely.
+
+## Supabase private schema lockdown — 2026-11-16
+- Added `docs/sql/payrollcheck-private-schema-dev-lockdown.sql` commit `54d0ace` and applied `payrollcheck_dev_private_schema_lockdown` to dedicated development project `izqzclahjijkhyxvhtif`.
+- Live SQL verification: all five tables retain RLS enabled + FORCE RLS and zero policies; `anon` and `authenticated` have neither schema USAGE nor table SELECT privileges. No data inserted.
+- This is defense in depth, not completed authentication or tenant isolation. Server-side JWT verification, reviewed per-tenant policies, live access audit and real endpoint remain unimplemented. Production remains untouched.
