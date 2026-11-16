@@ -204,3 +204,8 @@
 - Discovered malformed and duplicated SQL in the unapplied schema draft; rewrote it to a single valid-looking deny-by-default schema (`903837a`). This requires execution verification.
 - Added a separate GitHub Actions workflow with a disposable PostgreSQL 16 service (`6e04790`) and SQL checks for forced RLS, no policies, invisible seeded rows and rejected inserts for a non-BYPASSRLS role (`af7d4ca`). CI pending; do not claim successful real database execution yet.
 - No live database, RLS access policies, OIDC verification, production migration or deployment.
+
+## Live PostgreSQL CI constraint checks — 2026-11-16
+- Verified disposable PostgreSQL 16 RLS schema test succeeded on commit `af7d4ca` (run 43808641430); earlier workflow-only commit failed before SQL test file existed.
+- Added PostgreSQL SQL integration checks for duplicate active consent, duplicate scopes, and active grants lacking approval (commit `eeb9231`), wired into isolated PostgreSQL CI (commit `d81d241`). Latest CI pending.
+- These tests use synthetic records in a disposable database. Production RLS policies, JWT signature validation, sessions, app service, persistent audit, real user access and deployment remain absent.
