@@ -7,6 +7,7 @@ const id=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x);
 const deny=reason=>Object.freeze({allowed:false,reason});
 export async function checkAuthenticatedReportAccess({verifiedClaims,identityConfig,reportId,action,loadTrustedRecords}={}){
  if(typeof loadTrustedRecords!=='function'||!identityConfig||!id(reportId))return deny('invalid_boundary_config');
+ if(!['view_report','review_finding'].includes(action))return deny('unsupported_action');
  const session=mapVerifiedIdentity({claims:verifiedClaims,expectedIssuer:identityConfig.issuer,expectedAudience:identityConfig.audience,nowSeconds:identityConfig.nowSeconds});
  if(!session)return deny('unverified_session');
  let records;
