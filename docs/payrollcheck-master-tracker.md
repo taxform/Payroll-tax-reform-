@@ -181,3 +181,8 @@
 - Tightened unconnected PostgreSQL loader to reject duplicate or excessive consent scopes, matching pure consent model and draft SQL expectations (commit `00e6689`).
 - Added fake-query negative tests (commit `21028bf`); latest CI pending.
 - Still no managed database, OIDC integration, RLS runtime test, live deployment or customer payroll data.
+
+## SQL loader to authorization boundary integration — 2026-11-16
+- Verified previous SQL consent-scope tests passed (run 43808152398).
+- Added fabricated-record end-to-end Node integration tests for the PostgreSQL loader wired to authenticated report authorization, including valid firm consent, revoked/missing consent, ungranted actions, mismatched membership, expired claims and query failures (commit `cd25d2a`).
+- CI pending. These are mock SQL rows, not a running PostgreSQL server; token signatures, RLS, transactions, live identity, and browser behavior remain untested. No production deployment.
