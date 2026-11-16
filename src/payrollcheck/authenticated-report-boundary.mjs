@@ -14,6 +14,10 @@ export async function checkAuthenticatedReportAccess({verifiedClaims,identityCon
  try{records=await loadTrustedRecords({userId:session.userId,reportId});}
  catch{return deny('trusted_record_lookup_failed');}
  if(!records||typeof records!=='object'||Array.isArray(records))return deny('trusted_record_lookup_failed');
- const decision=authorizeStoredReportAccess({session,memberships:records.memberships,reports:records.reports,grants:records.grants,reportId,action});
- return Object.freeze({allowed:decision.allowed===true,reason:decision.reason});
+ try{
+  const decision=authorizeStoredReportAccess({session,memberships:records.memberships,reports:records.reports,grants:records.grants,reportId,action});
+  return Object.freeze({allowed:decision.allowed===true,reason:decision.reason});
+ }catch{
+  return deny('invalid_trusted_records');
+ }
 }
