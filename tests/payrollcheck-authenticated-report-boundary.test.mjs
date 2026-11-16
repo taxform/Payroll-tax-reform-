@@ -88,3 +88,19 @@ test('malformed role types fail closed without throwing',async()=>{
   assert.equal(decision.reason,'unsupported_role');
  }
 });
+
+test('unexpected trusted record getter errors fail closed without exposing details',async()=>{
+ const recordsWithThrowingGetter={
+  get memberships(){throw Error('sensitive database diagnostic')},
+  reports:records.reports,
+  grants:records.grants
+ };
+ const decision=await check(input({loadTrustedRecords:async()=>recordsWithThrowingGetter}));
+ assert.deepEqual(decision,{allowed:false,reason:'invalid_trusted_records'});
+ assert.equal(Object.isFrozen(decision),true);
+});
+test('unexpected malformed membership entries fail closed rather than throwing',async()=>{
+ const malformed={...records,memberships:[{userId:'user1',tenantId:'businessA',role:{startsWith(){throw Error('unsafe role')}},active:true}]};
+ const decision=await check(input({loadTrustedRecords:async()=>malformed}));
+ assert.equal(decision.allowed,false);
+});
