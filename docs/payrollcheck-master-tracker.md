@@ -214,3 +214,9 @@
 - Confirmed disposable PostgreSQL consent constraint test succeeded (run 43808761792).
 - Extended SQL integration coverage to revoke an active consent, assert it disappears from active grants, then approve a replacement grant for the same firm/business pair (`e92df99`). CI pending.
 - Production login still blocked on explicit identity-provider selection and MFA/session security design; no provider chosen or connected.
+
+## Supabase Auth provider decision and development preparation — 2026-11-16
+- Recommended Supabase Auth + PostgreSQL for cost-conscious B2B prototype; published Free and Pro $25/month baseline, subject to infrastructure and production requirements.
+- Added server-only Supabase identity boundary requiring independently verified JWT claims, AAL2 MFA, trusted email confirmation lookup, and trusted UUID-to-internal-user mapping (commits `6bc604a`, `ea7f10c`).
+- Added synthetic identity tests (`36a5fc3`) and integration decision/security checklist (`86097d6`). CI pending.
+- No Supabase project, cryptographic JWT verifier, actual user login, sessions, production database, live payroll or deployment connected. Owner must approve provider account connection before live integration.
