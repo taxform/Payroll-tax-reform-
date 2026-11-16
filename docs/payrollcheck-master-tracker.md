@@ -275,3 +275,9 @@
 ## CI diagnosis and UUID fix — 2026-11-16
 - Investigated GitHub Actions smoke failure: positive session-membership test returned `invalid_request` because `src/payrollcheck/supabase-session-membership.mjs` UUID regex omitted one 4-digit UUID group.
 - Fixed regex to full 8-4-4-4-12 format in commit `1575d00`. No DB or production changes. Await successful post-fix CI before calling it verified.
+
+## Post-fix CI and development DB security recheck — 2026-11-16
+- GitHub Actions smoke tests on `1575d00` and `3ebb50b` both completed successfully after fixing the malformed UUID validator.
+- Rechecked dedicated Supabase development project: all five private tables have RLS and FORCE RLS, zero policies, and no anon/authenticated SELECT or authenticated INSERT/UPDATE grants.
+- Added reusable read-only drift check `docs/sql/payrollcheck-dev-security-regression-check.sql` (`6f4d236`). This verifies closed access, not positive per-tenant access.
+- Still blocked from customer use: no authorized tenant RLS policies, live user enrollment, real API/session binding or database role/transaction design.
