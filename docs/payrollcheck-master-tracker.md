@@ -126,3 +126,9 @@
 - Added an async composition boundary for already-verified identity claims and trusted report/membership/grant records, with fail-closed lookup tests (commits for `src/payrollcheck/authenticated-report-boundary.mjs` and `de1b7f9`).
 - This is not an HTTP endpoint or cryptographic token verifier. The callback must be implemented against trusted server-side storage; no production session or database service exists.
 - Next: verify CI, select actual identity/backend/database stack, implement verified middleware and transaction-safe data access, and run manual browser QA.
+
+## Report authorization integration tests — 2026-11-15
+- Confirmed prior authenticated-boundary CI passed (GitHub Actions run 43807123955).
+- Added end-to-end *prototype* tests covering accounting firm pending/approved/revoked grants and scope restrictions (commit `8f34e83`).
+- Reject unsupported report actions before any trusted-record lookup; added negative test (commits `508168c`, `ca898ae`). Latest CI pending.
+- These are in-memory tests only, not a real OIDC provider, database transaction, or browser test. Milestone 1 manual QA and Milestone 2 production implementation remain incomplete.
