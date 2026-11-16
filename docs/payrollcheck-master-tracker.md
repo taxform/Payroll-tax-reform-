@@ -33,6 +33,7 @@
 - [x] Privacy-minimized authorization audit event model and tests (no persistence or event delivery).
 - [x] Unapplied deny-by-default PostgreSQL schema proposal and security review checklist (not an approved database design or migration).
 - [x] Static schema guard tests check all draft tables have forced RLS and no grant/policy statements; does not replace PostgreSQL integration tests.
+- [x] Pure OIDC-claims-to-session adapter and negative tests (assumes upstream cryptographic verification; not login or session service).
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -110,3 +111,8 @@
 - Confirmed prior PostgreSQL proposal and tracker CI passed (run 43806861478).
 - Added static schema guard tests (commit `6cc582d`), latest CI pending.
 - Remaining: real database tests, session verification, RLS policies, manual browser QA and independent security review.
+
+## Identity boundary session — 2026-11-15
+- Verified static schema guard CI passed (GitHub Actions run 43806902386).
+- Added and hardened a fail-closed mapping adapter for *already cryptographically verified* OIDC claims with negative tests (commits `5dfc7a6`, `3a9c147`, `ad63b9f`). Latest CI pending.
+- No actual identity provider, JWT signature verification, MFA, secure session service or database connection exists. Do not treat this adapter as authentication.
