@@ -84,5 +84,6 @@
 - Synthetic demo validation/status accessibility hardening at `5a06d1c` (CI passed).
 - Proposed backend/authentication architecture documented at `85481b4` (not implemented or approved).
 - Manual browser checklist expanded for CSV preview at `2726ebf`; **manual browser runs still NOT executed** (no browser test environment or verified preview available in this session).
-- Consent lifecycle prototype commits `4cadef0` and `993820e` (CI pending; no production enforcement).
-- **Next action:** verify CI; run manual browser QA on an unpublished preview; choose identity provider/backend before implementing server-side consent persistence and enforcement. Do not close Milestone 1 until complete.
+- Consent lifecycle prototype commits `4cadef0` and `993820e` (CI passed: run 43805710387; no production enforcement).
+- Hardened consent prototype to reject forged active approval metadata at `9eeeff1`; added regression tests at `e145318` (new CI pending).
+- **Next action:** verify latest consent-hardening CI; run manual browser QA on an unpublished preview; choose identity provider/backend before implementing server-side consent persistence and enforcement. Do not close Milestone 1 until complete.
