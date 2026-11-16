@@ -27,6 +27,7 @@
 ## Milestone 2 — Production identity and data isolation (NOT STARTED)
 - [x] Pure authorization-policy prototype and tests (not deployed enforcement).
 - [x] Identity/security requirements document.
+- [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
 - [ ] Implement verified login, MFA for privileged users, sessions, password recovery, and server-side role assignment.
 - [ ] Implement business tenant isolation, accounting firm/client consent grants, immediate revocation, database policies and audit logs.
@@ -78,4 +79,6 @@
 - CSV parser fix passed CI at `5207f32`; fixture browser module added at `8453cca` (CI passed).
 - Dashboard sample metrics corrected at `a479758` and responsive/focus CSS added at `09e95b4`; QA smoke tests at `2d07949` (GitHub Actions 43804394989 passed).
 - Browser acceptance checklist committed at `e0ca0a0`; no manual pass has been claimed.
-- Synthetic demo validation/status accessibility hardening at `5a06d1c` (CI pending).\n- **Next action:** verify CI, then execute documented manual browser QA against an unpublished preview, record evidence and fix failures. Do not close Milestone 1 until complete.
+- Synthetic demo validation/status accessibility hardening at `5a06d1c` (CI passed).
+- Proposed backend/authentication architecture documented at `85481b4` (not implemented or approved).
+- **Next action:** execute manual browser QA against an unpublished preview and record evidence; then review identity provider/backend choices before production implementation. Do not close Milestone 1 until complete.
