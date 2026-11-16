@@ -198,3 +198,9 @@
 - Added a server-only composition module wiring preverified identity, read-only transaction, parameterized record loader and report authorization together (commit `a24ed69`).
 - Added fake-pool tests covering valid scoped firm access, expired identity before connection, missing grant, rollback and connection release on query failure (commit `cf8d7e0`). Latest CI pending.
 - This is **not** an HTTP endpoint, cryptographic token verifier, real PostgreSQL connection or runtime RLS test. Real data and production deployment remain prohibited.
+
+## Disposable PostgreSQL 16 CI milestone — 2026-11-16
+- Previous authenticated PostgreSQL composition tests passed (run for `4ab3ee8`).
+- Discovered malformed and duplicated SQL in the unapplied schema draft; rewrote it to a single valid-looking deny-by-default schema (`903837a`). This requires execution verification.
+- Added a separate GitHub Actions workflow with a disposable PostgreSQL 16 service (`6e04790`) and SQL checks for forced RLS, no policies, invisible seeded rows and rejected inserts for a non-BYPASSRLS role (`af7d4ca`). CI pending; do not claim successful real database execution yet.
+- No live database, RLS access policies, OIDC verification, production migration or deployment.
