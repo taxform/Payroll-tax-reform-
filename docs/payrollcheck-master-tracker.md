@@ -271,3 +271,7 @@
 - Added `src/payrollcheck/supabase-auth-checks.mjs` commit `b9ab803` and synthetic tests `tests/payrollcheck-supabase-auth-checks.test.mjs` commit `f4bb3b0`.
 - Uses injected trusted Supabase client's `auth.getUser(token)` and `auth.getClaims(token)` and enforces matching user ID, `aal2`, authenticated role, nonanonymous identity and UUID session ID; rejects failures.
 - No actual client instantiation, live token, credential, user enrollment, session cookie, or tenant-scoped database integration yet. CI to be verified; no production deployment.
+
+## CI diagnosis and UUID fix — 2026-11-16
+- Investigated GitHub Actions smoke failure: positive session-membership test returned `invalid_request` because `src/payrollcheck/supabase-session-membership.mjs` UUID regex omitted one 4-digit UUID group.
+- Fixed regex to full 8-4-4-4-12 format in commit `1575d00`. No DB or production changes. Await successful post-fix CI before calling it verified.
