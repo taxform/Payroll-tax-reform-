@@ -232,3 +232,9 @@
 - Public project URL: `https://sfsazfknbhnnyvavfmhv.supabase.co`. **Do not assume this is a dedicated PayrollCheck development project**: existing project is named First.
 - Security advisor flags `public.rls_auto_enable()` SECURITY DEFINER as callable by anon and authenticated. Review before any sensitive data; do not change without owner approval.
 - No SQL migrations or Supabase settings changed. Ask whether to use First or create a separate development project before applying PayrollCheck schema.
+
+## Dedicated Supabase development project created — 2026-11-16
+- Owner approved separate project under `payrolltaxreform organization`; cost tool quoted $0/month and creation succeeded.
+- Project `payrollcheck-360-dev`, ref `izqzclahjijkhyxvhtif`, URL `https://izqzclahjijkhyxvhtif.supabase.co`, region `us-east-1`, ACTIVE_HEALTHY.
+- New project public schema contains no tables at inspection. Existing project `First` not changed.
+- No PayrollCheck schema applied, login enabled, production deployed or customer data imported. Next: review Supabase Auth docs and create/test dev-only deny-by-default schema with owner authorization for changes.
