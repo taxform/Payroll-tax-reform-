@@ -28,6 +28,7 @@
 ## Milestone 2 — Production identity and data isolation (NOT STARTED)
 - [x] Pure authorization-policy prototype and tests (not deployed enforcement).
 - [x] Pure client-consent approval/revocation prototype and tests (not persisted or wired to authenticated server requests).
+- [x] Trusted-context report-access boundary prototype and regression tests (not a deployed API, and session verification/database persistence not implemented).
 - [x] Identity/security requirements document.
 - [x] Draft production identity architecture and adversarial acceptance tests (proposal only; provider/backend not selected).
 - [ ] Choose backend, authentication and data storage design.
@@ -86,4 +87,6 @@
 - Manual browser checklist expanded for CSV preview at `2726ebf`; **manual browser runs still NOT executed** (no browser test environment or verified preview available in this session).
 - Consent lifecycle prototype commits `4cadef0` and `993820e` (CI passed: run 43805710387; no production enforcement).
 - Hardened consent prototype to reject forged active approval metadata at `9eeeff1`; added regression tests at `e145318` (new CI pending).
-- **Next action:** verify latest consent-hardening CI; run manual browser QA on an unpublished preview; choose identity provider/backend before implementing server-side consent persistence and enforcement. Do not close Milestone 1 until complete.
+- Consent-hardening CI passed (run 43805823509).
+- Trusted-context report-access boundary commits `11c48b6` and `b937a8b` (CI pending).
+- **Next action:** verify report-boundary CI; run manual browser QA; choose identity provider/backend, then implement real server session validation and database enforcement. Do not close Milestone 1 until complete.
