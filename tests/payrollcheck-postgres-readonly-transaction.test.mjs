@@ -33,5 +33,5 @@ test('handles begin failure without leaking client or attempting invalid rollbac
 });
 test('rejects malformed transaction dependencies',async()=>{
  assert.deepEqual(await transact({}),{ok:false,reason:'invalid_transaction_config'});
- assert.equal((await transact({pool:{connect:async()=>({query:async()=>{}})},operation:async()=>true})).allowed,false);
+ assert.deepEqual(await transact({pool:{connect:async()=>({query:async()=>{}})},operation:async()=>true}),{ok:false,reason:'invalid_database_client'});
 });
