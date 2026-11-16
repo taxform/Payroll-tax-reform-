@@ -10,7 +10,7 @@ export function authorizeReportRequest({session,membership,report,grant,action}=
  if(!membership||membership.userId!==session.userId||membership.active!==true||!id(membership.tenantId))return deny('inactive_or_mismatched_membership');
  if(!report||!id(report.id)||!id(report.businessTenantId)||report.active!==true)return deny('invalid_report');
  if(!['view_report','review_finding'].includes(action))return deny('unsupported_action');
- const actor={userId:session.userId,tenantId:membership.tenantId,role:membership.role,active:true,firmId:membership.role?.startsWith('accounting_')?membership.tenantId:undefined};
+ const actor={userId:session.userId,tenantId:membership.tenantId,role:membership.role,active:true,firmId:typeof membership.role==='string'&&membership.role.startsWith('accounting_')?membership.tenantId:undefined};
  const resource={tenantId:report.businessTenantId,clientId:report.clientId,active:true};
  if(membership.role==='business_owner')return authorizePayrollAction({actor,resource,action,grants:[]});
  if(!id(report.clientId)||!grantAllows({grant,firmTenantId:membership.tenantId,businessTenantId:report.businessTenantId,action}))return deny('missing_client_consent');
