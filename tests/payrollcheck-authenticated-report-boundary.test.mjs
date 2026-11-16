@@ -54,3 +54,27 @@ test('unsupported action never triggers trusted record query',async()=>{
  assert.equal(decision.reason,'unsupported_action');
  assert.equal(called,false);
 });
+
+test('rejects duplicate memberships and duplicate active firm grants',async()=>{
+ const {requestClientGrant,approveClientGrant}=await import('../src/payrollcheck/client-consent.mjs');
+ const pending=requestClientGrant({firmTenantId:'firmA',businessTenantId:'businessA',requestedBy:'admin1',scopes:['view_report']}).grant;
+ const grant=approveClientGrant({grant:pending,actor:{userId:'owner1',tenantId:'businessA',role:'business_owner',active:true}}).grant;
+ const membership={userId:'user1',tenantId:'firmA',role:'accounting_reviewer',active:true};
+ const report={id:'report1',businessTenantId:'businessA',clientId:'clientA',active:true};
+ for(const stored of [
+  {memberships:[membership,membership],reports:[report],grants:[grant]},
+  {memberships:[membership],reports:[report],grants:[grant,grant]},
+  {memberships:[membership],reports:[report,report],grants:[grant]}
+ ]){
+  assert.equal((await check(input({loadTrustedRecords:async()=>stored}))).allowed,false);
+ }
+});
+test('rejects malformed trusted record collections and unsupported roles',async()=>{
+ for(const stored of [
+  {...records,memberships:null},
+  {...records,grants:null},
+  {...records,memberships:[{userId:'user1',tenantId:'businessA',role:'unknown',active:true}]}
+ ]){
+  assert.equal((await check(input({loadTrustedRecords:async()=>stored}))).allowed,false);
+ }
+});
