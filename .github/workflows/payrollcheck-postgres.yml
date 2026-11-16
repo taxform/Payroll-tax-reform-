@@ -5,6 +5,7 @@ on:
     paths:
       - 'docs/sql/payrollcheck-deny-by-default-schema.sql'
       - 'tests/sql/payrollcheck-rls-smoke.sql'
+      - 'tests/sql/payrollcheck-consent-constraints.sql'
       - '.github/workflows/payrollcheck-postgres.yml'
   workflow_dispatch:
 permissions:
@@ -37,3 +38,5 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-deny-by-default-schema.sql
       - name: Verify RLS denies an otherwise granted unprivileged role
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-rls-smoke.sql
+      - name: Verify consent constraints in disposable database
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-consent-constraints.sql
