@@ -17,6 +17,7 @@
 - [x] Automated Node test workflow and initial tests.
 - [x] Confirm access-policy CI passes (GitHub Actions runs 43803598404, 43803601322, 43803604779).
 - [x] Add CSV regression tests for quoting, malformed input, overflow, dates and duplicate fields; parser hardening committed. Parser fix passed GitHub Actions run 43804119997.
+- [x] Repair broken browser CSV module and add importability/parity tests against hardened core parser (commits `580ed6a`, `f497def`; latest CI awaiting verification).
 - [x] Display fabricated X-Ray findings on both static dashboards using local browser-only demonstration data.
 - [x] Dashboard demo reads shared synthetic fixtures; automated tests check fixture finding codes against the actual X-Ray engine (browser does not calculate live reports).
 - [x] Add automated smoke checks for sample metric consistency, responsive CSS, keyboard focus, and demo error messaging (GitHub Actions 43804394989 passed).
@@ -81,4 +82,4 @@
 - Browser acceptance checklist committed at `e0ca0a0`; no manual pass has been claimed.
 - Synthetic demo validation/status accessibility hardening at `5a06d1c` (CI passed).
 - Proposed backend/authentication architecture documented at `85481b4` (not implemented or approved).
-- **Next action:** execute manual browser QA against an unpublished preview and record evidence; then review identity provider/backend choices before production implementation. Do not close Milestone 1 until complete.
+- **Next action:** verify browser CSV parity CI; execute manual browser QA against an unpublished preview and record evidence; then review identity provider/backend choices before production implementation. Do not close Milestone 1 until complete.
