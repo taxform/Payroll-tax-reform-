@@ -1,5 +1,8 @@
-// Standalone browser-safe CSV preview module. No external imports or network.
-// Universal Payroll Connect: provider-neutral, offline prototype. No network or credentials.
+// Browser-only standalone parser. Keep in parity with src/payrollcheck/aggregate-csv.mjs and universal-connect.mjs.
+// Fabricated aggregate samples only; no network or real payroll uploads.
+const date=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&!Number.isNaN(Date.parse(s))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s;
+function normalizePayrollSummary(input){
+ const errors=[];
  if(!input||typeof input!=='object'||Array.isArray(input))return {status:'invalid',errors:['Expected payroll summary object'],data:null};
  const {companyId,periodStart,periodEnd,grossPay,employeeCount,jurisdictions}=input;
  if(typeof companyId!=='string'||!companyId.trim())errors.push('Missing company ID');
@@ -18,16 +21,29 @@ export const REQUIRED_COLUMNS=Object.freeze(['companyId','periodStart','periodEn
 const MAX_BYTES=64*1024;
 function parseRows(csv){
  if(typeof csv!=='string'||new TextEncoder().encode(csv).length>MAX_BYTES)throw new Error('CSV must be text under 64 KiB');
- const rows=[];let row=[],field='',quoted=false;
+ const rows=[];let row=[],field='',state='start';
  for(let i=0;i<csv.length;i++){
   const c=csv[i];
-  if(quoted){if(c==='"'&&csv[i+1]==='"'){field+='"';i++}else if(c==='"')quoted=false;else field+=c}
-  else if(c==='"'){if(field!=='')throw new Error('Unexpected quote');quoted=true}
-  else if(c===','){row.push(field);field=''}
-  else if(c==='\n'){row.push(field.replace(/\r$/,''));rows.push(row);row=[];field=''}
-  else if(c==='\r'&&csv[i+1]==='\n'){}else field+=c;
+  if(state==='quoted'){
+   if(c==='"'&&csv[i+1]==='"'){field+='"';i++}
+   else if(c==='"')state='closed';
+   else if(c==='\n'||c==='\r')throw new Error('Multiline CSV fields are not supported');
+   else field+=c;
+  }else if(state==='closed'){
+   if(c===','){row.push(field);field='';state='start'}
+   else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';state='start'}
+   else if(c==='\r'&&csv[i+1]==='\n'){row.push(field);rows.push(row);row=[];field='';state='start';i++}
+   else throw new Error('Unexpected character after quoted field');
+  }else if(c==='"'){
+   if(state!=='start')throw new Error('Unexpected quote');
+   state='quoted';
+  }else if(c===','){row.push(field);field='';state='start'}
+  else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';state='start'}
+  else if(c==='\r'&&csv[i+1]==='\n'){row.push(field);rows.push(row);row=[];field='';state='start';i++}
+  else if(c==='\r')throw new Error('Unexpected carriage return');
+  else{field+=c;state='plain'}
  }
- if(quoted)throw new Error('Unclosed quote');
+ if(state==='quoted')throw new Error('Unclosed quote');
  if(field!==''||row.length){row.push(field);rows.push(row)}
  return rows;
 }
