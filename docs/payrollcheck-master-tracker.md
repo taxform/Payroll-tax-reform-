@@ -162,3 +162,10 @@
 - Wrapped trusted-record authorization in a fail-closed error boundary so unexpected record adapter exceptions cannot expose internal exception text (commit `0b20070`).
 - Added regression tests for a throwing trusted-record getter and malformed membership roles (commit `fb88e87`). Latest CI pending.
 - This remains a non-cryptographic, in-memory authorization prototype; no real OIDC, database, server endpoint or payroll processing is deployed.
+
+## Parameterized PostgreSQL loader scaffold — 2026-11-16
+- Confirmed previous fail-closed authorization CI success (run 43807834687).
+- Added a **server-only, unconnected** parameterized SQL record loader requiring injected query and trusted UUID-to-prototype-ID mapping functions (commits `949dcfe`, `8cd3784`).
+- Added required requester metadata to the **unapplied** SQL draft (commit `bbfa6f2`).
+- Added fake-query tests for parameterization, consent field mapping, missing reports and malformed inputs (commit `039ff82`). CI pending.
+- This is not a real PostgreSQL connection, transaction, RLS test, identity integration, or production endpoint. The schema remains unreviewed; live data remains prohibited.
