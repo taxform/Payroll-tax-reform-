@@ -1,20 +1,25 @@
-// Fictional demonstration only. No network, user input, storage, or real payroll data.
-const demo=Object.freeze([
- {client:'Example Retail LLC',findings:[{label:'Gross payroll increased 30%',priority:'Review'},{label:'Reported work states changed',priority:'Review'},{label:'Employee count changed',priority:'Info'}]},
- {client:'Sample Services Co.',findings:[{label:'Gross payroll increased 28%',priority:'Review'},{label:'Employee count changed',priority:'Info'}]},
- {client:'Demo Workshop Inc.',findings:[{label:'Reported work states changed',priority:'Review'}]}
-]);
+// Fictional demo fixture is checked against the actual X-Ray engine in CI.
+// Static same-origin GET only. No uploads, account data, or external providers.
 const container=document.querySelector('[data-xray-demo]');
 if(container){
- const isFirm=container.dataset.xrayDemo==='accounting';
- const heading=document.createElement('h2');heading.textContent=isFirm?'Payroll X-Ray™ sample client queue':'Payroll X-Ray™ sample findings';container.append(heading);
- const intro=document.createElement('p');intro.textContent='Fabricated demonstration data only. These are change indicators, not confirmed payroll errors or compliance findings.';container.append(intro);
- const list=document.createElement('ul');
- for(const client of (isFirm?demo:[demo[0]])){
-  const item=document.createElement('li');
-  const label=document.createElement('strong');label.textContent=client.client+': ';
-  item.append(label,document.createTextNode(client.findings.map(f=>f.label+' ('+f.priority+')').join('; ')));
-  list.append(item);
- }
- container.append(list);
+ const title=document.createElement('h2');
+ title.textContent=container.dataset.xrayDemo==='accounting'?'Payroll X-Ray™ sample client queue':'Payroll X-Ray™ sample findings';
+ container.append(title);
+ const notice=document.createElement('p');notice.textContent='Synthetic examples only. Flags are not confirmed payroll errors or compliance findings.';container.append(notice);
+ const status=document.createElement('p');status.setAttribute('role','status');status.textContent='Loading sample data…';container.append(status);
+ try{
+  const response=await fetch('../xray-fixtures.json',{credentials:'omit',cache:'no-store'});
+  if(!response.ok)throw new Error('Demo fixture unavailable');
+  const fixture=await response.json();
+  if(!Array.isArray(fixture.clients)||fixture.clients.length!==3)throw new Error('Invalid demo fixture');
+  const list=document.createElement('ul');
+  const clients=container.dataset.xrayDemo==='accounting'?fixture.clients:fixture.clients.slice(0,1);
+  const labels={GROSS_PAY_INCREASE:'Gross payroll increase',JURISDICTION_CHANGE:'Reported work-state change',EMPLOYEE_COUNT_CHANGE:'Employee count change',NO_BASELINE:'No prior gross-pay baseline'};
+  for(const client of clients){
+   const li=document.createElement('li');const name=document.createElement('strong');name.textContent=client.name+': ';
+   li.append(name,document.createTextNode(client.expectedCodes.map(code=>labels[code]??'Unknown change').join('; ')||'No sample findings'));
+   list.append(li);
+  }
+  container.append(list);status.textContent='Sample data loaded; no live payroll connections.';
+ }catch{status.textContent='Sample findings are temporarily unavailable. No payroll data was accessed.'}
 }
