@@ -296,3 +296,8 @@
 - Isolated PostgreSQL workflow `43811553211` failed with duplicate tenant primary key: new isolation test reused tenant IDs persisted by earlier consent-constraint test.
 - Updated synthetic tenant UUIDs in `tests/sql/payrollcheck-report-rls-isolation.sql` (commit `469bf45`); new PostgreSQL run `43811699902` started and was in progress at checkpoint.
 - Existing smoke tests passed. This fix only changes synthetic fixture data; Supabase development database remains untouched.
+
+## Correlated RLS policy defect found in CI — 2026-11-16
+- PostgreSQL run `43811699902` failed the positive accounting-firm access assertion. Investigation identified unqualified `business_tenant_id` inside a nested client-grant EXISTS; PostgreSQL can bind it to the inner grant table, making the intended report ownership comparison tautological.
+- Qualified as `g.business_tenant_id = payrollcheck.reports.business_tenant_id` in disposable fixture (commit `20eb7d3`). CI rerun `43811831763` was in progress at checkpoint.
+- No live Supabase policy changes. This illustrates why positive AND negative tenant-isolation tests are mandatory before authorization deployment.
