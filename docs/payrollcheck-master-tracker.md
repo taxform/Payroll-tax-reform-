@@ -291,3 +291,8 @@
 - Updated disposable PostgreSQL CI workflow (`1c4b36f`) to run fixture and tests. CI was in progress at tracker update.
 - Fixture uses a custom PostgreSQL setting for synthetic identity and intentionally broad supporting-table SELECT policies. **Not secure for direct SQL clients and never to be applied to Supabase dev/production.**
 - Remaining: review trustworthy transaction-bound identity, least-privilege supporting-table access, RLS policies, actual verified Supabase Auth and tenant-consent lifecycle, then independently test before dev migration.
+
+## Disposable PostgreSQL CI repair — 2026-11-16
+- Isolated PostgreSQL workflow `43811553211` failed with duplicate tenant primary key: new isolation test reused tenant IDs persisted by earlier consent-constraint test.
+- Updated synthetic tenant UUIDs in `tests/sql/payrollcheck-report-rls-isolation.sql` (commit `469bf45`); new PostgreSQL run `43811699902` started and was in progress at checkpoint.
+- Existing smoke tests passed. This fix only changes synthetic fixture data; Supabase development database remains untouched.
