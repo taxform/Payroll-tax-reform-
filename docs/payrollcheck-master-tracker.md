@@ -175,3 +175,9 @@
 - Hardened server-only fake-query adapter to reject unexpected report status, mismatched SQL row identities, malformed grant metadata and tenant UUID-to-ID collisions (commit `5424008`).
 - Added regression tests for invalid SQL rows and tenant mapping collisions (commit `b9bda0f`). Latest CI pending.
 - No live PostgreSQL instance, actual transaction, OIDC provider, runtime RLS verification or real payroll data. Integration remains unconnected.
+
+## SQL consent scope consistency — 2026-11-16
+- Verified previous SQL row provenance CI success (run 43808039273).
+- Tightened unconnected PostgreSQL loader to reject duplicate or excessive consent scopes, matching pure consent model and draft SQL expectations (commit `00e6689`).
+- Added fake-query negative tests (commit `21028bf`); latest CI pending.
+- Still no managed database, OIDC integration, RLS runtime test, live deployment or customer payroll data.
