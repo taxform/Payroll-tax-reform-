@@ -31,7 +31,7 @@ CREATE POLICY fixture_reports_read ON payrollcheck.reports
        AND EXISTS (
         SELECT 1 FROM payrollcheck.client_grants g
         WHERE g.firm_tenant_id=m.tenant_id
-         AND g.business_tenant_id=business_tenant_id
+         AND g.business_tenant_id=payrollcheck.reports.business_tenant_id
          AND g.status='active' AND 'view_report'=ANY(g.scopes)
        ))
     )
