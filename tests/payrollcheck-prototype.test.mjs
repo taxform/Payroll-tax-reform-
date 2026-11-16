@@ -29,6 +29,6 @@ test('readiness audit retains 15 screening questions and non-certification langu
 test('pre-payroll review retains 8 checklist items and no approval claims',()=>{
  assert.match(prepay,/No external validation was performed/);
  assert.match(prepay,/Not a payroll approval/);
- assert.match(prepay,/No payroll-provider integration/);
+ assert.match(prepay,/does not connect to payroll providers/);
  assert.match(prepay,/items\.length/);
 });
