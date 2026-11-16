@@ -121,3 +121,8 @@
 - Confirmed prior identity adapter CI passed (GitHub Actions run 43806979591).
 - Hardened already-verified claims mapping against malformed/duplicate audiences, future not-before and authentication times, and inconsistent issued/expiry timestamps (commits `4d3104d`, `8ffac0b`; CI pending).
 - This is **not JWT verification or real login**. A production OIDC middleware must verify signatures, issuer/audience, algorithm, keys, expiry, token type, session revocation and MFA before using these helpers. Manual browser QA and database integration remain open.
+
+## Authenticated-boundary prototype — 2026-11-15
+- Added an async composition boundary for already-verified identity claims and trusted report/membership/grant records, with fail-closed lookup tests (commits for `src/payrollcheck/authenticated-report-boundary.mjs` and `de1b7f9`).
+- This is not an HTTP endpoint or cryptographic token verifier. The callback must be implemented against trusted server-side storage; no production session or database service exists.
+- Next: verify CI, select actual identity/backend/database stack, implement verified middleware and transaction-safe data access, and run manual browser QA.
