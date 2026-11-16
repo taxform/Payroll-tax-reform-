@@ -3,6 +3,7 @@
 -- trusted transaction controller. PostgreSQL custom settings are spoofable by
 -- any role with SQL execution: this is NOT a safe direct-client auth design.
 BEGIN;
+ALTER TABLE payrollcheck.memberships ADD COLUMN auth_user_id uuid;
 CREATE ROLE payrollcheck_rls_fixture NOLOGIN NOBYPASSRLS;
 GRANT USAGE ON SCHEMA payrollcheck TO payrollcheck_rls_fixture;
 GRANT SELECT ON payrollcheck.tenants,payrollcheck.memberships,
