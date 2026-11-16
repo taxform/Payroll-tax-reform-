@@ -266,3 +266,8 @@
 - Added `src/payrollcheck/supabase-session-membership.mjs` (`34e47c9`) and synthetic unit tests `tests/payrollcheck-supabase-session-membership.test.mjs` (`d060642`).
 - Fail-closed composition expects server-trusted `getVerifiedUser`, independent `requireAal2` and tenant-scoped membership query; rejects anonymous/unconfirmed users and missing MFA.
 - **Important:** callbacks are not implemented against a real Supabase Auth service; no session token signature verification or live RLS tenant access is proven. Tests use synthetic callbacks. No production deployment.
+
+## Supabase Auth client adapter — 2026-11-16
+- Added `src/payrollcheck/supabase-auth-checks.mjs` commit `b9ab803` and synthetic tests `tests/payrollcheck-supabase-auth-checks.test.mjs` commit `f4bb3b0`.
+- Uses injected trusted Supabase client's `auth.getUser(token)` and `auth.getClaims(token)` and enforces matching user ID, `aal2`, authenticated role, nonanonymous identity and UUID session ID; rejects failures.
+- No actual client instantiation, live token, credential, user enrollment, session cookie, or tenant-scoped database integration yet. CI to be verified; no production deployment.
