@@ -33,3 +33,17 @@ test('does not query memberships or grants for absent reports',async()=>{
  assert.equal(count,1);
  assert.deepEqual(result,{memberships:[],reports:[],grants:[]});
 });
+
+test('rejects a tenant mapping collision across distinct database UUIDs',async()=>{
+ await assert.rejects(()=>load({...options(),resolveTenantId:async()=> 'sameTenant'}),/invalid_tenant_mapping/);
+});
+test('rejects inconsistent SQL rows instead of trusting query adapter output',async()=>{
+ const cases=[
+  {match:'payrollcheck.reports',rows:[{report_id:reportUuid,business_tenant_id:businessUuid,client_id:'clientA',status:'unknown'}]},
+  {match:'payrollcheck.memberships',rows:[{subject_id:'other',tenant_id:firmUuid,role:'accounting_reviewer',active:true}]},
+  {match:'payrollcheck.client_grants',rows:[{firm_tenant_id:firmUuid,business_tenant_id:businessUuid,scopes:['view_report'],status:'active',requested_by_subject:'admin1',approved_by_subject:'owner1',revoked_by_subject:'attacker'}]}
+ ];
+ for(const scenario of cases){
+  await assert.rejects(()=>load({...options(),query:async(sql,params)=>sql.includes(scenario.match)?{rows:scenario.rows}:query(sql,params)}),/invalid_.*_row/);
+ }
+});
