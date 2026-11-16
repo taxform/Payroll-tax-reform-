@@ -192,3 +192,9 @@
 - Added a server-only read-only repeatable-read transaction wrapper with rollback and connection release handling (commit `1ba80cd`).
 - Added fake-pool tests for commit, rollback, begin failure and malformed client; corrected a test assertion (commits `e4d0b44`, `0407fe2`). Latest CI pending.
 - No actual PostgreSQL server or RLS runtime test. This wrapper does not confer tenant isolation and must not be used with real payroll data before reviewed policies and independent security verification.
+
+## Transaction-backed authorization composition — 2026-11-16
+- Confirmed read-only transaction wrapper CI passed (run 43808436688).
+- Added a server-only composition module wiring preverified identity, read-only transaction, parameterized record loader and report authorization together (commit `a24ed69`).
+- Added fake-pool tests covering valid scoped firm access, expired identity before connection, missing grant, rollback and connection release on query failure (commit `cf8d7e0`). Latest CI pending.
+- This is **not** an HTTP endpoint, cryptographic token verifier, real PostgreSQL connection or runtime RLS test. Real data and production deployment remain prohibited.
