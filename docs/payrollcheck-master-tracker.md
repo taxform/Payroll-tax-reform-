@@ -238,3 +238,9 @@
 - Project `payrollcheck-360-dev`, ref `izqzclahjijkhyxvhtif`, URL `https://izqzclahjijkhyxvhtif.supabase.co`, region `us-east-1`, ACTIVE_HEALTHY.
 - New project public schema contains no tables at inspection. Existing project `First` not changed.
 - No PayrollCheck schema applied, login enabled, production deployed or customer data imported. Next: review Supabase Auth docs and create/test dev-only deny-by-default schema with owner authorization for changes.
+
+## Dedicated Supabase development schema applied — 2026-11-16
+- Applied `docs/sql/payrollcheck-deny-by-default-schema.sql` to project `izqzclahjijkhyxvhtif` using migration `payrollcheck_dev_deny_by_default_schema`. Migration returned success.
+- Verified five empty tables in private `payrollcheck` schema: tenants, memberships, reports, client_grants, access_audit.
+- Independently queried pg_catalog: all five have RLS enabled and forced, with zero policies. Supabase advisor reports expected informational `rls_enabled_no_policy` notices, not an authorization bypass.
+- No authentication users, customer data, API access grants, production deployment, payment integration, or real payroll ingestion. Next: design and test explicit RLS policies and secure identity binding, without loosening access prematurely.
