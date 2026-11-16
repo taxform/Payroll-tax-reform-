@@ -261,3 +261,8 @@
 - Adapter requires trusted, verified Supabase UUID and tenant UUID, parameterized SQL, exactly one active membership, and allowed role; fails closed for missing, duplicate, malformed or mismatched records.
 - This is **not** a live login, RLS policy, actual database connection, JWT verification, or authorization endpoint. Current dev database intentionally denies all application access; do not use a bypass-RLS connection as a workaround.
 - Previous CI on `2f99b61` passed; new commit tests pending at time of update.
+
+## Supabase session-to-membership scaffold — 2026-11-16
+- Added `src/payrollcheck/supabase-session-membership.mjs` (`34e47c9`) and synthetic unit tests `tests/payrollcheck-supabase-session-membership.test.mjs` (`d060642`).
+- Fail-closed composition expects server-trusted `getVerifiedUser`, independent `requireAal2` and tenant-scoped membership query; rejects anonymous/unconfirmed users and missing MFA.
+- **Important:** callbacks are not implemented against a real Supabase Auth service; no session token signature verification or live RLS tenant access is proven. Tests use synthetic callbacks. No production deployment.
