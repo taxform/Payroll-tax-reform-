@@ -116,3 +116,8 @@
 - Verified static schema guard CI passed (GitHub Actions run 43806902386).
 - Added and hardened a fail-closed mapping adapter for *already cryptographically verified* OIDC claims with negative tests (commits `5dfc7a6`, `3a9c147`, `ad63b9f`). Latest CI pending.
 - No actual identity provider, JWT signature verification, MFA, secure session service or database connection exists. Do not treat this adapter as authentication.
+
+## OIDC claim hardening session — 2026-11-15
+- Confirmed prior identity adapter CI passed (GitHub Actions run 43806979591).
+- Hardened already-verified claims mapping against malformed/duplicate audiences, future not-before and authentication times, and inconsistent issued/expiry timestamps (commits `4d3104d`, `8ffac0b`; CI pending).
+- This is **not JWT verification or real login**. A production OIDC middleware must verify signatures, issuer/audience, algorithm, keys, expiry, token type, session revocation and MFA before using these helpers. Manual browser QA and database integration remain open.
