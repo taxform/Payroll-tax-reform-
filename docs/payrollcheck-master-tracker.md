@@ -169,3 +169,9 @@
 - Added required requester metadata to the **unapplied** SQL draft (commit `bbfa6f2`).
 - Added fake-query tests for parameterization, consent field mapping, missing reports and malformed inputs (commit `039ff82`). CI pending.
 - This is not a real PostgreSQL connection, transaction, RLS test, identity integration, or production endpoint. The schema remains unreviewed; live data remains prohibited.
+
+## PostgreSQL loader provenance validation — 2026-11-16
+- Confirmed previous loader scaffold CI passed (run 43807946321).
+- Hardened server-only fake-query adapter to reject unexpected report status, mismatched SQL row identities, malformed grant metadata and tenant UUID-to-ID collisions (commit `5424008`).
+- Added regression tests for invalid SQL rows and tenant mapping collisions (commit `b9bda0f`). Latest CI pending.
+- No live PostgreSQL instance, actual transaction, OIDC provider, runtime RLS verification or real payroll data. Integration remains unconnected.
