@@ -186,3 +186,9 @@
 - Verified previous SQL consent-scope tests passed (run 43808152398).
 - Added fabricated-record end-to-end Node integration tests for the PostgreSQL loader wired to authenticated report authorization, including valid firm consent, revoked/missing consent, ungranted actions, mismatched membership, expired claims and query failures (commit `cd25d2a`).
 - CI pending. These are mock SQL rows, not a running PostgreSQL server; token signatures, RLS, transactions, live identity, and browser behavior remain untested. No production deployment.
+
+## Read-only PostgreSQL transaction scaffold — 2026-11-16
+- Verified mocked SQL-to-authorization integration CI success (run 43808352571).
+- Added a server-only read-only repeatable-read transaction wrapper with rollback and connection release handling (commit `1ba80cd`).
+- Added fake-pool tests for commit, rollback, begin failure and malformed client; corrected a test assertion (commits `e4d0b44`, `0407fe2`). Latest CI pending.
+- No actual PostgreSQL server or RLS runtime test. This wrapper does not confer tenant isolation and must not be used with real payroll data before reviewed policies and independent security verification.
