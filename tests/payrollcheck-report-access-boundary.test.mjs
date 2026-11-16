@@ -26,3 +26,10 @@ test('accounting reviewer requires active scoped business consent',()=>{
  const revoked=revokeClientGrant({grant:approved,actor:{userId:'owner',tenantId:'businessA',role:'business_owner',active:true}}).grant;
  assert.equal(check(input({membership:firm,grant:revoked})).allowed,false);
 });
+
+test('direct boundary rejects malformed membership role without throwing',()=>{
+ for(const role of [42,{},[],true,null]){
+  const decision=check(input({membership:{...business,role}}));
+  assert.equal(decision.allowed,false);
+ }
+});
