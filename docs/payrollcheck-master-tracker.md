@@ -150,3 +150,9 @@
 - Hardened the direct report access boundary to handle non-string role values without throwing (commit `619b1c2`).
 - Added direct-boundary regression tests for malformed roles (commit `05d7021`).
 - Latest CI pending; this is still a pure prototype without production OIDC, database or HTTP route.
+
+## Database schema contract alignment — 2026-11-16
+- Previous direct-boundary hardening CI passed (run 43807568227).
+- Updated **unapplied draft** PostgreSQL schema to include a report client identifier, consent action scopes, and a partial unique index preventing multiple simultaneously active grants for the same firm/business pair (commit `25eecd5`).
+- Added static schema guard regression tests for the above constraints (commit `971035f`). Latest CI pending.
+- Schema remains design-only and unreviewed: no database instance, real OIDC integration, migration execution or PostgreSQL runtime tests. Database UUID identifiers still require a reviewed mapping to current prototype IDs.
