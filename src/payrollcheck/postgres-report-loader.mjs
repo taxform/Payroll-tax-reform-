@@ -4,8 +4,8 @@
 const id=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x);
 const uuid=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
 const requiredRows=(result,max)=>{if(!result||!Array.isArray(result.rows)||result.rows.length>max)throw Error('invalid_query_result');return result.rows;};
-export async function loadReportAuthorizationRecords({query,userId,reportId,resolveReportUuid}={}){
- if(typeof query!=='function'||!id(userId)||!id(reportId)||typeof resolveReportUuid!=='function')throw Error('invalid_loader_config');
+export async function loadReportAuthorizationRecords({query,userId,reportId,resolveReportUuid,resolveTenantId}={}){
+ if(typeof query!=='function'||!id(userId)||!id(reportId)||typeof resolveReportUuid!=='function'||typeof resolveTenantId!=='function')throw Error('invalid_loader_config');
  // Current prototype report IDs are not UUIDs. Only a trusted server-side mapping may resolve them.
  const reportUuid=await resolveReportUuid(reportId);
  if(!uuid(reportUuid))throw Error('invalid_report_mapping');
@@ -17,10 +17,16 @@ export async function loadReportAuthorizationRecords({query,userId,reportId,reso
  const memberships=requiredRows(await query(
   'SELECT subject_id, tenant_id, role, active FROM payrollcheck.memberships WHERE subject_id=$1 AND active=true LIMIT 501',[userId]),501);
  const grants=requiredRows(await query(
-  "SELECT firm_tenant_id, business_tenant_id, scopes, status, approved_by_subject, approved_at, revoked_at FROM payrollcheck.client_grants WHERE business_tenant_id=$1 AND status='active' LIMIT 501",[report.business_tenant_id]),501);
+  "SELECT firm_tenant_id, business_tenant_id, scopes, status, requested_by_subject, approved_by_subject, approved_at, revoked_by_subject, revoked_at FROM payrollcheck.client_grants WHERE business_tenant_id=$1 AND status='active' LIMIT 501",[report.business_tenant_id]),501);
+ const tenantIds=new Map();
+ for(const tenantUuid of new Set([report.business_tenant_id,...memberships.map(m=>m.tenant_id),...grants.flatMap(g=>[g.firm_tenant_id,g.business_tenant_id])])){
+  const tenantId=await resolveTenantId(tenantUuid);
+  if(!id(tenantId))throw Error('invalid_tenant_mapping');
+  tenantIds.set(tenantUuid,tenantId);
+ }
  return {
-  reports:[{id:reportId,businessTenantId:report.business_tenant_id,clientId:report.client_id,active:report.status!=='archived'}],
-  memberships:memberships.map(m=>({userId:m.subject_id,tenantId:m.tenant_id,role:m.role,active:m.active})),
-  grants:grants.map(g=>({firmTenantId:g.firm_tenant_id,businessTenantId:g.business_tenant_id,scopes:g.scopes,status:g.status,approvedBy:g.approved_by_subject,approvedAt:g.approved_at,revokedAt:g.revoked_at}))
+  reports:[{id:reportId,businessTenantId:tenantIds.get(report.business_tenant_id),clientId:report.client_id,active:report.status!=='archived'}],
+  memberships:memberships.map(m=>({userId:m.subject_id,tenantId:tenantIds.get(m.tenant_id),role:m.role,active:m.active})),
+  grants:grants.map(g=>({firmTenantId:tenantIds.get(g.firm_tenant_id),businessTenantId:tenantIds.get(g.business_tenant_id),scopes:g.scopes,status:g.status,requestedBy:g.requested_by_subject,approvedBy:g.approved_by_subject,revokedBy:g.revoked_by_subject}))
  };
 }
