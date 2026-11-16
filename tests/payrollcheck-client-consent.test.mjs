@@ -30,3 +30,12 @@ test('malformed grants, invalid scopes, impersonation and inactive actors fail c
  assert.equal(approveClientGrant({grant:request().grant,actor:{...owner,active:false}}).ok,false);
  assert.equal(grantAllows({grant:{...request().grant,status:'active',scopes:['delete']},firmTenantId:'firm1',businessTenantId:'business1',action:'delete'}),false);
 });
+
+test('forged active approval metadata cannot authorize access',()=>{
+ const pending=request().grant;
+ for(const g of [{...pending,status:'active'},{...pending,status:'active',approvedBy:''},{...pending,status:'active',approvedBy:'owner1',revokedBy:'owner1'}]){
+  assert.equal(grantAllows({grant:g,firmTenantId:'firm1',businessTenantId:'business1',action:'view_report'}),false);
+ }
+ const active=approveClientGrant({grant:pending,actor:owner}).grant;
+ assert.equal(grantAllows({grant:active,firmTenantId:'firm1',businessTenantId:'business1',action:'view_report'}),true);
+});
