@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {generateKeyPairSync, createSign} from 'node:crypto';
-import {createSupabaseJwksVerifier} from './supabase-jwks-verifier.mjs';
+import {createSupabaseJwksVerifier} from '../src/payrollcheck/supabase-jwks-verifier.mjs';
 
 const ISSUER = 'https://demo-project.supabase.co/auth/v1';
 const AUDIENCE = 'authenticated';
