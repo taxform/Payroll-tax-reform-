@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Official federal source inventory for future human-reviewed rule extraction; NOT executable compliance rules",
+  "coverageStatus": "research_only",
+  "sources": [
+    {
+      "id": "IRS-PUB15-2026",
+      "agency": "Internal Revenue Service",
+      "title": "Publication 15 (2026), Employer's Tax Guide",
+      "url": "https://www.irs.gov/publications/p15",
+      "taxYear": 2026,
+      "categories": ["federal_income_withholding", "employment_tax_deposits", "federal_reporting"],
+      "reviewStatus": "source_identified",
+      "notes": "Contains exceptions and deposit schedule rules. Never infer an employer's schedule from pay frequency."
+    },
+    {
+      "id": "IRS-EMPLOYMENT-DUE-DATES",
+      "agency": "Internal Revenue Service",
+      "title": "Employment tax due dates",
+      "url": "https://www.irs.gov/businesses/small-businesses-self-employed/employment-tax-due-dates",
+      "taxYear": null,
+      "categories": ["employment_tax_deposits", "federal_reporting"],
+      "reviewStatus": "source_identified",
+      "notes": "Deadline logic needs deposit schedule, lookback, holidays, and special exceptions."
+    },
+    {
+      "id": "IRS-DEPOSIT-REPORT",
+      "agency": "Internal Revenue Service",
+      "title": "Depositing and reporting employment taxes",
+      "url": "https://www.irs.gov/businesses/small-businesses-self-employed/depositing-and-reporting-employment-taxes",
+      "taxYear": null,
+      "categories": ["employment_tax_deposits", "federal_reporting"],
+      "reviewStatus": "source_identified",
+      "notes": "Source identification does not establish tax compliance or correct calculation."
+    }
+  ]
+}

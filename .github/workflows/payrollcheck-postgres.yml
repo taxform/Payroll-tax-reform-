@@ -1,0 +1,49 @@
+name: PayrollCheck isolated PostgreSQL schema test
+on:
+  push:
+    branches: [feature/payrollcheck-free-audit]
+    paths:
+      - 'docs/sql/payrollcheck-deny-by-default-schema.sql'
+      - 'tests/sql/payrollcheck-rls-smoke.sql'
+      - 'tests/sql/payrollcheck-consent-constraints.sql'
+      - 'tests/sql/payrollcheck-report-rls-fixture.sql'
+      - 'tests/sql/payrollcheck-report-rls-isolation.sql'
+      - '.github/workflows/payrollcheck-postgres.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  postgres-rls:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: payrollcheck_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d payrollcheck_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: local-test-only
+      PGDATABASE: payrollcheck_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply draft schema to disposable database
+        run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-deny-by-default-schema.sql
+      - name: Verify RLS denies an otherwise granted unprivileged role
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-rls-smoke.sql
+      - name: Verify consent constraints in disposable database
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-consent-constraints.sql
+
+      - name: Install isolated tenant RLS fixture (not for deployment)
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-report-rls-fixture.sql
+      - name: Test business and firm tenant isolation and grant revocation
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-report-rls-isolation.sql

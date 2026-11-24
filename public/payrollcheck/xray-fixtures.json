@@ -1,0 +1,88 @@
+{
+  "clients": [
+    {
+      "clientKey": "retail",
+      "name": "Example Retail LLC",
+      "previous": {
+        "companyId": "retail",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-15",
+        "grossPay": "1000.00",
+        "employeeCount": 2,
+        "jurisdictions": [
+          "NY"
+        ]
+      },
+      "current": {
+        "companyId": "retail",
+        "periodStart": "2026-11-01",
+        "periodEnd": "2026-11-15",
+        "grossPay": "1300.00",
+        "employeeCount": 3,
+        "jurisdictions": [
+          "NY",
+          "PA"
+        ]
+      },
+      "expectedCodes": [
+        "GROSS_PAY_INCREASE",
+        "JURISDICTION_CHANGE",
+        "EMPLOYEE_COUNT_CHANGE"
+      ]
+    },
+    {
+      "clientKey": "services",
+      "name": "Sample Services Co.",
+      "previous": {
+        "companyId": "services",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-15",
+        "grossPay": "2000.00",
+        "employeeCount": 5,
+        "jurisdictions": [
+          "NY"
+        ]
+      },
+      "current": {
+        "companyId": "services",
+        "periodStart": "2026-11-01",
+        "periodEnd": "2026-11-15",
+        "grossPay": "2600.00",
+        "employeeCount": 5,
+        "jurisdictions": [
+          "NY"
+        ]
+      },
+      "expectedCodes": [
+        "GROSS_PAY_INCREASE"
+      ]
+    },
+    {
+      "clientKey": "workshop",
+      "name": "Demo Workshop Inc.",
+      "previous": {
+        "companyId": "workshop",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-15",
+        "grossPay": "3000.00",
+        "employeeCount": 4,
+        "jurisdictions": [
+          "NY"
+        ]
+      },
+      "current": {
+        "companyId": "workshop",
+        "periodStart": "2026-11-01",
+        "periodEnd": "2026-11-15",
+        "grossPay": "3000.00",
+        "employeeCount": 4,
+        "jurisdictions": [
+          "PA"
+        ]
+      },
+      "expectedCodes": [
+        "JURISDICTION_CHANGE"
+      ]
+    }
+  ]
+}
