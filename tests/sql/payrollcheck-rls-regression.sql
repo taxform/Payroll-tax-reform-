@@ -41,6 +41,11 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'payrollcheck_app' AND rolbypassrls = false) THEN
     RAISE EXCEPTION 'payrollcheck_app role missing or BYPASSRLS';
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace ns ON ns.oid = p.pronamespace
+    WHERE ns.nspname = 'payrollcheck' AND p.proname = 'owned_business_tenant_ids'
+    AND p.prosecdef = true) THEN
+    RAISE EXCEPTION 'owned_business_tenant_ids missing or not SECURITY DEFINER';
+  END IF;
 END $$;
 
 -- The deny-by-default schema has no auth_user_id column; the
