@@ -615,6 +615,11 @@ export function createPayrollcheckAuth({
         if (layer.verifyCsrf(sessionId, csrfToken) !== true) {
           return { status: 403, reason: 'csrf_failed' };
         }
+        // The sessions-table RLS policy hides the row unless the
+        // presented session id is set as the RLS identity, so set
+        // it before revoke(): otherwise the DELETE matches zero
+        // rows and the session stays live until its 12h expiry.
+        await setRlsIdentity({ query, sessionId });
         const revoked = await layer.revoke(sessionId);
         if (revoked !== true) {
           // The session row could not be deleted: do NOT clear the
@@ -694,6 +699,17 @@ export function createPayrollcheckAuth({
       outcome = await withTransaction(async ({ query }) => {
         const store = sessionStoreFactory({ query });
         const layer = sessionLayerFactory({ store });
+        // The sessions-table RLS policy hides a row unless
+        // payrollcheck.current_session_id matches it, so set the
+        // presented session id BEFORE load(): with no identity set
+        // the SELECT returns zero rows and every signed-in read
+        // fails as unknown_session. No id presented: skip the call
+        // (setRlsIdentity throws when given nothing) and let load()
+        // return no_session as before.
+        const presentedSessionId = layer.parseSessionId(cookieHeader);
+        if (presentedSessionId) {
+          await setRlsIdentity({ query, sessionId: presentedSessionId });
+        }
         const loaded = await layer.load(cookieHeader);
         if (!loaded || loaded.ok !== true) {
           const reason =

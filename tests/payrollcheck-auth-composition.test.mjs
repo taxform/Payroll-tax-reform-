@@ -1143,3 +1143,145 @@ test('requestRecovery: an invalid email returns 400', async () => {
   assert.equal(res.status, 400);
   assert.equal(res.body.error, 'invalid_request');
 });
+
+// ---------------------------------------------------------------------
+// readReport / logout — session RLS identity before the session load
+// (step 4b). The sessions-table RLS policy hides a row unless
+// payrollcheck.current_session_id matches it, so the composition must
+// set the presented session id BEFORE layer.load() / layer.revoke().
+// The store below mirrors that policy: reads and deletes see a row
+// only while the session-id identity matches it; writes (issue) are
+// ungated, exactly as the INSERT policy allows them.
+// ---------------------------------------------------------------------
+function makeRlsMirroringDeps(events) {
+  // `events` records, in order, every setRlsIdentity call and every
+  // session-layer load/revoke, so tests can assert identity-before-load.
+  let currentSessionId = null;
+  return (deps) => {
+    const originalSetRlsIdentity = deps.setRlsIdentity;
+    deps.setRlsIdentity = async (args) => {
+      currentSessionId = args.sessionId ?? null;
+      events.push({ type: 'setRlsIdentity', sessionId: args.sessionId ?? null });
+      return originalSetRlsIdentity(args);
+    };
+    const originalStoreFactory = deps.sessionStoreFactory;
+    deps.sessionStoreFactory = () => {
+      const store = originalStoreFactory();
+      const visible = (row) =>
+        row &&
+        currentSessionId !== null &&
+        (currentSessionId === row.sessionId ||
+          currentSessionId === row.previousSessionId);
+      return {
+        ...store,
+        get: async (id) => {
+          const row = await store.get(id);
+          return visible(row) ? row : null;
+        },
+        getByPreviousSessionId: async (id) => {
+          const row = await store.getByPreviousSessionId(id);
+          return visible(row) ? row : null;
+        },
+        delete: async (id) => {
+          const row = await store.get(id);
+          // Mirrors the real DELETE policy matching zero rows: the
+          // row stays when no matching identity was set, and the
+          // caller (revoke) still reports success.
+          if (visible(row)) await store.delete(id);
+        },
+      };
+    };
+    const originalLayerFactory = deps.sessionLayerFactory;
+    deps.sessionLayerFactory = ({ store: s }) => {
+      const layer = originalLayerFactory({ store: s });
+      const originalLoad = layer.load;
+      const originalRevoke = layer.revoke;
+      return {
+        ...layer,
+        load: async (...args) => {
+          events.push({ type: 'load' });
+          return originalLoad(...args);
+        },
+        revoke: async (...args) => {
+          events.push({ type: 'revoke', sessionId: args[0] ?? null });
+          return originalRevoke(...args);
+        },
+      };
+    };
+  };
+}
+
+test('readReport: sets the presented session id as RLS identity BEFORE the session load', async () => {
+  const events = [];
+  const { composition, cookie, sessionId, csrfToken } = await loggedInOwner({
+    deps: makeRlsMirroringDeps(events),
+  });
+  const before = events.length;
+  const res = await composition.readReport({
+    cookieHeader: cookie,
+    csrfToken,
+    reportId: REPORT_A,
+    action: 'view_report',
+  });
+  const readEvents = events.slice(before);
+  const identityIndex = readEvents.findIndex(
+    (e) => e.type === 'setRlsIdentity' && e.sessionId === sessionId,
+  );
+  const loadIndex = readEvents.findIndex((e) => e.type === 'load');
+  assert.notEqual(identityIndex, -1, 'setRlsIdentity was called with the presented session id');
+  assert.notEqual(loadIndex, -1, 'the session was loaded');
+  assert.ok(identityIndex < loadIndex, 'the session-id identity must be set before the load');
+  assert.equal(readEvents[0].type, 'setRlsIdentity');
+  assert.equal(readEvents[0].sessionId, sessionId);
+  assert.equal(readEvents[1].type, 'load');
+  assert.equal(res.status, 200);
+});
+
+test('readReport: reads the report when the sessions table hides rows without session identity (RLS regression)', async () => {
+  const events = [];
+  const { composition, cookie, csrfToken, auditRows } = await loggedInOwner({
+    deps: makeRlsMirroringDeps(events),
+  });
+  const res = await composition.readReport({
+    cookieHeader: cookie,
+    csrfToken,
+    reportId: REPORT_A,
+    action: 'view_report',
+  });
+  // Without the fix this is 401 unknown_session: load() runs with no
+  // identity set, so the RLS-gated store returns no row.
+  assert.equal(res.status, 200);
+  assert.equal(res.body.ok, true);
+  assert.equal(res.body.report.report_id, REPORT_A);
+  assert.equal(auditRows.length, 1);
+  assert.equal(auditRows[0].outcome, 'allowed');
+});
+
+test('logout: revoking actually deletes the session row (identity set before revoke)', async () => {
+  const events = [];
+  const { composition, cookie, sessionId, csrfToken, store } = await loggedInOwner({
+    deps: makeRlsMirroringDeps(events),
+  });
+  assert.equal(store.rows.size, 1);
+  const before = events.length;
+  const res = await composition.logout({ cookieHeader: cookie, csrfToken });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.ok, true);
+  assert.equal(store.rows.size, 0, 'the session row must be gone, not live until expiry');
+  const logoutEvents = events.slice(before);
+  const identityIndex = logoutEvents.findIndex(
+    (e) => e.type === 'setRlsIdentity' && e.sessionId === sessionId,
+  );
+  const revokeIndex = logoutEvents.findIndex((e) => e.type === 'revoke');
+  assert.notEqual(identityIndex, -1, 'setRlsIdentity was called with the session id');
+  assert.notEqual(revokeIndex, -1, 'the session was revoked');
+  assert.ok(identityIndex < revokeIndex, 'the session-id identity must be set before the revoke');
+  // The revoked session no longer reads.
+  const after = await composition.readReport({
+    cookieHeader: cookie,
+    csrfToken,
+    reportId: REPORT_A,
+    action: 'view_report',
+  });
+  assert.equal(after.status, 401);
+});
