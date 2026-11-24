@@ -103,7 +103,9 @@ END $$;
 RESET ROLE;
 
 -- Check 2: business owner A reads exactly their own report, tenant,
--- membership row, grants (business side), audit row, and sessions.
+-- membership rows (owner + staff of tenant A — the owner branch of
+-- the memberships SELECT policy), grants (business side), audit row,
+-- and sessions.
 SET payrollcheck.current_subject_id = 'ownerA';
 SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
 SET ROLE payrollcheck_app;
@@ -112,7 +114,7 @@ DO $$ BEGIN
   RAISE NOTICE 'ownerA sees reports: %', (SELECT coalesce(array_agg(report_id ORDER BY report_id)::text, '<none>') FROM payrollcheck.reports);
   IF (SELECT array_agg(report_id ORDER BY report_id) FROM payrollcheck.reports) IS DISTINCT FROM ARRAY['50000000-0000-4000-8000-000000000001'::uuid] THEN RAISE EXCEPTION 'ownerA report isolation failed'; END IF;
   IF (SELECT array_agg(tenant_id ORDER BY tenant_id) FROM payrollcheck.tenants) IS DISTINCT FROM ARRAY['eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'::uuid] THEN RAISE EXCEPTION 'ownerA tenant isolation failed'; END IF;
-  IF (SELECT array_agg(subject_id ORDER BY subject_id) FROM payrollcheck.memberships) IS DISTINCT FROM ARRAY['ownerA'] THEN RAISE EXCEPTION 'ownerA membership isolation failed'; END IF;
+  IF (SELECT array_agg(subject_id ORDER BY subject_id) FROM payrollcheck.memberships) IS DISTINCT FROM ARRAY['ownerA','staffA'] THEN RAISE EXCEPTION 'ownerA membership isolation failed'; END IF;
   IF (SELECT count(*) FROM payrollcheck.client_grants) <> 3 THEN RAISE EXCEPTION 'ownerA grant visibility failed'; END IF;
   IF (SELECT count(*) FROM payrollcheck.access_audit) <> 1 THEN RAISE EXCEPTION 'ownerA audit isolation failed'; END IF;
   IF (SELECT count(*) FROM payrollcheck.sessions) <> 2 THEN RAISE EXCEPTION 'ownerA session isolation failed'; END IF;
@@ -284,8 +286,10 @@ END $$;
 
 -- Check 12: membership writes — an owner may provision, deactivate,
 -- and reactivate members of their own tenant, and nothing else.
--- (Verified as superuser: the new row is invisible to the owner via
--- SELECT, because the memberships read policy is own-rows-only.)
+-- (The new row IS visible to the owner via SELECT: the memberships
+-- read policy includes the owner's tenant members, which Postgres
+-- requires for the UPDATE below to find the row. The superuser check
+-- still verifies the provisioned row independently.)
 SET payrollcheck.current_subject_id = 'ownerA';
 SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
 SET ROLE payrollcheck_app;
