@@ -108,6 +108,16 @@ export function getAuthComposition() {
     max: 5,
     ssl: { rejectUnauthorized: false },
   });
+  // TEMPORARY DEBUG — revert once the staging login 503 is diagnosed.
+  // Logs only whether the connection string carries sslmode=no-verify,
+  // never the URL or any credential.
+  console.info(
+    JSON.stringify({
+      source: 'payrollcheck-auth',
+      event: 'pool_config',
+      sslNoVerify: databaseUrl.includes('sslmode=no-verify'),
+    }),
+  );
   pool.on('error', (error) => {
     console.error('payrollcheck pool error:', error instanceof Error ? error.message : 'unknown');
   });
