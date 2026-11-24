@@ -58,4 +58,3 @@ WHERE NOT EXISTS (
   SELECT 1 FROM pg_proc p JOIN pg_namespace ns ON ns.oid = p.pronamespace
   WHERE ns.nspname='payrollcheck' AND p.proname='is_business_owner_of' AND p.prosecdef
 );
-
