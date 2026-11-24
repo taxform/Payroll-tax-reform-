@@ -56,6 +56,8 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-rls-smoke.sql
       - name: Verify consent constraints in disposable database
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-consent-constraints.sql
+      - name: Add auth_user_id column (identity-link equivalent for disposable Postgres)
+        run: psql -X -v ON_ERROR_STOP=1 -c "ALTER TABLE payrollcheck.memberships ADD COLUMN IF NOT EXISTS auth_user_id uuid;"
       - name: Apply tenant-scoped RLS policies (M2 step 7)
         run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-rls-policies.sql
       - name: Test tenant isolation, grant lifecycle, and sessions RLS
