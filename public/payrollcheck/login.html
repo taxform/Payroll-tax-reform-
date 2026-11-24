@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>PayrollCheck 360 — Staging Login</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  .banner { background: #fff3cd; border: 1px solid #d9a400; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; }
+  .banner strong { display: block; margin-bottom: 0.25rem; }
+  section { border: 1px solid #ccc; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+  section[hidden] { display: none; }
+  label { display: block; margin: 0.5rem 0; }
+  input, select, button { font: inherit; padding: 0.4rem 0.6rem; }
+  input, select { width: 100%; box-sizing: border-box; }
+  button { cursor: pointer; margin-top: 0.5rem; }
+  .error { color: #a00; }
+  .ok { color: #060; }
+  pre { background: #f4f4f4; padding: 0.75rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .secret { font-family: monospace; font-size: 1.1rem; background: #f4f4f4; padding: 0.5rem; word-break: break-all; }
+  small { color: #555; }
+</style>
+</head>
+<body>
+<div class="banner">
+  <strong>STAGING ONLY — fabricated data</strong>
+  This page talks to the PayrollCheck 360 staging project
+  (payrollcheck-360-dev). Every report, tenant, and membership here is
+  fabricated test data. Never enter real payroll data, real employee
+  details, or a real client's records on this page.
+</div>
+
+<h1>PayrollCheck 360 — Staging Login</h1>
+
+<section id="login-section">
+  <h2>Sign in</h2>
+  <form id="login-form">
+    <label>Email <input type="email" name="email" required autocomplete="username"></label>
+    <label>Password <input type="password" name="password" required autocomplete="current-password"></label>
+    <button type="submit">Sign in</button>
+  </form>
+  <p><button type="button" id="forgot-button">Forgot password?</button></p>
+  <p id="login-message" role="status"></p>
+</section>
+
+<section id="mfa-section" hidden>
+  <h2>Two-factor code</h2>
+  <p>Enter the 6-digit code from your authenticator app.</p>
+  <form id="mfa-form">
+    <label id="factor-label" hidden>Factor
+      <select name="factorId" id="factor-select"></select>
+    </label>
+    <label>Code <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"></label>
+    <button type="submit">Verify</button>
+  </form>
+  <p id="mfa-message" role="status"></p>
+</section>
+
+<section id="enroll-section" hidden>
+  <h2>Set up two-factor authentication</h2>
+  <p>Your account has no authenticator yet. Scan the QR code or enter the
+  secret below into your authenticator app — the secret is shown
+  <strong>once</strong> and never stored. Then enter a code to finish.</p>
+  <div id="enroll-qr"></div>
+  <p>Secret: <span class="secret" id="enroll-secret"></span></p>
+  <form id="enroll-form">
+    <label>Code <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"></label>
+    <button type="submit">Verify and finish setup</button>
+  </form>
+  <p id="enroll-message" role="status"></p>
+</section>
+
+<section id="report-section" hidden>
+  <h2>Read a report (staging)</h2>
+  <p class="ok" id="session-status">Signed in.</p>
+  <form id="report-form">
+    <label>Report ID <input type="text" name="reportId" required placeholder="00000000-0000-0000-0000-000000000000"></label>
+    <label>Action
+      <select name="action">
+        <option value="view_report">view_report</option>
+        <option value="review_finding">review_finding</option>
+      </select>
+    </label>
+    <button type="submit">Read report</button>
+  </form>
+  <p><button type="button" id="logout-button">Sign out</button></p>
+  <p id="report-message" role="status"></p>
+  <pre id="report-output" hidden></pre>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  // The pending MFA blob is ciphertext the server sealed; it is held in
+  // memory only for the few seconds between login and verify, never
+  // stored, never logged. A reload mid-MFA just means signing in again.
+  var pendingBlob = null;
+  var pendingFactorId = null;
+
+  var CSRF_KEY = 'payrollcheck-csrf-token';
+  function getCsrfToken() {
+    try { return window.sessionStorage.getItem(CSRF_KEY) || ''; } catch (e) { return ''; }
+  }
+  function setCsrfToken(token) {
+    try {
+      if (token) window.sessionStorage.setItem(CSRF_KEY, token);
+      else window.sessionStorage.removeItem(CSRF_KEY);
+    } catch (e) { /* storage unavailable: the session still works until reload */ }
+  }
+
+  function show(id, visible) {
+    document.getElementById(id).hidden = !visible;
+  }
+  function message(id, text, isError) {
+    var el = document.getElementById(id);
+    el.textContent = text || '';
+    el.className = isError ? 'error' : '';
+  }
+  function genericError(status) {
+    if (status === 429) return 'Too many attempts. Please wait and try again.';
+    if (status === 503) return 'The service is temporarily unavailable. Please try again later.';
+    if (status === 401) return 'That did not match. Please try again.';
+    if (status === 403) return 'That was refused. Please sign in again.';
+    if (status === 404) return 'Not found.';
+    return 'Something went wrong. Please try again.';
+  }
+
+  async function post(path, body, withCsrf) {
+    var headers = { 'Content-Type': 'application/json' };
+    if (withCsrf) headers['X-CSRF-Token'] = getCsrfToken();
+    var response = await fetch(path, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: headers,
+      body: JSON.stringify(body || {}),
+    });
+    var data = null;
+    try { data = await response.json(); } catch (e) { data = null; }
+    return { status: response.status, data: data || {} };
+  }
+
+  function signedIn(csrfToken) {
+    if (csrfToken) setCsrfToken(csrfToken);
+    pendingBlob = null;
+    pendingFactorId = null;
+    show('login-section', false);
+    show('mfa-section', false);
+    show('enroll-section', false);
+    show('report-section', true);
+    message('report-message', '');
+    document.getElementById('report-output').hidden = true;
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    message('login-message', '');
+    var form = event.target;
+    var email = form.email.value.trim();
+    var password = form.password.value;
+    var result;
+    try {
+      result = await post('/payrollcheck/api/login', { email: email, password: password });
+    } catch (e) {
+      message('login-message', genericError(0), true);
+      return;
+    }
+    if (result.status !== 200) {
+      message('login-message', genericError(result.status), true);
+      return;
+    }
+    if (result.data.mfaRequired) {
+      pendingBlob = result.data.pendingBlob || null;
+      var factors = Array.isArray(result.data.factors) ? result.data.factors : [];
+      var select = document.getElementById('factor-select');
+      select.innerHTML = '';
+      factors.forEach(function (factor) {
+        var option = document.createElement('option');
+        option.value = factor.id || '';
+        option.textContent = (factor.friendlyName || 'Authenticator') + ' (' + (factor.factorType || 'totp') + ')';
+        select.appendChild(option);
+      });
+      document.getElementById('factor-label').hidden = factors.length <= 1;
+      pendingFactorId = factors.length === 1 ? factors[0].id : null;
+      show('login-section', false);
+      show('mfa-section', true);
+      message('mfa-message', '');
+      return;
+    }
+    if (result.data.ok) {
+      if (result.data.mfaSetupRequired) {
+        // No authenticator yet: run enrollment with the same credentials.
+        var enroll;
+        try {
+          enroll = await post('/payrollcheck/api/mfa/enroll', { email: email, password: password });
+        } catch (e) {
+          message('login-message', genericError(0), true);
+          return;
+        }
+        if (enroll.status !== 200 || !enroll.data.pendingBlob) {
+          message('login-message', genericError(enroll.status), true);
+          return;
+        }
+        pendingBlob = enroll.data.pendingBlob;
+        pendingFactorId = enroll.data.factorId || null;
+        document.getElementById('enroll-secret').textContent = enroll.data.secret || '(unavailable — try again)';
+        var qr = document.getElementById('enroll-qr');
+        qr.innerHTML = '';
+        if (enroll.data.qrCode) {
+          var img = document.createElement('img');
+          img.alt = 'Authenticator QR code';
+          img.src = enroll.data.qrCode;
+          qr.appendChild(img);
+        }
+        show('login-section', false);
+        show('enroll-section', true);
+        message('enroll-message', '');
+        return;
+      }
+      signedIn(result.data.csrfToken);
+      return;
+    }
+    message('login-message', genericError(result.status), true);
+  });
+
+  document.getElementById('mfa-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    message('mfa-message', '');
+    var form = event.target;
+    var factorId = document.getElementById('factor-label').hidden
+      ? pendingFactorId
+      : form.factorId.value;
+    var result;
+    try {
+      result = await post('/payrollcheck/api/mfa/verify', {
+        pendingBlob: pendingBlob,
+        factorId: factorId,
+        code: form.code.value.trim(),
+      });
+    } catch (e) {
+      message('mfa-message', genericError(0), true);
+      return;
+    }
+    if (result.status !== 200 || !result.data.ok) {
+      message('mfa-message', genericError(result.status), true);
+      return;
+    }
+    signedIn(result.data.csrfToken);
+  });
+
+  document.getElementById('enroll-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    message('enroll-message', '');
+    var form = event.target;
+    var result;
+    try {
+      result = await post('/payrollcheck/api/mfa/verify', {
+        pendingBlob: pendingBlob,
+        factorId: pendingFactorId,
+        code: form.code.value.trim(),
+      });
+    } catch (e) {
+      message('enroll-message', genericError(0), true);
+      return;
+    }
+    if (result.status !== 200 || !result.data.ok) {
+      message('enroll-message', genericError(result.status), true);
+      return;
+    }
+    signedIn(result.data.csrfToken);
+  });
+
+  document.getElementById('report-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    message('report-message', '');
+    var form = event.target;
+    var output = document.getElementById('report-output');
+    output.hidden = true;
+    var result;
+    try {
+      result = await post('/payrollcheck/api/report', {
+        reportId: form.reportId.value.trim(),
+        action: form.action.value,
+      }, true);
+    } catch (e) {
+      message('report-message', genericError(0), true);
+      return;
+    }
+    if (result.status === 200 && result.data.ok) {
+      // A rotation hands back a fresh CSRF token for the new session id;
+      // store it, or the next request fails the CSRF check.
+      if (result.data.csrfToken) setCsrfToken(result.data.csrfToken);
+      output.textContent = JSON.stringify(result.data.report, null, 2);
+      output.hidden = false;
+      message('report-message', 'Report read (' + (result.data.path || 'unknown path') + ').');
+      return;
+    }
+    if (result.status === 401 || result.status === 403) {
+      setCsrfToken('');
+      show('report-section', false);
+      show('login-section', true);
+    }
+    message('report-message', genericError(result.status), true);
+  });
+
+  document.getElementById('logout-button').addEventListener('click', async function () {
+    try {
+      await post('/payrollcheck/api/logout', {}, true);
+    } catch (e) { /* logout is best-effort from the UI side */ }
+    setCsrfToken('');
+    pendingBlob = null;
+    show('report-section', false);
+    show('login-section', true);
+    message('login-message', 'Signed out.');
+  });
+
+  document.getElementById('forgot-button').addEventListener('click', async function () {
+    var email = document.querySelector('#login-form input[name="email"]').value.trim();
+    if (!email) {
+      message('login-message', 'Enter your email above first, then use Forgot password.', true);
+      return;
+    }
+    var result;
+    try {
+      result = await post('/payrollcheck/api/recover', { email: email });
+    } catch (e) {
+      message('login-message', genericError(0), true);
+      return;
+    }
+    // The reply never reveals whether the account exists.
+    message('login-message', result.status === 200
+      ? 'If an account exists for that email, a reset link is on its way.'
+      : genericError(result.status), result.status !== 200);
+  });
+})();
+</script>
+</body>
+</html>
