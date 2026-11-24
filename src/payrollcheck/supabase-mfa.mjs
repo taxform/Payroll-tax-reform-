@@ -16,10 +16,12 @@
 // NOTE: the endpoint shapes are from Supabase Auth's public API surface
 // (GoTrue MFA). listMfaFactors reads the user object (GET /user): GoTrue
 // has no user-facing GET /factors (it answers 405), and the official
-// client lists factors from user.factors. Step 9 acceptance must run a
-// real enroll -> challenge -> verify round-trip against the staging
-// project and confirm the returned token carries aal "aal2" before MFA
-// is offered to users.
+// client lists factors from user.factors. verifyMfaChallenge posts to
+// POST /factors/{factorId}/verify, as the official client does: the
+// general /verify endpoint does not verify TOTP factors. Step 9
+// acceptance must run a real enroll -> challenge -> verify round-trip
+// against the staging project and confirm the returned token carries
+// aal "aal2" before MFA is offered to users.
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -167,12 +169,16 @@ export async function verifyMfaChallenge({
   if (typeof code !== 'string' || !/^\d{6}$/.test(code)) {
     throw new Error('code must be a 6-digit string');
   }
+    // The official client verifies a TOTP challenge at
+    // POST /factors/{factorId}/verify with { challenge_id, code }.
+    // The general /verify endpoint does not handle TOTP factor
+    // verification, so posting there rejects every correct code.
   return mfaRequest({
     baseUrl,
     ...rest,
-    path: '/auth/v1/verify',
-    method: 'POST',
-    body: { type: 'totp', factor_id: factor, challenge_id: challenge, code },
+    path: `/auth/v1/factors/${factor}/verify`,    
+  method: 'POST',
+    body: { challenge_id: challenge, code },
   });
 }
 
