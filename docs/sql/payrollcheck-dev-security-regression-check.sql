@@ -34,7 +34,7 @@ WITH protected_tables AS (
   CASE WHEN NOT relrowsecurity OR NOT relforcerowsecurity THEN 'rls_not_forced'
        WHEN NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='payrollcheck' AND p.tablename=relname) THEN 'missing_rls_policy'
        WHEN EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='payrollcheck' AND p.tablename=relname AND p.policyname NOT IN (SELECT policy_name FROM expected_policies WHERE table_name=relname)) THEN 'unexpected_rls_policy'
-       WHEN EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='payrollcheck' AND p.tablename=relname AND (p.roles @> ARRAY['anon'] OR p.roles @> ARRAY['authenticated'] OR p.roles @> ARRAY['public'])) THEN 'policy_grants_public_role'
+       WHEN EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='payrollcheck' AND p.tablename=relname AND (p.roles @> ARRAY['anon'::name] OR p.roles @> ARRAY['authenticated'::name] OR p.roles @> ARRAY['public'::name])) THEN 'policy_grants_public_role'
        WHEN has_table_privilege('anon',oid,'SELECT') OR has_table_privilege('authenticated',oid,'SELECT')
          OR has_table_privilege('authenticated',oid,'INSERT') OR has_table_privilege('authenticated',oid,'UPDATE')
          OR has_table_privilege('authenticated',oid,'DELETE') THEN 'unexpected_table_grant'
@@ -58,3 +58,4 @@ WHERE NOT EXISTS (
   SELECT 1 FROM pg_proc p JOIN pg_namespace ns ON ns.oid = p.pronamespace
   WHERE ns.nspname='payrollcheck' AND p.proname='is_business_owner_of' AND p.prosecdef
 );
+
