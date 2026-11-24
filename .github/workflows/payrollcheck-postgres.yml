@@ -1,13 +1,25 @@
 name: PayrollCheck isolated PostgreSQL schema test
 on:
   push:
-    branches: [feature/payrollcheck-free-audit]
+    branches: [feature/payrollcheck-free-audit, main]
     paths:
       - 'docs/sql/payrollcheck-deny-by-default-schema.sql'
+      - 'docs/sql/payrollcheck-sessions-schema.sql'
       - 'tests/sql/payrollcheck-rls-smoke.sql'
       - 'tests/sql/payrollcheck-consent-constraints.sql'
       - 'tests/sql/payrollcheck-report-rls-fixture.sql'
       - 'tests/sql/payrollcheck-report-rls-isolation.sql'
+      - 'tests/sql/payrollcheck-sessions-store.sql'
+      - '.github/workflows/payrollcheck-postgres.yml'
+  pull_request:
+    paths:
+      - 'docs/sql/payrollcheck-deny-by-default-schema.sql'
+      - 'docs/sql/payrollcheck-sessions-schema.sql'
+      - 'tests/sql/payrollcheck-rls-smoke.sql'
+      - 'tests/sql/payrollcheck-consent-constraints.sql'
+      - 'tests/sql/payrollcheck-report-rls-fixture.sql'
+      - 'tests/sql/payrollcheck-report-rls-isolation.sql'
+      - 'tests/sql/payrollcheck-sessions-store.sql'
       - '.github/workflows/payrollcheck-postgres.yml'
   workflow_dispatch:
 permissions:
@@ -38,6 +50,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply draft schema to disposable database
         run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-deny-by-default-schema.sql
+      - name: Apply sessions schema to disposable database
+        run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-sessions-schema.sql
       - name: Verify RLS denies an otherwise granted unprivileged role
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-rls-smoke.sql
       - name: Verify consent constraints in disposable database
@@ -47,3 +61,5 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-report-rls-fixture.sql
       - name: Test business and firm tenant isolation and grant revocation
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-report-rls-isolation.sql
+      - name: Test session store queries in disposable database
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/payrollcheck-sessions-store.sql
