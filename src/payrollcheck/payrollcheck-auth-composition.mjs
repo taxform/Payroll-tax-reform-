@@ -328,12 +328,42 @@ export function createPayrollcheckAuth({
     let factors;
     try {
       factors = await listMfaFactors({ accessToken: signIn.access_token });
-    } catch {
+    } catch (error) {
       edgeLog(requestId, route, 503, 'mfa_factors_failed');
+      // TEMPORARY DEBUG — revert once the staging login 503 is diagnosed.
+      // Server-side function log only; never returned to the client.
+      try {
+        log({
+          requestId,
+          route,
+          status: 503,
+          reason: 'mfa_factors_failed_detail',
+          detail: error instanceof Error ? error.message : 'unknown',
+        });
+      } catch {
+        // Logging must never break the request.
+      }
       return { status: 503, body: { error: 'unavailable' } };
     }
     if (!Array.isArray(factors)) {
       edgeLog(requestId, route, 503, 'mfa_factors_invalid');
+      // TEMPORARY DEBUG — revert once the staging login 503 is diagnosed.
+      // Logs only the response shape (type and keys), never factor data.
+      try {
+        log({
+          requestId,
+          route,
+          status: 503,
+          reason: 'mfa_factors_invalid_detail',
+          detail: JSON.stringify({
+            type: typeof factors,
+            isArray: Array.isArray(factors),
+            keys: factors !== null && typeof factors === 'object' ? Object.keys(factors) : null,
+          }),
+        });
+      } catch {
+        // Logging must never break the request.
+      }
       return { status: 503, body: { error: 'unavailable' } };
     }
     if (factors.length > 0) {
