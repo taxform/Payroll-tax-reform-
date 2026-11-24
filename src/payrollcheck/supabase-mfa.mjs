@@ -177,7 +177,7 @@ export async function verifyMfaChallenge({
     baseUrl,
     ...rest,
     path: `/auth/v1/factors/${factor}/verify`,    
-  method: 'POST',
+    method: 'POST',
     body: { challenge_id: challenge, code },
   });
 }
