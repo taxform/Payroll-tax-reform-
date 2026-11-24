@@ -46,6 +46,12 @@
 --                   request one (as themselves); only an active
 --                   business_owner of the business tenant may approve,
 --                   never the requester themselves; either side may revoke.
+--                   Approve and revoke share ONE update policy: two
+--                   separate permissive UPDATE policies are OR-combined
+--                   by Postgres, so a caller satisfying either policy's
+--                   USING and either policy's WITH CHECK could cross
+--                   them (a firm requester self-approving via the
+--                   revoke USING + approve WITH CHECK).
 --   access_audit:   append-only; a caller writes/reads only their own
 --                   actor rows.
 --   sessions:       a session is readable/writable only by its own
@@ -236,30 +242,19 @@ CREATE POLICY app_client_grants_insert ON payrollcheck.client_grants
     AND firm_tenant_id <> business_tenant_id
   );
 
--- Approve: only an active business_owner of the business tenant, never
--- the requester themselves (self-approval is denied even for a user who
--- holds memberships on both sides). The approver is bound to the row.
-DROP POLICY IF EXISTS app_client_grants_approve ON payrollcheck.client_grants;
-CREATE POLICY app_client_grants_approve ON payrollcheck.client_grants
-  FOR UPDATE TO payrollcheck_app USING (
-    status = 'pending'
-    AND requested_by_subject <> nullif(current_setting('payrollcheck.current_subject_id', true), '')
-    AND business_tenant_id IN (
-      SELECT tenant_id FROM payrollcheck.memberships
-      WHERE subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
-        AND active = true
-        AND role = 'business_owner'
-    )
-  ) WITH CHECK (
-    status = 'active'
-    AND approved_by_subject = nullif(current_setting('payrollcheck.current_subject_id', true), '')
-  );
-
--- Revoke: either side may revoke (a pending request may be withdrawn,
--- an active grant ended by the firm or the business). The revoker is
--- bound to the row.
-DROP POLICY IF EXISTS app_client_grants_revoke ON payrollcheck.client_grants;
-CREATE POLICY app_client_grants_revoke ON payrollcheck.client_grants
+-- Update (approve / revoke): ONE policy, not two. Two separate
+-- permissive UPDATE policies are OR-combined by Postgres: a row is
+-- updatable if it passes either policy's USING and its new version
+-- passes either policy's WITH CHECK. A firm requester could then
+-- self-approve by passing the revoke USING (firm member, pending)
+-- and the approve WITH CHECK (status active, approver = self).
+-- A single policy ties each transition to the caller in one WITH
+-- CHECK, so no cross-combination is possible. Note the self-approve
+-- denial now surfaces as an insufficient_privilege error (the row is
+-- visible via USING but no valid transition exists), not as zero
+-- affected rows — see regression Check 8.
+DROP POLICY IF EXISTS app_client_grants_update ON payrollcheck.client_grants;
+CREATE POLICY app_client_grants_update ON payrollcheck.client_grants
   FOR UPDATE TO payrollcheck_app USING (
     status IN ('pending', 'active')
     AND (
@@ -275,8 +270,29 @@ CREATE POLICY app_client_grants_revoke ON payrollcheck.client_grants
       )
     )
   ) WITH CHECK (
-    status = 'revoked'
-    AND revoked_by_subject = nullif(current_setting('payrollcheck.current_subject_id', true), '')
+    (
+      -- Approve: only an active business_owner of the business tenant,
+      -- never the requester themselves (self-approval is denied even
+      -- for a user who holds memberships on both sides). The approver
+      -- is bound to the row.
+      status = 'active'
+      AND approved_by_subject = nullif(current_setting('payrollcheck.current_subject_id', true), '')
+      AND requested_by_subject <> nullif(current_setting('payrollcheck.current_subject_id', true), '')
+      AND business_tenant_id IN (
+        SELECT tenant_id FROM payrollcheck.memberships
+        WHERE subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
+          AND active = true
+          AND role = 'business_owner'
+      )
+    )
+    OR
+    (
+      -- Revoke: either side may revoke (a pending request may be
+      -- withdrawn, an active grant ended by the firm or the business).
+      -- The revoker is bound to the row.
+      status = 'revoked'
+      AND revoked_by_subject = nullif(current_setting('payrollcheck.current_subject_id', true), '')
+    )
   );
 
 -- ------------------------------------------------------------ access_audit
