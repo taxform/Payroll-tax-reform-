@@ -3,7 +3,7 @@
 -- UPDATED Nov 23, 2026 (M2 step 7): this used to check the deny-by-default
 -- posture (zero policies, five tables). The step-7 policies are now the
 -- reviewed posture, so this checks THAT instead: RLS enabled + forced on
--- all six tables, exactly the fifteen app_* policies, no policy granting
+-- all six tables, exactly the fourteen app_* policies, no policy granting
 -- anon/authenticated/public, no table grants to anon/authenticated, no
 -- schema USAGE for anon/authenticated, six tables. Run it against the
 -- Supabase dev project (where anon/authenticated exist), NOT disposable
@@ -22,8 +22,7 @@ WITH protected_tables AS (
   ('reports','app_reports_select'),
   ('client_grants','app_client_grants_select'),
   ('client_grants','app_client_grants_insert'),
-  ('client_grants','app_client_grants_approve'),
-  ('client_grants','app_client_grants_revoke'),
+  ('client_grants','app_client_grants_update'),
   ('access_audit','app_access_audit_select'),
   ('access_audit','app_access_audit_insert'),
   ('sessions','app_sessions_select'),
