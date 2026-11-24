@@ -279,8 +279,22 @@ export function createPayrollcheckAuth({
         const mapping = mappingFactory({ query });
         return mapping.resolveInternalUserId(authUserId);
       });
-    } catch {
-      edgeLog(requestId, route, 503, 'mapping_failed'); 
+    } catch (error) {
+      edgeLog(requestId, route, 503, 'mapping_failed');
+      // TEMPORARY DEBUG — revert once the staging login 503 is diagnosed.
+      // Server-side function log only; never returned to the client.
+      // pg error messages do not carry credentials.
+      try {
+        log({
+          requestId,
+          route,
+          status: 503,
+          reason: 'mapping_failed_detail',
+          detail: error instanceof Error ? error.message : 'unknown',
+        });
+      } catch {
+        // Logging must never break the request.
+      } 
       return { status: 503, body: { error: 'unavailable' } };
     }
     if (typeof subjectId !== 'string' || !subjectId) {
