@@ -1,5 +1,16 @@
 // Tenancy, memberships, client grants, and access audit for
-// PayrollCheck 360 (M2 step 6).
+// PayrollCheck 360 (M2 step 6; approveClientGrant tightened in step 8).
+//
+// Step-8 change (only approveClientGrant + the new getActiveMembershipRole
+// helper): the step-7 policy app_client_grants_update requires the
+// approver to be an active business_owner of the business tenant AND
+// never the requester, but the step-6 module approved for ANY active
+// business member with no self-approve check, then reported the
+// misleading reason 'not_pending' when the DB denied the write. The
+// module now enforces the same rule (new reasons 'not_business_owner'
+// and 'self_approve') so module and policy agree and a denial is
+// diagnosed here, not as a confusing DB error. Everything else is
+// byte-identical to the step-6 version.
 //
 // Pure module: all SQL runs through an injected pg-style
 // `query(sql, values) => { rows }` on the caller's least-privilege,
@@ -259,15 +270,43 @@ export function createPayrollcheckTenancy({
     return result.rows[0];
   }
 
+  async function getActiveMembershipRole(tenantId, subjectId) {
+    // Returns the caller's active role in the tenant, or null when they
+    // hold no active membership there. DB errors propagate (admin-write
+    // fail-closed split). Added in step 8 for the approve tightening.
+    const result = await query(
+      'SELECT role FROM payrollcheck.memberships WHERE tenant_id = $1::uuid AND subject_id = $2 AND active = true LIMIT 1',
+      [tenantId, subjectId],
+    );
+    if (!Array.isArray(result.rows) || result.rows.length !== 1) return null;
+    const role = result.rows[0] && result.rows[0].role;
+    return ROLES.includes(role) ? role : null;
+  }
+
   async function approveClientGrant({ grantId, approvedBySubject } = {}) {
     assertUuid(grantId, 'grant_id');
     assertSubjectId(approvedBySubject, 'approved_by_subject');
     const grant = await getClientGrant({ grantId });
     if (!grant) return { ok: false, reason: 'not_found' };
     if (grant.status !== 'pending') return { ok: false, reason: 'not_pending' };
-    // The business approves access to its own reports.
-    if (!(await isActiveMember(grant.business_tenant_id, approvedBySubject))) {
+    // The business approves access to its own reports. The step-7
+    // policy requires the approver to be an active business_owner of
+    // the business tenant, never the requester — the module enforces
+    // the same rule so the denial is diagnosed here. Check order is
+    // role first, then self-approve: a non-owner who is also the
+    // requester gets 'not_business_owner'. Both deny.
+    const approverRole = await getActiveMembershipRole(
+      grant.business_tenant_id,
+      approvedBySubject,
+    );
+    if (approverRole === null) {
       return { ok: false, reason: 'approver_not_member' };
+    }
+    if (approverRole !== 'business_owner') {
+      return { ok: false, reason: 'not_business_owner' };
+    }
+    if (approvedBySubject === grant.requested_by_subject) {
+      return { ok: false, reason: 'self_approve' };
     }
     let result;
     try {
