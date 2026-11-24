@@ -23,18 +23,31 @@ function stubFetch(response) {
   return { calls, fetchImpl };
 }
 
-test('listMfaFactors GETs /auth/v1/factors with apikey + Bearer', async () => {
+test('listMfaFactors GETs /auth/v1/user and returns user.factors', async () => {
+  const factors = [
+    { id: FACTOR_ID, friendly_name: 'My phone', factor_type: 'totp', status: 'verified' },
+  ];
   const { calls, fetchImpl } = stubFetch({
     ok: true,
     status: 200,
-    json: async () => ({ totp: [] }),
+    json: async () => ({ id: 'user-1', email: 'test@example.com', factors }),
   });
   const result = await listMfaFactors({ supabaseUrl: BASE, apiKey: API_KEY, accessToken: TOKEN, fetchImpl });
-  assert.deepEqual(result, { totp: [] });
-  assert.equal(calls[0].url, `${BASE}/auth/v1/factors`);
+  assert.deepEqual(result, factors);
+  assert.equal(calls[0].url, `${BASE}/auth/v1/user`);
   assert.equal(calls[0].options.method, 'GET');
   assert.equal(calls[0].options.headers.apikey, API_KEY);
   assert.equal(calls[0].options.headers.Authorization, `Bearer ${TOKEN}`);
+});
+
+test('listMfaFactors returns [] when the user has no factors array', async () => {
+  const { fetchImpl } = stubFetch({
+    ok: true,
+    status: 200,
+    json: async () => ({ id: 'user-1', email: 'test@example.com' }),
+  });
+  const result = await listMfaFactors({ supabaseUrl: BASE, apiKey: API_KEY, accessToken: TOKEN, fetchImpl });
+  assert.deepEqual(result, []);
 });
 
 test('enrollTotpFactor posts friendly_name, factor_type totp and issuer', async () => {

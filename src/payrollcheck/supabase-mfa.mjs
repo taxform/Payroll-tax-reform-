@@ -14,10 +14,12 @@
 // it. This module returns the parsed response as-is.
 //
 // NOTE: the endpoint shapes are from Supabase Auth's public API surface
-// (GoTrue MFA) and have not yet been exercised against the dev project.
-// Step 9 acceptance must run a real enroll -> challenge -> verify
-// round-trip against the staging project and confirm the returned token
-// carries aal "aal2" before MFA is offered to users.
+// (GoTrue MFA). listMfaFactors reads the user object (GET /user): GoTrue
+// has no user-facing GET /factors (it answers 405), and the official
+// client lists factors from user.factors. Step 9 acceptance must run a
+// real enroll -> challenge -> verify round-trip against the staging
+// project and confirm the returned token carries aal "aal2" before MFA
+// is offered to users.
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -98,7 +100,14 @@ function common({ supabaseUrl, apiKey, accessToken, fetchImpl }) {
 
 export async function listMfaFactors({ supabaseUrl, apiKey, accessToken, fetchImpl = globalThis.fetch } = {}) {
   const { baseUrl, ...rest } = common({ supabaseUrl, apiKey, accessToken, fetchImpl });
-  return mfaRequest({ baseUrl, ...rest, path: '/auth/v1/factors', method: 'GET' });
+  // GoTrue has no user-facing GET /factors (it answers 405). The official
+  // client lists factors by reading the user object (GET /user), whose
+  // `factors` field is the array the login flow expects.
+  const user = await mfaRequest({ baseUrl, ...rest, path: '/auth/v1/user', method: 'GET' });
+  if (!user || !Array.isArray(user.factors)) {
+    return [];
+  }
+  return user.factors;
 }
 
 export async function enrollTotpFactor({
