@@ -3,7 +3,8 @@
 // - fetches the JWKS from {issuer}/.well-known/jwks.json (cached; refetched
 //   on unknown kid, i.e. key rotation)
 // - rejects any algorithm other than RS256 or ES256, unknown keys, bad
-//   signatures. ES256 signatures are verified in JWS (ieee-p1363) form.
+//   signatures. ES256 signatures arrive in JWS raw R||S form and are
+//   converted to DER before verifying (Node's verifier expects DER).
 // - checks issuer, audience, exp/iat (after the signature is verified)
 // Returns the decoded claims on success. Throws an Error with a stable `code`
 // on failure. Fail closed: any error means "do not trust this token".
@@ -13,6 +14,15 @@
 // every token from such a project, so requireAal2 can never pass —
 // that is what broke the staging MFA verify (Nov 24, 2026: the dev
 // project's JWKS carries a single EC/ES256 key).
+// NOTE 2: do NOT "fix" ES256 by passing dsaEncoding: 'ieee-p1363' to
+// createVerify. On the Node versions we run that option is ignored:
+// verified Nov 24, 2026 on Node v24.22.1 — a raw 64-byte JWS signature
+// verifies false with AND without the option, while the DER-converted
+// form verifies true, and createSign with the option still emits DER.
+// The ignored option is exactly why the staging MFA verify failed with
+// invalid_signature even after the ES256 fix (PR #111): the local tests
+// round-tripped DER through both sides, so they passed while every real
+// GoTrue token (raw R||S) failed. Convert raw to DER explicitly.
 import {createPublicKey, createVerify} from 'node:crypto';
 
 const MAX_TOKEN_LENGTH = 16384;
@@ -46,6 +56,33 @@ function audienceIncludes(aud, expected) {
   if (typeof aud === 'string') return aud === expected;
   if (Array.isArray(aud)) return aud.includes(expected);
   return false;
+}
+
+// Convert a JWS ES256 signature (raw R||S, exactly 64 bytes) to DER, the
+// form Node's verifier expects. Each 32-byte half becomes a DER INTEGER,
+// with a leading 0x00 byte when its top bit is set (otherwise the integer
+// would read as negative).
+function rawEs256SignatureToDer(raw) {
+  const encodeInteger = (half) => {
+    let start = 0;
+    while (start < half.length - 1 && half[start] === 0) start++;
+    const value = half.subarray(start);
+    const pad = value[0] & 0x80 ? 1 : 0;
+    const out = Buffer.alloc(2 + pad + value.length);
+    out[0] = 0x02;
+    out[1] = pad + value.length;
+    if (pad) out[2] = 0x00;
+    value.copy(out, 2 + pad);
+    return out;
+  };
+  const r = encodeInteger(raw.subarray(0, 32));
+  const s = encodeInteger(raw.subarray(32, 64));
+  const out = Buffer.alloc(2 + r.length + s.length);
+  out[0] = 0x30;
+  out[1] = r.length + s.length;
+  r.copy(out, 2);
+  s.copy(out, 2 + r.length);
+  return out;
 }
 
 export function createSupabaseJwksVerifier({
@@ -142,15 +179,21 @@ export function createSupabaseJwksVerifier({
     const signature = decodeSegment(signatureSegment);
     let valid = false;
     try {
-      // ES256 (ECDSA P-256) signatures in JWS are raw R||S (ieee-p1363),
-      // not DER — Node needs the encoding named explicitly.
-      const verify = header.alg === 'ES256'
-        ? createVerify('SHA256', {dsaEncoding: 'ieee-p1363'})
-        : createVerify('RSA-SHA256');
-      valid = verify
-        .update(`${headerSegment}.${payloadSegment}`)
-        .verify(publicKey, signature);
-    } catch {
+      if (header.alg === 'ES256') {
+        // JWS ES256 signatures are raw R||S (64 bytes). Node's verifier
+        // expects DER, so convert first (see NOTE 2 above — the
+        // dsaEncoding option does not do this on our Node versions).
+        if (signature.length !== 64) throw fail('invalid_signature');
+        valid = createVerify('SHA256')
+          .update(`${headerSegment}.${payloadSegment}`)
+          .verify(publicKey, rawEs256SignatureToDer(signature));
+      } else {
+        valid = createVerify('RSA-SHA256')
+          .update(`${headerSegment}.${payloadSegment}`)
+          .verify(publicKey, signature);
+      }
+    } catch (error) {
+      if (error && error.code === 'invalid_signature') throw error;
       throw fail('invalid_signature');
     }
     if (!valid) throw fail('invalid_signature');
