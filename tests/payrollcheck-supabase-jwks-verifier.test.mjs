@@ -1,6 +1,6 @@
-// Tests for supabase-jwks-verifier.mjs — fully offline. Real RSA keypairs are
-// generated in-test; the JWKS endpoint is a stubbed fetch. No live Supabase,
-// no network, no secrets.
+// Tests for supabase-jwks-verifier.mjs — fully offline. Real RSA and EC
+// (P-256) keypairs are generated in-test; the JWKS endpoint is a stubbed
+// fetch. No live Supabase, no network, no secrets.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {generateKeyPairSync, createSign} from 'node:crypto';
@@ -19,13 +19,17 @@ function signToken({privateKey, kid, alg = 'RS256', claims}) {
   const header = {alg, kid, typ: 'JWT'};
   const signingInput = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(claims))}`;
   if (alg === 'none') return `${signingInput}.`;
-  const signature = createSign('RSA-SHA256').update(signingInput).sign(privateKey);
+  // ES256 (ECDSA P-256) signatures in JWS are raw R||S (ieee-p1363).
+  const signer = alg === 'ES256'
+    ? createSign('SHA256', {dsaEncoding: 'ieee-p1363'})
+    : createSign('RSA-SHA256');
+  const signature = signer.update(signingInput).sign(privateKey);
   return `${signingInput}.${signature.toString('base64url')}`;
 }
 
-function jwksFor(publicKey, kid) {
+function jwksFor(publicKey, kid, alg = 'RS256') {
   const jwk = publicKey.export({format: 'jwk'});
-  return {keys: [{...jwk, kid, use: 'sig', alg: 'RS256'}]};
+  return {keys: [{...jwk, kid, use: 'sig', alg}]};
 }
 
 function baseClaims(overrides = {}) {
@@ -45,6 +49,10 @@ function baseClaims(overrides = {}) {
 
 function keypair() {
   return generateKeyPairSync('rsa', {modulusLength: 2048});
+}
+
+function ecKeypair() {
+  return generateKeyPairSync('ec', {namedCurve: 'P-256'});
 }
 
 function verifierFor(jwks, calls = []) {
@@ -69,6 +77,53 @@ test('accepts a valid RS256 token and returns its claims', async () => {
   assert.equal(claims.role, 'authenticated');
   assert.equal(claims.aal, 'aal2');
   assert.equal(claims.email, 'owner@example.test');
+});
+
+// Supabase projects created after the ES256 migration sign tokens with
+// ES256 (EC P-256). The staging dev project carries a single EC/ES256 key,
+// so a verifier that only accepts RS256 rejects every token from it.
+test('accepts a valid ES256 token and returns its claims', async () => {
+  const {privateKey, publicKey} = ecKeypair();
+  const verifier = verifierFor(jwksFor(publicKey, 'ec-key-1', 'ES256'));
+  const token = signToken({privateKey, kid: 'ec-key-1', alg: 'ES256', claims: baseClaims()});
+  const claims = await verifier.verifyAccessToken(token);
+  assert.equal(claims.sub, '11111111-1111-4111-8111-111111111111');
+  assert.equal(claims.aal, 'aal2');
+  assert.equal(claims.email, 'owner@example.test');
+});
+
+test('rejects an ES256 token with a tampered payload', async () => {
+  const {privateKey, publicKey} = ecKeypair();
+  const verifier = verifierFor(jwksFor(publicKey, 'ec-key-1', 'ES256'));
+  const token = signToken({privateKey, kid: 'ec-key-1', alg: 'ES256', claims: baseClaims()});
+  const [header, payload, signature] = token.split('.');
+  const tamperedPayload = base64url(
+    Buffer.from(payload, 'base64url').toString('utf8').replace('"exp":2000', '"exp":2001'),
+  );
+  await assert.rejects(
+    () => verifier.verifyAccessToken(`${header}.${tamperedPayload}.${signature}`),
+    hasCode('invalid_signature'),
+  );
+});
+
+test('rejects an ES256 token signed by a different key', async () => {
+  const {publicKey} = ecKeypair();
+  const {privateKey: otherPrivate} = ecKeypair();
+  const verifier = verifierFor(jwksFor(publicKey, 'ec-key-1', 'ES256'));
+  const token = signToken({privateKey: otherPrivate, kid: 'ec-key-1', alg: 'ES256', claims: baseClaims()});
+  await assert.rejects(() => verifier.verifyAccessToken(token), hasCode('invalid_signature'));
+});
+
+test('accepts ES256 and RS256 tokens from one JWKS', async () => {
+  const {privateKey: rsaPrivate, publicKey: rsaPublic} = keypair();
+  const {privateKey: ecPrivate, publicKey: ecPublic} = ecKeypair();
+  const rsaJwk = {...rsaPublic.export({format: 'jwk'}), kid: 'rsa-1', use: 'sig', alg: 'RS256'};
+  const ecJwk = {...ecPublic.export({format: 'jwk'}), kid: 'ec-1', use: 'sig', alg: 'ES256'};
+  const verifier = verifierFor({keys: [rsaJwk, ecJwk]});
+  const rsaToken = signToken({privateKey: rsaPrivate, kid: 'rsa-1', claims: baseClaims()});
+  const ecToken = signToken({privateKey: ecPrivate, kid: 'ec-1', alg: 'ES256', claims: baseClaims()});
+  assert.equal((await verifier.verifyAccessToken(rsaToken)).aal, 'aal2');
+  assert.equal((await verifier.verifyAccessToken(ecToken)).aal, 'aal2');
 });
 
 test('rejects HS256 tokens', async () => {

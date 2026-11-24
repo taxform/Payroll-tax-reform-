@@ -1,12 +1,18 @@
 // Server-only Supabase JWT verifier (JWKS). No SDK, no new dependency.
-// Verifies RS256 access tokens issued by a Supabase Auth server:
+// Verifies RS256 and ES256 access tokens issued by a Supabase Auth server:
 // - fetches the JWKS from {issuer}/.well-known/jwks.json (cached; refetched
 //   on unknown kid, i.e. key rotation)
-// - rejects any algorithm other than RS256, unknown keys, bad signatures
+// - rejects any algorithm other than RS256 or ES256, unknown keys, bad
+//   signatures. ES256 signatures are verified in JWS (ieee-p1363) form.
 // - checks issuer, audience, exp/iat (after the signature is verified)
 // Returns the decoded claims on success. Throws an Error with a stable `code`
 // on failure. Fail closed: any error means "do not trust this token".
 // Never log the token.
+// NOTE: Supabase projects created after the ES256 migration sign tokens
+// with ES256 (EC P-256 keys). A verifier that only accepts RS256 rejects
+// every token from such a project, so requireAal2 can never pass —
+// that is what broke the staging MFA verify (Nov 24, 2026: the dev
+// project's JWKS carries a single EC/ES256 key).
 import {createPublicKey, createVerify} from 'node:crypto';
 
 const MAX_TOKEN_LENGTH = 16384;
@@ -87,7 +93,15 @@ export function createSupabaseJwksVerifier({
   }
 
   function publicKeyFor(jwk) {
-    if (!jwk || jwk.kty !== 'RSA' || typeof jwk.n !== 'string' || typeof jwk.e !== 'string') return null;
+    if (!jwk || typeof jwk !== 'object') return null;
+    if (jwk.kty === 'RSA') {
+      if (typeof jwk.n !== 'string' || typeof jwk.e !== 'string') return null;
+    } else if (jwk.kty === 'EC') {
+      // ES256 uses the P-256 curve only.
+      if (jwk.crv !== 'P-256' || typeof jwk.x !== 'string' || typeof jwk.y !== 'string') return null;
+    } else {
+      return null;
+    }
     try {
       return createPublicKey({key: jwk, format: 'jwk'});
     } catch {
@@ -108,7 +122,7 @@ export function createSupabaseJwksVerifier({
     if (parts.length !== 3) throw fail('invalid_token_format');
     const [headerSegment, payloadSegment, signatureSegment] = parts;
     const header = decodeJsonSegment(headerSegment);
-    if (header.alg !== 'RS256') throw fail('unsupported_algorithm');
+    if (header.alg !== 'RS256' && header.alg !== 'ES256') throw fail('unsupported_algorithm');
     if (typeof header.kid !== 'string' || !header.kid) throw fail('unknown_key');
     // Decode the payload for structure only — its values are not trusted until
     // the signature below verifies.
@@ -128,7 +142,12 @@ export function createSupabaseJwksVerifier({
     const signature = decodeSegment(signatureSegment);
     let valid = false;
     try {
-      valid = createVerify('RSA-SHA256')
+      // ES256 (ECDSA P-256) signatures in JWS are raw R||S (ieee-p1363),
+      // not DER — Node needs the encoding named explicitly.
+      const verify = header.alg === 'ES256'
+        ? createVerify('SHA256', {dsaEncoding: 'ieee-p1363'})
+        : createVerify('RSA-SHA256');
+      valid = verify
         .update(`${headerSegment}.${payloadSegment}`)
         .verify(publicKey, signature);
     } catch {
