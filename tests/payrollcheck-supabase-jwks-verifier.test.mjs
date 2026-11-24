@@ -15,16 +15,41 @@ function base64url(input) {
   return Buffer.from(input).toString('base64url');
 }
 
-function signToken({privateKey, kid, alg = 'RS256', claims}) {
+// Convert a DER ECDSA signature to the raw R||S (64-byte) form that JWS
+// ES256 tokens actually carry. Node's createSign emits DER even when asked
+// for ieee-p1363 (verified Nov 24, 2026 on Node v24.22.1), so a test that
+// signs with the dsaEncoding option round-trips DER through both sides and
+// passes while every real GoTrue token fails — that is exactly what let the
+// staging MFA verify break with invalid_signature after PR #111. Sign DER,
+// convert to raw here, and the tests exercise the true JWS path.
+function derToRaw(der) {
+  let offset = 2; // skip 0x30 + length (short form; P-256 DER is < 128 bytes)
+  if (der[offset] !== 0x02) throw new Error('not a DER signature');
+  const lenR = der[offset + 1];
+  const r = der.subarray(offset + 2, offset + 2 + lenR);
+  offset += 2 + lenR;
+  if (der[offset] !== 0x02) throw new Error('not a DER signature');
+  const lenS = der[offset + 1];
+  const s = der.subarray(offset + 2, offset + 2 + lenS);
+  const pad = (part) => {
+    const out = Buffer.alloc(32);
+    part.copy(out, 32 - Math.min(32, part.length), Math.max(0, part.length - 32));
+    return out;
+  };
+  return Buffer.concat([pad(r), pad(s)]);
+}
+
+function signToken({privateKey, kid, alg = 'RS256', claims, rawEs256 = true}) {
   const header = {alg, kid, typ: 'JWT'};
   const signingInput = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(claims))}`;
   if (alg === 'none') return `${signingInput}.`;
-  // ES256 (ECDSA P-256) signatures in JWS are raw R||S (ieee-p1363).
-  const signer = alg === 'ES256'
-    ? createSign('SHA256', {dsaEncoding: 'ieee-p1363'})
-    : createSign('RSA-SHA256');
-  const signature = signer.update(signingInput).sign(privateKey);
-  return `${signingInput}.${signature.toString('base64url')}`;
+  // ES256 (ECDSA P-256) signatures in JWS are raw R||S. Node signs DER,
+  // so convert to raw to build a real JWS token (see derToRaw above).
+  const signature = createSign(alg === 'ES256' ? 'SHA256' : 'RSA-SHA256')
+    .update(signingInput)
+    .sign(privateKey);
+  const jwsSignature = alg === 'ES256' && rawEs256 ? derToRaw(signature) : signature;
+  return `${signingInput}.${jwsSignature.toString('base64url')}`;
 }
 
 function jwksFor(publicKey, kid, alg = 'RS256') {
@@ -82,6 +107,8 @@ test('accepts a valid RS256 token and returns its claims', async () => {
 // Supabase projects created after the ES256 migration sign tokens with
 // ES256 (EC P-256). The staging dev project carries a single EC/ES256 key,
 // so a verifier that only accepts RS256 rejects every token from it.
+// These tokens carry REAL raw R||S JWS signatures (see signToken), not the
+// DER form Node emits — a verifier that only handles DER fails them.
 test('accepts a valid ES256 token and returns its claims', async () => {
   const {privateKey, publicKey} = ecKeypair();
   const verifier = verifierFor(jwksFor(publicKey, 'ec-key-1', 'ES256'));
@@ -90,6 +117,17 @@ test('accepts a valid ES256 token and returns its claims', async () => {
   assert.equal(claims.sub, '11111111-1111-4111-8111-111111111111');
   assert.equal(claims.aal, 'aal2');
   assert.equal(claims.email, 'owner@example.test');
+});
+
+// Regression test for the Nov 24 staging failure: a DER-encoded signature
+// in an ES256 token's JWS slot must be rejected. The pre-fix verifier
+// expected DER (its dsaEncoding option was ignored), so it accepted DER
+// tokens in tests while rejecting every real GoTrue token.
+test('rejects a DER-encoded signature in an ES256 token', async () => {
+  const {privateKey, publicKey} = ecKeypair();
+  const verifier = verifierFor(jwksFor(publicKey, 'ec-key-1', 'ES256'));
+  const token = signToken({privateKey, kid: 'ec-key-1', alg: 'ES256', claims: baseClaims(), rawEs256: false});
+  await assert.rejects(() => verifier.verifyAccessToken(token), hasCode('invalid_signature'));
 });
 
 test('rejects an ES256 token with a tampered payload', async () => {
