@@ -311,10 +311,11 @@ test('requestClientGrant validates firm/business, scopes, and subject', async ()
   );
 });
 
-test('approveClientGrant activates a pending grant when the approver is a business member', async () => {
+test('approveClientGrant activates a pending grant when the approver is a business owner', async () => {
   const activeRow = { ...grantRow, status: 'active', approved_by_subject: 'biz-owner-1', approved_at: '2026-11-23T01:00:00Z' };
   const { api, calls } = setup(async (sql) => {
     if (sql.includes('FROM payrollcheck.client_grants WHERE grant_id')) return { rows: [grantRow] };
+if (sql.includes('SELECT role FROM payrollcheck.memberships')) return { rows: [{ role: 'business_owner' }] };
     if (sql.includes('FROM payrollcheck.memberships')) return { rows: [{ one: 1 }] };
     if (sql.includes("SET status = 'active'")) return { rows: [activeRow] };
     return { rows: [] };
@@ -353,6 +354,7 @@ test('approveClientGrant refuses missing, non-pending, and non-member approvers'
 test('approveClientGrant reports active_grant_exists on a unique violation', async () => {
   const { api } = setup(async (sql) => {
     if (sql.includes('FROM payrollcheck.client_grants')) return { rows: [grantRow] };
+    if (sql.includes('SELECT role FROM payrollcheck.memberships')) return { rows: [{ role: 'business_owner' }] };
     if (sql.includes('FROM payrollcheck.memberships')) return { rows: [{ one: 1 }] };
     if (sql.includes("SET status = 'active'")) {
       const error = new Error('duplicate key value violates unique constraint');
