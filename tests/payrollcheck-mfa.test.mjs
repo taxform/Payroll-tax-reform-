@@ -98,7 +98,7 @@ test('challengeMfaFactor posts to the factor challenge endpoint', async () => {
   assert.equal(calls[0].options.method, 'POST');
 });
 
-test('verifyMfaChallenge posts type totp with factor, challenge and code, returns the session', async () => {
+test('verifyMfaChallenge posts challenge_id and code to the factor verify endpoint, returns the session', async () => {
   const { calls, fetchImpl } = stubFetch({
     ok: true,
     status: 200,
@@ -114,11 +114,9 @@ test('verifyMfaChallenge posts type totp with factor, challenge and code, return
     fetchImpl,
   });
   assert.equal(result.access_token, 'aal2-token');
-  assert.equal(calls[0].url, `${BASE}/auth/v1/verify`);
+  assert.equal(calls[0].url, `${BASE}/auth/v1/factors/${FACTOR_ID}/verify`);
   assert.equal(calls[0].options.method, 'POST');
   assert.deepEqual(JSON.parse(calls[0].options.body), {
-    type: 'totp',
-    factor_id: FACTOR_ID,
     challenge_id: CHALLENGE_ID,
     code: '123456',
   });
