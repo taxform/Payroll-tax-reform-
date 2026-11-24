@@ -37,10 +37,15 @@
 --                   UPDATE to find it, so owner deactivate/reactivate
 --                   only works if the owner can see the member rows;
 --                   this also means owners can list their own tenant's
---                   members, but never another tenant's). A
---                   business_owner may insert/deactivate members of
---                   their own tenant. (Bootstrap of the FIRST owner is
---                   an ops action as table owner, not an app-role write.)
+--                   members, but never another tenant's). The owner
+--                   branch calls the SECURITY DEFINER helper
+--                   owned_business_tenant_ids (defined below, reviewed
+--                   per spec gate 3): a plain subquery on memberships
+--                   inside its own SELECT policy recurses infinitely
+--                   (CI Check 1 proved it). A business_owner may
+--                   insert/deactivate members of their own tenant.
+--                   (Bootstrap of the FIRST owner is an ops action as
+--                   table owner, not an app-role write.)
 --   reports:        business_owner of the owning business tenant, or a
 --                   firm reviewer/admin with an ACTIVE client_grants row
 --                   carrying 'view_report' for that business. Pending,
@@ -93,6 +98,33 @@ BEGIN
   END IF;
 END $$;
 
+-- SECURITY DEFINER helper: tenant ids where the given subject is an
+-- active business_owner. The memberships SELECT policy's owner branch
+-- calls this instead of a plain subquery on memberships: a policy
+-- expression that queries its own table re-enters the same policy,
+-- and Postgres raises "infinite recursion detected in policy"
+-- (CI Check 1 proved it on the first attempt). The function runs as
+-- its definer — the table owner, who bypasses RLS — so the lookup
+-- does not re-enter the policy. Reviewed per spec gate 3: minimal,
+-- read-only, single purpose, takes the subject as an argument,
+-- returns only tenant ids, grants nothing itself. search_path is
+-- locked to payrollcheck (no hijack via a planted function), and
+-- EXECUTE is granted only to payrollcheck_app (revoked from PUBLIC).
+CREATE OR REPLACE FUNCTION payrollcheck.owned_business_tenant_ids(p_subject_id text)
+RETURNS SETOF uuid
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = payrollcheck
+AS $$
+  SELECT tenant_id FROM payrollcheck.memberships
+  WHERE subject_id = p_subject_id
+    AND active = true
+    AND role = 'business_owner';
+$$;
+REVOKE ALL ON FUNCTION payrollcheck.owned_business_tenant_ids(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION payrollcheck.owned_business_tenant_ids(text) TO payrollcheck_app;
+
 -- Re-assert RLS (enabled + forced by the schema files) so this file is
 -- self-sufficient if applied on its own.
 ALTER TABLE payrollcheck.tenants ENABLE ROW LEVEL SECURITY;
@@ -144,17 +176,13 @@ CREATE POLICY app_tenants_select ON payrollcheck.tenants
 -- sees their own (inactive) row; every authorization path re-checks
 -- active, so visibility grants nothing. Owners see only their own
 -- tenant's members — never another tenant's.
+-- The owner branch calls owned_business_tenant_ids (SECURITY DEFINER helper above), not a plain subquery: a subquery on memberships inside its own SELECT policy recurses infinitely.
 DROP POLICY IF EXISTS app_memberships_select ON payrollcheck.memberships;
 CREATE POLICY app_memberships_select ON payrollcheck.memberships
   FOR SELECT TO payrollcheck_app USING (
     subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
     OR auth_user_id = nullif(current_setting('payrollcheck.current_auth_user_id', true), '')::uuid
-    OR tenant_id IN (
-      SELECT tenant_id FROM payrollcheck.memberships
-      WHERE subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
-        AND active = true
-        AND role = 'business_owner'
-    )
+    OR tenant_id = ANY (payrollcheck.owned_business_tenant_ids(nullif(current_setting('payrollcheck.current_subject_id', true), '')))
   );
 
 -- Insert: only a business_owner adding a member to a tenant they own.
