@@ -26,7 +26,7 @@
 -- exception. Rolls back at the end so no rows remain.
 BEGIN;
 
--- Structural guard: the six tables have RLS enabled + forced, the 15
+-- Structural guard: the six tables have RLS enabled + forced, the 14
 -- step-7 policies exist, and the app role exists without BYPASSRLS.
 DO $$
 DECLARE n int;
@@ -37,7 +37,7 @@ BEGIN
     AND c.relrowsecurity AND c.relforcerowsecurity;
   IF n <> 6 THEN RAISE EXCEPTION 'expected 6 tables with RLS enabled+forced, got %', n; END IF;
   SELECT count(*) INTO n FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname LIKE 'app\_%';
-  IF n <> 15 THEN RAISE EXCEPTION 'expected 15 app policies, got %', n; END IF;
+  IF n <> 14 THEN RAISE EXCEPTION 'expected 14 app policies, got %', n; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'payrollcheck_app' AND rolbypassrls = false) THEN
     RAISE EXCEPTION 'payrollcheck_app role missing or BYPASSRLS';
   END IF;
@@ -204,14 +204,22 @@ RESET ROLE;
 
 -- Check 8: self-approval is denied — reviewer Y (who requested grant
 -- Y→A) cannot approve it, even though they are a member of the firm.
+-- Approve and revoke share one UPDATE policy (two permissive UPDATE
+-- policies would be OR-combined by Postgres and let a requester
+-- self-approve via the revoke USING + approve WITH CHECK). The row is
+-- visible to the firm member via USING, but no valid transition exists
+-- for a self-approval, so Postgres raises insufficient_privilege; the
+-- grant stays pending.
 SET payrollcheck.current_subject_id = 'reviewerY';
 SET payrollcheck.current_auth_user_id = '44444444-4444-4444-8444-444444444444';
 SET ROLE payrollcheck_app;
-DO $$ DECLARE n int; BEGIN
-  UPDATE payrollcheck.client_grants SET status='active',approved_by_subject='reviewerY',approved_at=now()
-   WHERE grant_id='60000000-0000-4000-8000-000000000003';
-  GET DIAGNOSTICS n = ROW_COUNT;
-  IF n <> 0 THEN RAISE EXCEPTION 'self-approve affected % rows', n; END IF;
+DO $$ BEGIN
+  BEGIN
+    UPDATE payrollcheck.client_grants SET status='active',approved_by_subject='reviewerY',approved_at=now()
+     WHERE grant_id='60000000-0000-4000-8000-000000000003';
+    RAISE EXCEPTION 'self-approve unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
 END $$;
 RESET ROLE;
 DO $$ DECLARE s text; BEGIN
