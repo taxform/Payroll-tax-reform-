@@ -31,11 +31,16 @@
 --
 -- WHAT THE POLICIES ENFORCE (see m2-step7-design.md for the full table)
 --   tenants:        a caller sees only tenants they actively belong to.
---   memberships:    a caller reads only their own rows; a business_owner
---                   may insert/deactivate members of their own tenant.
---                   (No member listing for owners via the app role — see
---                   the design note; bootstrap of the FIRST owner is an
---                   ops action as table owner, not an app-role write.)
+--   memberships:    a caller reads their own rows, plus — for a
+--                   business_owner — every member of a tenant they own
+--                   (Postgres requires a row to be SELECT-visible for
+--                   UPDATE to find it, so owner deactivate/reactivate
+--                   only works if the owner can see the member rows;
+--                   this also means owners can list their own tenant's
+--                   members, but never another tenant's). A
+--                   business_owner may insert/deactivate members of
+--                   their own tenant. (Bootstrap of the FIRST owner is
+--                   an ops action as table owner, not an app-role write.)
 --   reports:        business_owner of the owning business tenant, or a
 --                   firm reviewer/admin with an ACTIVE client_grants row
 --                   carrying 'view_report' for that business. Pending,
@@ -128,15 +133,28 @@ CREATE POLICY app_tenants_select ON payrollcheck.tenants
   );
 
 -- ------------------------------------------------------------ memberships
--- Read: own rows only — by mapped subject, or by verified Auth UUID on
--- the login/mapping path before any subject exists. No active filter:
--- an inactive member still sees their own (inactive) row; every
--- authorization path re-checks active, so visibility grants nothing.
+-- Read: own rows — by mapped subject, or by verified Auth UUID on
+-- the login/mapping path before any subject exists — plus, for an
+-- active business_owner, every member row of a tenant they own.
+-- The owner branch is required, not just convenient: Postgres only
+-- lets UPDATE find rows that are SELECT-visible, so without it an
+-- owner could provision a member (INSERT needs no SELECT) but never
+-- deactivate/reactivate them (UPDATE finds zero rows — CI Check 12
+-- proved it). No active filter on own rows: an inactive member still
+-- sees their own (inactive) row; every authorization path re-checks
+-- active, so visibility grants nothing. Owners see only their own
+-- tenant's members — never another tenant's.
 DROP POLICY IF EXISTS app_memberships_select ON payrollcheck.memberships;
 CREATE POLICY app_memberships_select ON payrollcheck.memberships
   FOR SELECT TO payrollcheck_app USING (
     subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
     OR auth_user_id = nullif(current_setting('payrollcheck.current_auth_user_id', true), '')::uuid
+    OR tenant_id IN (
+      SELECT tenant_id FROM payrollcheck.memberships
+      WHERE subject_id = nullif(current_setting('payrollcheck.current_subject_id', true), '')
+        AND active = true
+        AND role = 'business_owner'
+    )
   );
 
 -- Insert: only a business_owner adding a member to a tenant they own.
