@@ -76,7 +76,7 @@ export function getAuthComposition() {
   // sslmode=require (Supabase Postgres requires TLS).
   const pool = new Pool({ connectionString: databaseUrl, max: 5 });
   pool.on('error', (error) => {
-    console.error('payrollcheck pool error:', error instanceof Error ? error.message : 'unknown');
+    console.error('payrollcheck pool error:', errorCode(error));
   });
 
   const { withTransaction } = createPayrollcheckRequestScope({ pool });
@@ -130,11 +130,26 @@ export function getAuthComposition() {
   return composition;
 }
 
+// The IP used as a rate-limit bucket key. The leftmost X-Forwarded-For
+// entry is client-supplied and forgeable (rotating it rotates the bucket),
+// so it is never used. Netlify's edge sets the `client-ip` header from the
+// peer it actually saw, so that wins when present; otherwise the rightmost
+// X-Forwarded-For entry is the one the edge appended for the client-facing
+// hop. With neither header, every request shares the 'unknown' bucket.
+// Log only an error code or name, never error.message: pg messages can
+// echo caller-supplied input values.
+function errorCode(error) {
+  if (error && typeof error === 'object') return error.code ?? error.name ?? 'unknown';
+  return 'unknown';
+}
+
 export function clientIp(req) {
+  const edgeIp = req.headers.get('client-ip');
+  if (typeof edgeIp === 'string' && edgeIp.trim()) return edgeIp.trim();
   const forwarded = req.headers.get('x-forwarded-for');
   if (typeof forwarded === 'string' && forwarded) {
-    const first = forwarded.split(',')[0].trim();
-    if (first) return first;
+    const entries = forwarded.split(',').map((entry) => entry.trim()).filter(Boolean);
+    if (entries.length > 0) return entries[entries.length - 1];
   }
   return 'unknown';
 }
@@ -190,6 +205,6 @@ export function unavailable(error) {
   } else if (error && error.code === 'body_invalid_json') {
     return jsonResponse({ status: 400, body: { error: 'invalid_request' } });
   }
-  console.error('payrollcheck auth unavailable:', error instanceof Error ? error.message : 'unknown');
+  console.error('payrollcheck auth unavailable:', errorCode(error));
   return jsonResponse({ status: 503, body: { error: 'unavailable' } });
 }

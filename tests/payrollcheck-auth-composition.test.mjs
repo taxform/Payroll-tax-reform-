@@ -359,12 +359,12 @@ function makeSetup(overrides = {}) {
 
   const requireAal2 = async (accessToken) => accessToken === 'tok-aal2-owner';
 
-  const listMfaFactors = async ({ accessToken }) => {
-    if (accessToken === 'tok-aal1-owner') {
-      return [{ id: 'factor-1', factor_type: 'totp', status: 'verified', friendly_name: 'Phone' }];
-    }
-    return [];
+  // Mutable per-token factor list, so tests can simulate a user with no
+  // factors or a user at the cap.
+  const factorsByToken = {
+    'tok-aal1-owner': [{ id: 'factor-1', factor_type: 'totp', status: 'verified', friendly_name: 'Phone' }],
   };
+  const listMfaFactors = async ({ accessToken }) => factorsByToken[accessToken] ?? [];
 
   const enrollTotpFactor = async ({ accessToken, friendlyName, issuer }) => {
     if (accessToken === 'tok-aal1-owner') {
@@ -451,6 +451,7 @@ function makeSetup(overrides = {}) {
     setRlsCalls,
     mappingCalls,
     handlerDeps,
+    factorsByToken,
     authorizeCalls,
     recoveryCalls,
     pendingSealer,
@@ -584,8 +585,9 @@ test('login: correct password + no factor issues an aal2:false session and flags
 // ---------------------------------------------------------------------
 // mfaEnroll / mfaVerify
 // ---------------------------------------------------------------------
-test('mfaEnroll: seals an enroll pending blob and returns the TOTP secret once', async () => {
-  const { composition, pendingSealer } = makeSetup();
+test('mfaEnroll: first factor enrolls with password only and returns the TOTP secret once', async () => {
+  const { composition, pendingSealer, factorsByToken } = makeSetup();
+  factorsByToken['tok-aal1-owner'] = [];
   const res = await composition.mfaEnroll({
     email: 'owner@example.com',
     password: 'correct horse',
@@ -604,7 +606,8 @@ test('mfaEnroll: seals an enroll pending blob and returns the TOTP secret once',
 });
 
 test('mfaVerify: wrong code returns 401 invalid_code and issues nothing', async () => {
-  const { composition, store, successfulLogins } = makeSetup();
+  const { composition, store, successfulLogins, factorsByToken } = makeSetup();
+  factorsByToken['tok-aal1-owner'] = [];
   const enrolled = await composition.mfaEnroll({
     email: 'owner@example.com',
     password: 'correct horse',
@@ -658,7 +661,8 @@ test('mfaVerify: correct code issues the session cookie + CSRF token and records
 });
 
 test('mfaVerify: an enroll blob verifies and reports mfaEnrolled:true', async () => {
-  const { composition, store } = makeSetup();
+  const { composition, store, factorsByToken } = makeSetup();
+  factorsByToken['tok-aal1-owner'] = [];
   const enrolled = await composition.mfaEnroll({
     email: 'owner@example.com',
     password: 'correct horse',
@@ -672,6 +676,119 @@ test('mfaVerify: an enroll blob verifies and reports mfaEnrolled:true', async ()
   assert.equal(res.status, 200);
   assert.equal(res.body.mfaEnrolled, true);
   assert.equal(store.rows.size, 1);
+
+test('mfaVerify: accepts both login and enroll pending blobs (purpose is not a gate)', async () => {
+  const { composition, factorsByToken } = makeSetup();
+  // Enroll blob (owner, first factor): verifies and reports mfaEnrolled:true.
+  factorsByToken['tok-aal1-owner'] = [];
+  const enrolled = await composition.mfaEnroll({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  assert.equal(enrolled.status, 200);
+  const enrollVerify = await composition.mfaVerify({
+    pendingBlob: enrolled.body.pendingBlob,
+    factorId: 'factor-new',
+    code: '123456',
+    ip: '1.2.3.4',
+  });
+  assert.equal(enrollVerify.status, 200);
+  assert.equal(enrollVerify.body.mfaEnrolled, true);
+  // Login blob (owner, has a factor): verifies and reports mfaEnrolled:false.
+  factorsByToken['tok-aal1-owner'] = [{ id: 'factor-1', factor_type: 'totp', status: 'verified', friendly_name: 'Phone' }];
+  const logged = await composition.login({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  assert.equal(logged.body.mfaRequired, true);
+  const loginVerify = await composition.mfaVerify({
+    pendingBlob: logged.body.pendingBlob,
+    factorId: 'factor-1',
+    code: '123456',
+    ip: '1.2.3.4',
+  });
+  assert.equal(loginVerify.status, 200);
+  assert.equal(loginVerify.body.mfaEnrolled, false);
+});
+
+test('mfaEnroll: an additional factor without an existing session is refused', async () => {
+  const { composition } = makeSetup();
+  // Owner already has one verified factor; password alone is not enough.
+  const res = await composition.mfaEnroll({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  assert.equal(res.status, 403);
+  assert.equal(res.body.error, 'additional_factor_requires_session');
+});
+
+test('mfaEnroll: an additional factor with an existing session for the same user succeeds', async () => {
+  const { composition } = makeSetup();
+  const logged = await composition.login({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  const verified = await composition.mfaVerify({
+    pendingBlob: logged.body.pendingBlob,
+    factorId: 'factor-1',
+    code: '123456',
+    ip: '1.2.3.4',
+  });
+  assert.equal(verified.status, 200);
+  // mfaVerify returns the session id only in the Set-Cookie header, not the body.
+  const sessionId = parseCookie(verified.headers['Set-Cookie']);
+  assert.equal(typeof sessionId, 'string');
+  const res = await composition.mfaEnroll({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+    sessionId,
+  });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.factorId, 'factor-new');
+});
+
+test('mfaEnroll: an additional factor with a session for another user is refused', async () => {
+  const { composition } = makeSetup();
+  // Firm logs in (firm has no factors, so login issues a session directly)
+  // and that firm session is presented while enrolling for the owner, who
+  // already has a factor. The session belongs to another user, so it must
+  // not authorize the owner's additional factor.
+  const firmLogin = await composition.login({
+    email: 'firm@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  assert.equal(firmLogin.status, 200);
+  const res = await composition.mfaEnroll({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+    sessionId: firmLogin.body.sessionId,
+  });
+  assert.equal(res.status, 403);
+  assert.equal(res.body.error, 'additional_factor_requires_session');
+});
+
+test('mfaEnroll: the per-user factor cap refuses enrollment at the cap', async () => {
+  const { composition, factorsByToken } = makeSetup();
+  factorsByToken['tok-aal1-owner'] = [
+    { id: 'factor-1', factor_type: 'totp', status: 'verified', friendly_name: 'Phone' },
+    { id: 'factor-2', factor_type: 'totp', status: 'verified', friendly_name: 'Tablet' },
+    { id: 'factor-3', factor_type: 'totp', status: 'verified', friendly_name: 'Backup' },
+  ];
+  const res = await composition.mfaEnroll({
+    email: 'owner@example.com',
+    password: 'correct horse',
+    ip: '1.2.3.4',
+  });
+  assert.equal(res.status, 403);
+  assert.equal(res.body.error, 'factor_limit_reached');
+});
 });
 
 test('mfaVerify: a tampered pending blob returns 401 and issues nothing', async () => {

@@ -191,7 +191,7 @@ test('rejects a bad factory config', () => {
 // surfaced only as a bare session_lookup_failed. Both catch blocks must log
 // the underlying error's code and message (never session values) so a future
 // RLS denial is diagnosable.
-test('load logs the underlying store error when the read fails', async () => {
+test('load logs only the store error code when the read fails (never the message)', async () => {
   const logged = [];
   const originalError = console.error;
   console.error = (...args) => { logged.push(args.map((arg) => String(arg)).join(' ')); };
@@ -207,14 +207,15 @@ test('load logs the underlying store error when the read fails', async () => {
     assert.deepEqual(loaded, {ok: false, reason: 'session_lookup_failed'});
     assert.equal(logged.length, 1);
     assert.match(logged[0], /42501/);
-    assert.match(logged[0], /app_sessions_select/);
+    // S7: pg messages can echo input values, so only the code is logged.
+    assert.doesNotMatch(logged[0], /app_sessions_select/);
     assert.doesNotMatch(logged[0], /sess-/);
   } finally {
     console.error = originalError;
   }
 });
 
-test('load logs the underlying store error when the write-back fails', async () => {
+test('load logs only the store error code when the write-back fails (never the message)', async () => {
   const logged = [];
   const originalError = console.error;
   console.error = (...args) => { logged.push(args.map((arg) => String(arg)).join(' ')); };
@@ -230,7 +231,8 @@ test('load logs the underlying store error when the write-back fails', async () 
     assert.deepEqual(loaded, {ok: false, reason: 'session_lookup_failed'});
     assert.equal(logged.length, 1);
     assert.match(logged[0], /42501/);
-    assert.match(logged[0], /app_sessions_insert/);
+    // S7: pg messages can echo input values, so only the code is logged.
+    assert.doesNotMatch(logged[0], /app_sessions_insert/);
     assert.doesNotMatch(logged[0], /sess-/);
   } finally {
     console.error = originalError;

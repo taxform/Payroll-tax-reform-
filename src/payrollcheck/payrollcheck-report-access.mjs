@@ -248,7 +248,7 @@ export function createReportAccessHandler({
     if (sessionId !== undefined && sessionId !== null) {
       if (typeof getSession !== 'function') {
         // A presented session that cannot be checked must not be bypassed.
-        return deny(503, 'unavailable', { requestId: effectiveRequestId });
+        return denyAudited(503, 'unavailable', 'session_unavailable');
       }
       if (!isSubjectId(sessionId)) {
         return denyAudited(401, 'unknown_session', 'unknown_session');
@@ -301,7 +301,7 @@ export function createReportAccessHandler({
       }
       report = rows[0];
     } catch {
-      return deny(503, 'unavailable', { requestId: effectiveRequestId });
+      return denyAudited(503, 'unavailable', 'report_load_failed');
     }
     if (!report || !isUuid(report.business_tenant_id)) {
       return denyAudited(503, 'unavailable', 'invalid_record');
@@ -329,7 +329,7 @@ export function createReportAccessHandler({
         grantResult && Array.isArray(grantResult.rows) ? grantResult.rows : null;
       if (!memberships || !grants) throw new Error('load_failed');
     } catch {
-      return deny(503, 'unavailable', { requestId: effectiveRequestId });
+      return denyAudited(503, 'unavailable', 'membership_load_failed');
     }
 
     // 8. Secondary policy check: authorizeSupabaseTenantSession per
@@ -423,18 +423,7 @@ export function createReportAccessHandler({
     // 9. Consent recheck immediately before release: fresh SELECTs in
     // the same READ COMMITTED transaction, so a concurrent revocation
     // is visible here. A stale decision never releases data.
-    // Staging-only test hook (PAYROLLCHECK_TEST_DELAY_MS): pause here, between the
-  // report load and the consent recheck, so a concurrent revoke can land mid-flight
-  // (M2 live acceptance item (g)). Unset or 0: no delay, no extra query, no log line.
-  const testDelayMs = Math.min(
-    Math.max(Number.parseInt(process.env.PAYROLLCHECK_TEST_DELAY_MS, 10) || 0, 0),
-    30000,
-  );
-  if (testDelayMs > 0) {
-    await new Promise((resolve) => setTimeout(resolve, testDelayMs));
-  }
-
-  let recheckOk = false;
+    let recheckOk = false;
     try {
       if (decision.path === 'business') {
         const recheck = await query(
@@ -467,7 +456,7 @@ export function createReportAccessHandler({
         recheckOk = grantStillAuthorizes && membershipStillActive;
       }
     } catch {
-      return deny(503, 'unavailable', { requestId: effectiveRequestId });
+      return denyAudited(503, 'unavailable', 'consent_recheck_failed');
     }
     if (!recheckOk) {
       return denyAudited(404, 'not_found', 'consent_revoked');

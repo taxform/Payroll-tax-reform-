@@ -87,6 +87,7 @@ function makeDb() {
     failAudit: false,
     failSessionLookup: false,
     failReportLoad: false,
+  failMembershipLoad: false,
     rateLimited: false,
     rateLimitThrows: false,
     revokeGrantOnRecheck: null,
@@ -134,6 +135,7 @@ function makeQuery(db) {
     }
     // Caller memberships + tenant types.
     if (sql.includes('FROM payrollcheck.memberships m JOIN payrollcheck.tenants')) {
+    if (db.failMembershipLoad) throw new Error('db down');
       const rows = db.memberships
         .filter((m) => m.subject_id === values[0] && m.active === true)
         .map((m) => ({
@@ -531,10 +533,14 @@ test('session/user mismatch is 401 session_mismatch', async () => {
 });
 
 test('presented session with no getSession injected is 503 (fail closed)', async () => {
-  const { handler } = setup({ getSession: undefined });
+  const { db, handler } = setup({ getSession: undefined });
   const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a', sessionId: 'sess-owner-a' });
   assert.equal(result.status, 503);
   assert.equal(result.reason, 'unavailable');
+  // S3: a presented session that cannot be checked is audited.
+  assert.equal(db.auditRows.length, 1);
+  assert.equal(db.auditRows[0].reason, 'session_unavailable');
+  assert.equal(db.auditRows[0].allowed, false);
 });
 
 test('previous session id inside the rotation grace still allows', async () => {
@@ -768,43 +774,6 @@ test('membership deactivated between load and recheck (business path) is 404 con
   assert.equal(db.auditRows[0].reason, 'consent_revoked');
 });
 
-// --- Staging-only test delay hook (PAYROLLCHECK_TEST_DELAY_MS) ---
-// The hook pauses between the report load and the consent recheck, so a
-// concurrent revoke can land mid-flight. Unset: no delay at all.
-
-test('no test delay when PAYROLLCHECK_TEST_DELAY_MS is unset', async () => {
-  const { handler } = setup();
-  const previous = process.env.PAYROLLCHECK_TEST_DELAY_MS;
-  delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
-  try {
-    const startedAt = Date.now();
-    const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
-    const elapsedMs = Date.now() - startedAt;
-    assert.equal(result.status, 200);
-    assert.ok(elapsedMs < 50, 'expected no test delay, got ' + elapsedMs + 'ms');
-  } finally {
-    if (previous === undefined) delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
-    else process.env.PAYROLLCHECK_TEST_DELAY_MS = previous;
-  }
-});
-
-test('PAYROLLCHECK_TEST_DELAY_MS=50 delays the firm consent recheck', async () => {
-  const { handler } = setup();
-  const previous = process.env.PAYROLLCHECK_TEST_DELAY_MS;
-  process.env.PAYROLLCHECK_TEST_DELAY_MS = '50';
-  try {
-    const startedAt = Date.now();
-    const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
-    const elapsedMs = Date.now() - startedAt;
-    assert.equal(result.status, 200);
-    // 45ms floor allows for timer granularity; without the hook this is ~0ms.
-    assert.ok(elapsedMs >= 45, 'expected about 50ms of test delay, got ' + elapsedMs + 'ms');
-  } finally {
-    if (previous === undefined) delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
-    else process.env.PAYROLLCHECK_TEST_DELAY_MS = previous;
-  }
-});
-
 test('recheck DB error is 503, no data released', async () => {
   const { db, handler } = setup();
   db.recheckThrows = true;
@@ -812,6 +781,10 @@ test('recheck DB error is 503, no data released', async () => {
   assert.equal(result.status, 503);
   assert.equal(result.reason, 'unavailable');
   assert.equal(result.report, undefined);
+  // S3: the consent-recheck failure is audited like every other decision.
+  assert.equal(db.auditRows.length, 1);
+  assert.equal(db.auditRows[0].reason, 'consent_recheck_failed');
+  assert.equal(db.auditRows[0].allowed, false);
 });
 
 // --- Audit failure: fail closed -----------------------------------------
@@ -840,9 +813,25 @@ test('report load throwing is 503 unavailable', async () => {
   const { db, handler } = setup();
   db.failReportLoad = true;
   const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
+
+test('membership load throwing is 503 unavailable and audited', async () => {
+  const { db, handler } = setup();
+  db.failMembershipLoad = true;
+  const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
   assert.equal(result.status, 503);
   assert.equal(result.reason, 'unavailable');
-  assert.equal(db.auditRows.length, 0);
+  assert.equal(result.report, undefined);
+  // S3: the membership/grant-load failure is audited like every other decision.
+  assert.equal(db.auditRows.length, 1);
+  assert.equal(db.auditRows[0].reason, 'membership_load_failed');
+  assert.equal(db.auditRows[0].allowed, false);
+});
+  assert.equal(result.status, 503);
+  assert.equal(result.reason, 'unavailable');
+  // S3: the report-load failure is audited like every other decision.
+  assert.equal(db.auditRows.length, 1);
+  assert.equal(db.auditRows[0].reason, 'report_load_failed');
+  assert.equal(db.auditRows[0].allowed, false);
 });
 
 // --- No leakage ---------------------------------------------------------

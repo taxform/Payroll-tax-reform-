@@ -74,13 +74,20 @@
 --     could request as if it were a firm); the firm-path report policy
 --     re-checks the reader's tenant type, so a mis-typed grant cannot
 --     authorize a read.
---   - RLS cannot compare a new row to the old row, so an approver who
---     owns two businesses could move a grant between them; the step-6
---     module is the first layer (it updates status/actor/timestamps
---     only) and the step-9 handler must only expose that transition.
---   - Within-tenant role changes by a business_owner are permitted by
---     the memberships UPDATE policy; step-9 handlers restrict the
---     operation surface (step 6 only flips active).
+--   - RLS cannot compare a new row to the old row, so the UPDATE policies
+--     alone cannot stop an approver who owns two businesses from moving
+--     a grant between them or widening its scopes. The BEFORE UPDATE
+--     triggers below (prevent_client_grant_reassignment,
+--     prevent_membership_role_change) enforce that immutability in the
+--     database instead: scopes, firm_tenant_id and business_tenant_id
+--     on a grant, and role on a membership, cannot change on UPDATE.
+--     The step-6 modules only update status/actor/timestamps (grants)
+--     and the active flag (memberships), so they are unaffected.
+--   - Within-tenant role changes by a business owner were permitted by
+--     the memberships UPDATE policy; the prevent_membership_role_change
+--     trigger below now forbids any role change on UPDATE. Step-9
+--     handlers still restrict the operation surface (step 6 only flips
+--     active).
 --
 -- Apply after docs/sql/payrollcheck-deny-by-default-schema.sql,
 -- docs/sql/payrollcheck-dev-auth-identity-link.sql, and
@@ -212,8 +219,33 @@ CREATE POLICY app_memberships_insert ON payrollcheck.memberships
   );
 
 -- Update (deactivate/reactivate): only a business_owner of that tenant.
--- The policy permits any column change by the owner; step-6 modules and
--- step-9 handlers restrict the operation surface (active flag only).
+-- The policy permits any column change by the owner, but the
+-- prevent_membership_role_change trigger above forbids role changes on
+-- UPDATE; step-6 modules and step-9 handlers restrict the operation
+-- surface (active flag only).
+-- S6: RLS cannot compare a new row to the old row, so the memberships
+-- UPDATE policy alone cannot stop a business owner from changing a role
+-- within their tenant. This BEFORE UPDATE trigger forbids any role change,
+-- so no UPDATE (from any caller) can change a role. The step-6 modules
+-- only flip the active flag and are unaffected.
+CREATE OR REPLACE FUNCTION payrollcheck.prevent_membership_role_change()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role THEN
+    RAISE EXCEPTION 'memberships role is immutable on UPDATE'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS prevent_membership_role_change ON payrollcheck.memberships;
+CREATE TRIGGER prevent_membership_role_change
+  BEFORE UPDATE ON payrollcheck.memberships
+  FOR EACH ROW EXECUTE FUNCTION payrollcheck.prevent_membership_role_change();
+
 DROP POLICY IF EXISTS app_memberships_update ON payrollcheck.memberships;
 CREATE POLICY app_memberships_update ON payrollcheck.memberships
   FOR UPDATE TO payrollcheck_app USING (
@@ -311,6 +343,33 @@ CREATE POLICY app_client_grants_insert ON payrollcheck.client_grants
 -- denial now surfaces as an insufficient_privilege error (the row is
 -- visible via USING but no valid transition exists), not as zero
 -- affected rows — see regression Check 8.
+-- S6: RLS cannot compare a new row to the old row, so the client_grants
+-- UPDATE policy alone cannot stop an approver from moving a grant between
+-- businesses or widening its scopes in the same UPDATE that approves it.
+-- This BEFORE UPDATE trigger makes scopes, firm_tenant_id and
+-- business_tenant_id immutable, so no UPDATE (from any caller) can change
+-- them. The step-6 modules only update status/actor/timestamps and are
+-- unaffected.
+CREATE OR REPLACE FUNCTION payrollcheck.prevent_client_grant_reassignment()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.scopes IS DISTINCT FROM OLD.scopes
+     OR NEW.firm_tenant_id IS DISTINCT FROM OLD.firm_tenant_id
+     OR NEW.business_tenant_id IS DISTINCT FROM OLD.business_tenant_id THEN
+    RAISE EXCEPTION 'client_grants scopes, firm_tenant_id and business_tenant_id are immutable on UPDATE'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS prevent_client_grant_reassignment ON payrollcheck.client_grants;
+CREATE TRIGGER prevent_client_grant_reassignment
+  BEFORE UPDATE ON payrollcheck.client_grants
+  FOR EACH ROW EXECUTE FUNCTION payrollcheck.prevent_client_grant_reassignment();
+
 DROP POLICY IF EXISTS app_client_grants_update ON payrollcheck.client_grants;
 CREATE POLICY app_client_grants_update ON payrollcheck.client_grants
   FOR UPDATE TO payrollcheck_app USING (

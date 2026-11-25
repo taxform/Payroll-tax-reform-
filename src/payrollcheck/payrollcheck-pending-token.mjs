@@ -26,6 +26,13 @@
 // shape, wrong purpose) — it never throws for a bad blob. The key is
 // never logged, and neither is the access token.
 //
+// Purpose is recorded, not enforced: mfaVerify intentionally accepts
+// BOTH 'login' and 'enroll' blobs (the enroll flow depends on it). The
+// purpose only sets the mfaEnrolled flag in the verify response. Both
+// blob types are issued only after password authentication of the same
+// user, and both still require the 6-digit TOTP code, so accepting both
+// is not a privilege boundary - do not describe it as "purpose-bound".
+//
 // LIMITATION (documented, not hidden): the blob is stateless, so a
 // failed verify cannot "consume" it — it stays usable until expiry.
 // That is safe here because every use still requires the TOTP code and
