@@ -1,11 +1,15 @@
 -- Read-only security regression check for the dedicated Supabase development project.
 -- Returns zero rows on success; any row indicates unexpected access or RLS drift.
+-- Updated Nov 25, 2026 (schema reconciliation): auth_limits and its
+-- app_auth_limits_all policy were missing from the expected counts; this file
+-- now expects seven tables and fifteen policies, matching live dev and
+-- tests/sql/payrollcheck-rls-regression.sql.
 -- UPDATED Nov 23, 2026 (M2 step 7): this used to check the deny-by-default
 -- posture (zero policies, five tables). The step-7 policies are now the
 -- reviewed posture, so this checks THAT instead: RLS enabled + forced on
--- all six tables, exactly the fourteen app_* policies, the is_business_owner_of SECURITY DEFINER helper, no policy granting
+-- all seven tables, exactly the fifteen app_* policies, the is_business_owner_of SECURITY DEFINER helper, no policy granting
 -- anon/authenticated/public, no table grants to anon/authenticated, no
--- schema USAGE for anon/authenticated, six tables. Run it against the
+-- schema USAGE for anon/authenticated, seven tables. Run it against the
 -- Supabase dev project (where anon/authenticated exist), NOT disposable
 -- Postgres. If a future step adds or changes a policy, update the
 -- expected_policies list here in the same PR.
@@ -25,6 +29,7 @@ WITH protected_tables AS (
   ('client_grants','app_client_grants_update'),
   ('access_audit','app_access_audit_select'),
   ('access_audit','app_access_audit_insert'),
+  ('auth_limits','app_auth_limits_all'),
   ('sessions','app_sessions_select'),
   ('sessions','app_sessions_insert'),
   ('sessions','app_sessions_update'),
@@ -50,8 +55,8 @@ SELECT '(schema)','unexpected_schema_usage'
 WHERE has_schema_privilege('anon','payrollcheck','USAGE')
  OR has_schema_privilege('authenticated','payrollcheck','USAGE')
 UNION ALL
-SELECT '(tables)','expected_six_tables'
-WHERE (SELECT count(*) FROM protected_tables)<>6
+SELECT '(tables)','expected_seven_tables'
+WHERE (SELECT count(*) FROM protected_tables)<>7
 UNION ALL
 SELECT '(function)','missing_security_definer_helper'
 WHERE NOT EXISTS (
