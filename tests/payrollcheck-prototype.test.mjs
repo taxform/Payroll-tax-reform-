@@ -6,9 +6,9 @@ import { readFileSync } from 'node:fs';
 const audit=readFileSync(new URL('../public/payrollcheck/index.html',import.meta.url),'utf8');
 const prepay=readFileSync(new URL('../public/payrollcheck/before-you-pay.html',import.meta.url),'utf8');
 for(const [name,html] of [['readiness audit',audit],['pre-payroll review',prepay]]){
- test(name+' is not indexable during development',()=>{
-  assert.match(html,/<meta\s+name="robots"\s+content="[^"]*noindex/i);
- });
+  test(name+" indexability matches its launch state",()=>{
+    assert.equal(html.includes("noindex"),name==="pre-payroll review");
+  });
  test(name+' does not contain common browser persistence or outbound submission calls',()=>{
   assert.doesNotMatch(html,/\b(?:localStorage|sessionStorage|indexedDB|XMLHttpRequest|sendBeacon)\b/);
   assert.doesNotMatch(html,/\bfetch\s*\(/);
