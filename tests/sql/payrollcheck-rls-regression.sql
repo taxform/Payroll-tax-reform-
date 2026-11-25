@@ -38,6 +38,12 @@ BEGIN
   IF n <> 8 THEN RAISE EXCEPTION 'expected 8 tables with RLS enabled+forced, got %', n; END IF;
   SELECT count(*) INTO n FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname LIKE 'app\_%';
   IF n <> 18 THEN RAISE EXCEPTION 'expected 18 app policies, got %', n; END IF;
+IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname IN ('app_tenants_all', 'app_reports_all', 'app_client_grants_delete', 'app_memberships_read')) THEN
+  RAISE EXCEPTION 'non-canonical app policies present (app_tenants_all, app_reports_all, app_client_grants_delete, app_memberships_read); drop them with docs/sql/payrollcheck-policy-reconciliation-migration.sql';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'payrollcheck' AND table_name = 'memberships' AND column_name = 'membership_id') THEN
+  RAISE EXCEPTION 'memberships.membership_id is missing; add it with docs/sql/payrollcheck-policy-reconciliation-migration.sql';
+END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'payrollcheck_app' AND rolbypassrls = false) THEN
     RAISE EXCEPTION 'payrollcheck_app role missing or BYPASSRLS';
   END IF;

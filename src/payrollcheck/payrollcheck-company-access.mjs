@@ -10,6 +10,10 @@ import { parseCompanyInput, parseCompanyRequest, toCompanyResponse, normalizeEin
 import { resolveDashboardTenant } from './payrollcheck-dashboard.mjs';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Upper bound for a presented credential, mirroring
+// payrollcheck-report-access.mjs. The token is never parsed as a UUID.
+const MAX_TOKEN_LENGTH = 16384;
 const RATE_LIMIT_KEY_PREFIX = 'company:';
 
 export function createCompanyAccessHandler({
@@ -65,8 +69,12 @@ export function createCompanyAccessHandler({
       });
     }
 
-    // 2. Server-side verified user.
-    if (typeof accessToken !== 'string' || !UUID_PATTERN.test(accessToken)) {
+  // 2. The presented credential is verified server-side. The credential is
+  // the server session id the composition passes as `accessToken`, so only
+  // its presence and length are checked here (same as the report handler).
+  // The verified user must have a confirmed email address, must not be
+  // anonymous.
+    if (typeof accessToken !== 'string' || accessToken.length === 0 || accessToken.length > MAX_TOKEN_LENGTH) {
       return deny(401, 'invalid_session', {
         requestId: effectiveRequestId,
         clientIp,
