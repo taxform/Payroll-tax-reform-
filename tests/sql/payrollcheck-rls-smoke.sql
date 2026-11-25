@@ -10,7 +10,7 @@ VALUES ('11111111-1111-4111-8111-111111111111','business');
 DO $$
 DECLARE t text; n bigint; enabled boolean; forced boolean;
 BEGIN
- FOR t IN SELECT unnest(ARRAY['tenants','memberships','reports','client_grants','access_audit','sessions'])
+ FOR t IN SELECT unnest(ARRAY['tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits'])
  LOOP
   SELECT relrowsecurity,relforcerowsecurity INTO enabled,forced
   FROM pg_class WHERE oid=('payrollcheck.'||t)::regclass;

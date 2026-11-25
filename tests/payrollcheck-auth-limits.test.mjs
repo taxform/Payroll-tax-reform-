@@ -4,6 +4,30 @@ import { createAuthLimits } from '../src/payrollcheck/payrollcheck-auth-limits.m
 
 function makeStore({ failGet = false, failSet = false, failDelete = false } = {}) {
   const data = new Map();
+  const incrementAttempts = async ({ key, now, maxFailedAttempts, lockoutMs }) => {
+    if (failGet || failSet) throw new Error('store down');
+    let record = data.has(key) ? data.get(key) : null;
+    if (record?.lockedUntil && now >= record.lockedUntil) record = null;
+    const count = record ? record.count + 1 : 1;
+    const next = {
+      count,
+      firstFailureAt: record ? record.firstFailureAt : now,
+      lockedUntil: count >= maxFailedAttempts ? now + lockoutMs : 0,
+    };
+    data.set(key, next);
+    return next;
+  };
+  const incrementRateLimit = async ({ key, now, windowMs, maxRequests }) => {
+    if (failGet || failSet) throw new Error('store down');
+    let record = data.has(key) ? data.get(key) : null;
+    if (!record || now - record.windowStart >= windowMs) {
+      record = { count: 1, windowStart: now };
+    } else {
+      record = { count: record.count + 1, windowStart: record.windowStart };
+    }
+    data.set(key, record);
+    return record;
+  };
   return {
     data,
     async get(key) {
@@ -18,6 +42,8 @@ function makeStore({ failGet = false, failSet = false, failDelete = false } = {}
       if (failDelete) throw new Error('store down');
       data.delete(key);
     },
+    incrementAttempts,
+    incrementRateLimit,
   };
 }
 
@@ -47,6 +73,33 @@ test('identifier is normalized: case and whitespace do not create separate recor
   await limits.recordFailedLogin({ identifier: 'user@example.com' });
   const result = await limits.checkLoginAllowed({ identifier: 'USER@EXAMPLE.COM', ip: '203.0.113.7' });
   assert.equal(result.remainingAttempts, 3);
+});
+
+test('two createAuthLimits instances sharing one store see the same counts', async () => {
+  const clock = makeClock();
+  const store = makeStore();
+  const first = createAuthLimits({ store, now: clock.now });
+  const second = createAuthLimits({ store, now: clock.now });
+  await first.recordFailedLogin({ identifier: 'shared@example.com' });
+  await second.recordFailedLogin({ identifier: 'shared@example.com' });
+  const result = await first.checkLoginAllowed({
+    identifier: 'shared@example.com',
+    ip: '203.0.113.7',
+  });
+  assert.equal(result.remainingAttempts, 3);
+});
+
+test('concurrent atomic increments lose no counts', async () => {
+  const clock = makeClock();
+  const store = makeStore();
+  const limits = createAuthLimits({ store, now: clock.now });
+  await Promise.all(
+    Array.from({length: 20}, () =>
+      limits.recordFailedLogin({ identifier: 'concurrent@example.com' }),
+    ),
+  );
+  const record = await store.get('auth:attempts:concurrent@example.com');
+  assert.equal(record.count, 20);
 });
 
 test('fifth consecutive failure locks the account for 15 minutes', async () => {

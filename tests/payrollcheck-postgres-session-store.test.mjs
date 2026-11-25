@@ -196,12 +196,18 @@ test('delete and deleteByUserId run parameterized deletes', async () => {
   await store.delete(SESSION_ID);
   assert.match(calls[0].sql, /DELETE FROM payrollcheck\.sessions WHERE session_id = \$1::text/);
   assert.deepEqual(calls[0].values, [SESSION_ID]);
-  await store.deleteByUserId(USER_ID);
+  const deleted = await store.deleteByUserId(USER_ID);
   assert.match(calls[1].sql, /DELETE FROM payrollcheck\.sessions WHERE user_id = \$1::text/);
   assert.deepEqual(calls[1].values, [USER_ID]);
+  assert.equal(deleted, 0);
   await store.delete('bad id!!');
   await store.deleteByUserId('bad id!!');
   assert.equal(calls.length, 2);
+});
+
+test('deleteByUserId returns the deleted row count', async () => {
+  const {store} = storeFor([{session_id: 'sess-a'}, {session_id: 'sess-b'}]);
+  assert.equal(await store.deleteByUserId(USER_ID), 2);
 });
 
 test('rejects a bad factory config', () => {

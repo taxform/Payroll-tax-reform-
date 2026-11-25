@@ -28,9 +28,14 @@ function memoryStore() {
       byId.delete(sessionId);
     },
     async deleteByUserId(userId) {
+      let count = 0;
       for (const [sessionId, record] of byId.entries()) {
-        if (record.userId === userId) byId.delete(sessionId);
+        if (record.userId === userId) {
+          byId.delete(sessionId);
+          count += 1;
+        }
       }
+      return count;
     },
     size() {
       return byId.size;
@@ -122,9 +127,14 @@ test('revoke and revoke-all-for-user deny later loads', async () => {
   assert.equal(await s.sessions.revoke(first.sessionId), true);
   assert.deepEqual(await s.sessions.load(first.cookie), {ok: false, reason: 'unknown_session'});
   assert.equal((await s.sessions.load(second.cookie)).ok, true);
-  assert.equal(await s.sessions.revokeAllForUser(USER_ID), true);
+  assert.deepEqual(await s.sessions.revokeAllForUser(USER_ID), {ok: true, revoked: 1});
   assert.deepEqual(await s.sessions.load(second.cookie), {ok: false, reason: 'unknown_session'});
   assert.equal(s.store.size(), 0);
+});
+
+test('revokeAllForUser reports zero-row revocation as ok false', async () => {
+  const s = setup();
+  assert.deepEqual(await s.sessions.revokeAllForUser('nobody'), {ok: false, revoked: 0});
 });
 
 test('rotate issues a new id on demand and rejects bad ids', async () => {

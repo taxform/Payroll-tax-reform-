@@ -192,7 +192,11 @@ export function createPayrollcheckTenancy({
 
   async function deactivateMembership({ tenantId, subjectId } = {}) {
     const result = await setMembershipActive({ tenantId, subjectId, active: false });
-    return { ok: true, deactivated: result.changed, ...(result.membership ? { membership: result.membership } : {}) };
+    return {
+      ok: result.changed,
+      deactivated: result.changed,
+      ...(result.membership ? { membership: result.membership } : {}),
+    };
   }
 
   async function reactivateMembership({ tenantId, subjectId } = {}) {
@@ -207,7 +211,8 @@ export function createPayrollcheckTenancy({
       [authUserId],
     );
     if (!Array.isArray(result.rows)) throw new Error('revoke_all_failed');
-    return { ok: true, count: result.rows.length };
+    const count = result.rows.length;
+    return { ok: count > 0, count };
   }
 
   // --- Client grants -------------------------------------------------

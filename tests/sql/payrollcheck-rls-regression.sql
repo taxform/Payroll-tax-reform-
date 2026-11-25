@@ -26,18 +26,18 @@
 -- exception. Rolls back at the end so no rows remain.
 BEGIN;
 
--- Structural guard: the six tables have RLS enabled + forced, the 14
--- step-7 policies exist, and the app role exists without BYPASSRLS.
+-- Structural guard: the seven tables have RLS enabled + forced, the 15
+-- step-7/step-10 policies exist, and the app role exists without BYPASSRLS.
 DO $$
 DECLARE n int;
 BEGIN
   SELECT count(*) INTO n FROM pg_class c JOIN pg_namespace ns ON ns.oid = c.relnamespace
     WHERE ns.nspname = 'payrollcheck' AND c.relkind = 'r'
-    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions')
+    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits')
     AND c.relrowsecurity AND c.relforcerowsecurity;
-  IF n <> 6 THEN RAISE EXCEPTION 'expected 6 tables with RLS enabled+forced, got %', n; END IF;
+  IF n <> 7 THEN RAISE EXCEPTION 'expected 7 tables with RLS enabled+forced, got %', n; END IF;
   SELECT count(*) INTO n FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname LIKE 'app\_%';
-  IF n <> 14 THEN RAISE EXCEPTION 'expected 14 app policies, got %', n; END IF;
+  IF n <> 15 THEN RAISE EXCEPTION 'expected 15 app policies, got %', n; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'payrollcheck_app' AND rolbypassrls = false) THEN
     RAISE EXCEPTION 'payrollcheck_app role missing or BYPASSRLS';
   END IF;

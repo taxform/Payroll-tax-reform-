@@ -178,7 +178,7 @@ test('deactivateMembership is idempotent; reactivateMembership reverses it', asy
 
   const alreadyOff = setup(async () => ({ rows: [] }));
   assert.deepEqual(await alreadyOff.api.deactivateMembership({ tenantId: TENANT_ID, subjectId: 'usr_generatedsubject01' }), {
-    ok: true,
+    ok: false,
     deactivated: false,
   });
 
@@ -194,6 +194,8 @@ test('revokeUserEverywhere deactivates all rows for the auth user and returns th
   assert.deepEqual(result, { ok: true, count: 2 });
   const update = findCall(calls, 'UPDATE payrollcheck.memberships SET active = false WHERE auth_user_id');
   assert.ok(update);
+  const zero = setup(async () => ({ rows: [] }));
+  assert.deepEqual(await zero.api.revokeUserEverywhere({ authUserId: AUTH_USER_ID }), { ok: false, count: 0 });
   await assert.rejects(() => api.revokeUserEverywhere({ authUserId: 'x' }), /auth_user_id_must_be_a_uuid/);
 });
 

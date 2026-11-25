@@ -261,12 +261,13 @@ export function createServerSession({
   }
 
   async function revokeAllForUser(userId) {
-    if (!id(userId)) return false;
+    if (!id(userId)) return {ok: false, revoked: 0};
     try {
-      await store.deleteByUserId(userId);
-      return true;
+      const count = await store.deleteByUserId(userId);
+      const revoked = Number.isSafeInteger(count) && count > 0 ? count : 0;
+      return {ok: revoked > 0, revoked};
     } catch {
-      return false;
+      return {ok: false, revoked: 0};
     }
   }
 

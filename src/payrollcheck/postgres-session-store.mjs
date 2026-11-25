@@ -190,8 +190,12 @@ export function createPostgresSessionStore({query} = {}) {
   }
 
   async function deleteByUserId(userId) {
-    if (!id(userId)) return;
-    await query('DELETE FROM payrollcheck.sessions WHERE user_id = $1::text', [userId]);
+    if (!id(userId)) return 0;
+    const result = await query(
+      'DELETE FROM payrollcheck.sessions WHERE user_id = $1::text RETURNING session_id',
+      [userId],
+    );
+    return Array.isArray(result?.rows) ? result.rows.length : 0;
   }
 
   return Object.freeze({get, getByPreviousSessionId, set, delete: remove, deleteByUserId});

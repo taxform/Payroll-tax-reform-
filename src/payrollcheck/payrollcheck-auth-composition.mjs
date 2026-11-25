@@ -33,7 +33,7 @@
 //     presented session id (grace-aware — see the readReport comment);
 //     a rotation also returns the new token in the body so the browser
 //     can update it.
-//   deactivateMembershipAndRevokeSessions({ tenantId, subjectId }) —
+//   deactivateMembershipAndRevokeSessions({ tenantId, subjectId, actorSubjectId }) —
 //     admin composition (no HTTP endpoint in step 9; ops script only):
 //     deactivate the membership AND revoke all server sessions. A
 //     revoke failure is reported loudly, never hidden.
@@ -87,6 +87,7 @@ import { randomUUID } from 'node:crypto';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SUBJECT_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_PATTERN = /^[0-9]{6}$/;
 const ACTIONS = ['view_report', 'review_finding'];
@@ -775,44 +776,54 @@ export function createPayrollcheckAuth({
     return { status: outcome.status, headers, body };
   }
 
-  async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId } = {}) {
+  async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId, actorSubjectId } = {}) {
     if (
       typeof tenantId !== 'string' ||
       !UUID_PATTERN.test(tenantId) ||
       typeof subjectId !== 'string' ||
-      !subjectId
+      !SUBJECT_PATTERN.test(subjectId) ||
+      typeof actorSubjectId !== 'string' ||
+      !SUBJECT_PATTERN.test(actorSubjectId)
     ) {
-      throw new TypeError('tenant_id_and_subject_id_required');
+      throw new TypeError('tenant_id_subject_id_and_actor_subject_id_required');
     }
     const result = await withTransaction(async ({ query }) => {
       const tenancy = tenancyFactory({ query });
       const store = sessionStoreFactory({ query });
       const layer = sessionLayerFactory({ store });
+      await setRlsIdentity({ query, subjectId: actorSubjectId });
       const deactivated = await tenancy.deactivateMembership({ tenantId, subjectId });
-      // Do not revoke sessions for a deactivation that did not
-      // succeed: the report below must describe what actually
-      // happened. (Per the step-6 contract deactivateMembership
-      // returns { ok: true, ... } or throws; this branch is defensive.)
       if (!deactivated || deactivated.ok !== true) {
         return { deactivated, sessionsRevoked: false };
       }
-      const sessionsRevoked = await layer.revokeAllForUser(subjectId);
-      return { deactivated, sessionsRevoked };
+      if (deactivated.deactivated !== true) {
+        return { deactivated: { ...deactivated, ok: false, deactivated: false }, sessionsRevoked: false };
+      }
+      const authUserId =
+        deactivated.membership?.auth_user_id ?? deactivated.membership?.authUserId;
+      if (typeof authUserId !== 'string' || !UUID_PATTERN.test(authUserId)) {
+        throw new TypeError('deactivated_membership_auth_user_id_required');
+      }
+      await setRlsIdentity({ query, subjectId, authUserId });
+      const revokeResult = await layer.revokeAllForUser(subjectId);
+      return { deactivated, sessionsRevoked: revokeResult };
     });
     if (result.deactivated && result.deactivated.ok !== true) {
+      if (result.deactivated.deactivated === false) {
+        return { ok: false, reason: 'deactivate_noop', deactivated: false, sessionsRevoked: false };
+      }
       return { ok: false, reason: 'deactivate_failed', deactivated: false, sessionsRevoked: false };
     }
-    const wasDeactivated = Boolean(
-      result.deactivated && result.deactivated.deactivated === true,
-    );
-    if (result.sessionsRevoked !== true) {
-      // The membership is deactivated but live sessions were NOT
-      // revoked: the user is denied from the NEXT request (mapping
-      // stops resolving), but existing sessions stay valid until
-      // expiry. That half-state must be loud, never hidden.
-      return { ok: false, reason: 'sessions_not_revoked', deactivated: wasDeactivated, sessionsRevoked: false };
+    const revokeOk =
+      result.sessionsRevoked === true ||
+      (result.sessionsRevoked &&
+        result.sessionsRevoked.ok === true &&
+        Number.isSafeInteger(result.sessionsRevoked.revoked) &&
+        result.sessionsRevoked.revoked > 0);
+    if (!revokeOk) {
+      return { ok: false, reason: 'sessions_not_revoked', deactivated: true, sessionsRevoked: false };
     }
-    return { ok: true, deactivated: wasDeactivated, sessionsRevoked: true };
+    return { ok: true, deactivated: true, sessionsRevoked: true };
   }
 
   return Object.freeze({

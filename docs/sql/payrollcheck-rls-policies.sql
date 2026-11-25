@@ -148,6 +148,8 @@ ALTER TABLE payrollcheck.access_audit ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payrollcheck.access_audit FORCE ROW LEVEL SECURITY;
 ALTER TABLE payrollcheck.sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payrollcheck.sessions FORCE ROW LEVEL SECURITY;
+ALTER TABLE payrollcheck.auth_limits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payrollcheck.auth_limits FORCE ROW LEVEL SECURITY;
 
 -- Least privilege: only the operations the policies cover. Anything
 -- without a policy is denied by RLS even though the grant exists.
@@ -158,6 +160,7 @@ GRANT SELECT ON payrollcheck.reports TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE ON payrollcheck.client_grants TO payrollcheck_app;
 GRANT SELECT, INSERT ON payrollcheck.access_audit TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON payrollcheck.sessions TO payrollcheck_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON payrollcheck.auth_limits TO payrollcheck_app;
 REVOKE ALL ON ALL TABLES IN SCHEMA payrollcheck FROM PUBLIC;
 
 -- ---------------------------------------------------------------- tenants
@@ -416,5 +419,16 @@ CREATE POLICY app_sessions_delete ON payrollcheck.sessions
       AND auth_user_id = nullif(current_setting('payrollcheck.current_auth_user_id', true), '')::uuid
     )
   );
+
+-- -------------------------------------------------------- auth_limits
+-- Pre-auth server-role-only state. There is intentionally no user/tenant
+-- identity predicate: login lockout and IP rate-limit records must be
+-- reachable before an authenticated identity exists. Application access is
+-- limited to payrollcheck_app; public has no grants.
+DROP POLICY IF EXISTS app_auth_limits_all ON payrollcheck.auth_limits;
+CREATE POLICY app_auth_limits_all ON payrollcheck.auth_limits
+  FOR ALL TO payrollcheck_app
+  USING (true)
+  WITH CHECK (true);
 
 COMMIT;

@@ -49,9 +49,14 @@ function makeSessionStore() {
       rows.delete(id);
     },
     deleteByUserId: async (userId) => {
+      let count = 0;
       for (const [id, row] of rows) {
-        if (row.userId === userId) rows.delete(id);
+        if (row.userId === userId) {
+          rows.delete(id);
+          count += 1;
+        }
       }
+      return count;
     },
   };
 }
@@ -127,9 +132,9 @@ function makeSessionLayer(store, { rotateOnLoad = false, revokeAllReturnsFalse =
       return true;
     },
     revokeAllForUser: async (userId) => {
-      if (revokeAllReturnsFalse) return false;
-      await store.deleteByUserId(userId);
-      return true;
+      if (revokeAllReturnsFalse) return {ok: false, revoked: 0};
+      const revoked = await store.deleteByUserId(userId);
+      return {ok: revoked > 0, revoked};
     },
     verifyCsrf: (sessionId, token) => token === `csrf-for-${sessionId}`,
     clearCookie: () =>
@@ -273,7 +278,11 @@ function makeSetup(overrides = {}) {
     deactivateMembership: async ({ tenantId, subjectId }) => {
       if (overrides.deactivateThrows) throw new Error('deactivate failed');
       if (overrides.deactivateReturns !== undefined) return overrides.deactivateReturns;
-      return { ok: true, deactivated: true, membership: { tenant_id: tenantId, subject_id: subjectId } };
+      return {
+        ok: true,
+        deactivated: true,
+        membership: { tenant_id: tenantId, subject_id: subjectId, auth_user_id: OWNER_UUID },
+      };
     },
   };
 
@@ -1022,7 +1031,7 @@ test('logout: a wrong CSRF token refuses to revoke the session', async () => {
 // deactivateMembershipAndRevokeSessions
 // ---------------------------------------------------------------------
 test('deactivateMembershipAndRevokeSessions: deactivates AND revokes every server session', async () => {
-  const { composition, store } = await loggedInOwner();
+  const { composition, store, setRlsCalls } = await loggedInOwner();
   // A second session for the same user (another device).
   await store.set({
     sessionId: 'sess_second_device',
@@ -1041,9 +1050,17 @@ test('deactivateMembershipAndRevokeSessions: deactivates AND revokes every serve
   const res = await composition.deactivateMembershipAndRevokeSessions({
     tenantId: BUSINESS_A,
     subjectId: OWNER_SUBJECT,
+    actorSubjectId: OWNER_SUBJECT,
   });
   assert.deepEqual(res, { ok: true, deactivated: true, sessionsRevoked: true });
   assert.equal(store.rows.size, 0, 'every server session for the user is gone');
+  assert.deepEqual(
+    setRlsCalls.slice(-2),
+    [
+      { subjectId: OWNER_SUBJECT, authUserId: undefined, sessionId: undefined },
+      { subjectId: OWNER_SUBJECT, authUserId: OWNER_UUID, sessionId: undefined },
+    ],
+  );
   // The deactivated member can no longer read.
   const after = await composition.readReport({
     cookieHeader: '__Host-payrollcheck-session=sess_usr_ownerA123456789012',
@@ -1054,16 +1071,17 @@ test('deactivateMembershipAndRevokeSessions: deactivates AND revokes every serve
   assert.equal(after.status, 401);
 });
 
-test('deactivateMembershipAndRevokeSessions: an already-inactive membership still revokes sessions', async () => {
+test('deactivateMembershipAndRevokeSessions: an already-inactive membership is a loud no-op', async () => {
   const { composition, store } = await loggedInOwner({
     deactivateReturns: { ok: true, deactivated: false },
   });
   const res = await composition.deactivateMembershipAndRevokeSessions({
     tenantId: BUSINESS_A,
     subjectId: OWNER_SUBJECT,
+    actorSubjectId: OWNER_SUBJECT,
   });
-  assert.deepEqual(res, { ok: true, deactivated: false, sessionsRevoked: true });
-  assert.equal(store.rows.size, 0);
+  assert.deepEqual(res, { ok: false, reason: 'deactivate_noop', deactivated: false, sessionsRevoked: false });
+  assert.equal(store.rows.size, 1);
 });
 
 test('deactivateMembershipAndRevokeSessions: a throwing deactivation revokes nothing', async () => {
@@ -1073,6 +1091,7 @@ test('deactivateMembershipAndRevokeSessions: a throwing deactivation revokes not
       composition.deactivateMembershipAndRevokeSessions({
         tenantId: BUSINESS_A,
         subjectId: OWNER_SUBJECT,
+        actorSubjectId: OWNER_SUBJECT,
       }),
     /deactivate failed/,
   );
@@ -1086,6 +1105,7 @@ test('deactivateMembershipAndRevokeSessions: a malformed deactivation result rev
   const res = await composition.deactivateMembershipAndRevokeSessions({
     tenantId: BUSINESS_A,
     subjectId: OWNER_SUBJECT,
+    actorSubjectId: OWNER_SUBJECT,
   });
   assert.deepEqual(res, { ok: false, reason: 'deactivate_failed', deactivated: false, sessionsRevoked: false });
   assert.equal(store.rows.size, 1, 'no revocation happened for a failed deactivation');
@@ -1096,6 +1116,7 @@ test('deactivateMembershipAndRevokeSessions: a failed revoke is reported loudly'
   const res = await composition.deactivateMembershipAndRevokeSessions({
     tenantId: BUSINESS_A,
     subjectId: OWNER_SUBJECT,
+    actorSubjectId: OWNER_SUBJECT,
   });
   assert.deepEqual(res, { ok: false, reason: 'sessions_not_revoked', deactivated: true, sessionsRevoked: false });
   assert.equal(store.rows.size, 1, 'the session is still live — the report says so');
@@ -1104,8 +1125,19 @@ test('deactivateMembershipAndRevokeSessions: a failed revoke is reported loudly'
 test('deactivateMembershipAndRevokeSessions: bad input throws', async () => {
   const { composition } = makeSetup();
   await assert.rejects(
-    () => composition.deactivateMembershipAndRevokeSessions({ tenantId: 'not-a-uuid', subjectId: OWNER_SUBJECT }),
-    /tenant_id_and_subject_id_required/,
+    () => composition.deactivateMembershipAndRevokeSessions({
+      tenantId: 'not-a-uuid',
+      subjectId: OWNER_SUBJECT,
+      actorSubjectId: OWNER_SUBJECT,
+    }),
+    /tenant_id_subject_id_and_actor_subject_id_required/,
+  );
+  await assert.rejects(
+    () => composition.deactivateMembershipAndRevokeSessions({
+      tenantId: BUSINESS_A,
+      subjectId: OWNER_SUBJECT,
+    }),
+    /tenant_id_subject_id_and_actor_subject_id_required/,
   );
 });
 
