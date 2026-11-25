@@ -30,6 +30,7 @@ import { createPayrollcheckTenancy } from '../../src/payrollcheck/payrollcheck-t
 import { createPostgresSessionStore } from '../../src/payrollcheck/postgres-session-store.mjs';
 import { createServerSession } from '../../src/payrollcheck/payrollcheck-server-session.mjs';
 import { createReportAccessHandler } from '../../src/payrollcheck/payrollcheck-report-access.mjs';
+import { createDashboardAccessHandler } from '../../src/payrollcheck/payrollcheck-dashboard-access.mjs';
 import { createReportSessionLookup } from '../../src/payrollcheck/payrollcheck-report-session-lookup.mjs';
 import { authorizeSupabaseTenantSession } from '../../src/payrollcheck/supabase-session-membership.mjs';
 import { createAuthLimits } from '../../src/payrollcheck/payrollcheck-auth-limits.mjs';
@@ -107,6 +108,7 @@ export function getAuthComposition() {
     sessionStoreFactory: ({ query }) => createPostgresSessionStore({ query }),
     sessionLayerFactory: ({ store }) => createServerSession({ store, secret: sessionSecret }),
     reportHandlerFactory: (deps) => createReportAccessHandler(deps),
+    dashboardHandlerFactory: (deps) => createDashboardAccessHandler(deps),
     reportSessionLookupFactory: ({ store }) => createReportSessionLookup({ store }),
     authorizeTenantSession: authorizeSupabaseTenantSession,
     authLimits,
