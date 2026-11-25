@@ -768,6 +768,43 @@ test('membership deactivated between load and recheck (business path) is 404 con
   assert.equal(db.auditRows[0].reason, 'consent_revoked');
 });
 
+// --- Staging-only test delay hook (PAYROLLCHECK_TEST_DELAY_MS) ---
+// The hook pauses between the report load and the consent recheck, so a
+// concurrent revoke can land mid-flight. Unset: no delay at all.
+
+test('no test delay when PAYROLLCHECK_TEST_DELAY_MS is unset', async () => {
+  const { handler } = setup();
+  const previous = process.env.PAYROLLCHECK_TEST_DELAY_MS;
+  delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
+  try {
+    const startedAt = Date.now();
+    const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
+    const elapsedMs = Date.now() - startedAt;
+    assert.equal(result.status, 200);
+    assert.ok(elapsedMs < 50, 'expected no test delay, got ' + elapsedMs + 'ms');
+  } finally {
+    if (previous === undefined) delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
+    else process.env.PAYROLLCHECK_TEST_DELAY_MS = previous;
+  }
+});
+
+test('PAYROLLCHECK_TEST_DELAY_MS=50 delays the firm consent recheck', async () => {
+  const { handler } = setup();
+  const previous = process.env.PAYROLLCHECK_TEST_DELAY_MS;
+  process.env.PAYROLLCHECK_TEST_DELAY_MS = '50';
+  try {
+    const startedAt = Date.now();
+    const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
+    const elapsedMs = Date.now() - startedAt;
+    assert.equal(result.status, 200);
+    // 45ms floor allows for timer granularity; without the hook this is ~0ms.
+    assert.ok(elapsedMs >= 45, 'expected about 50ms of test delay, got ' + elapsedMs + 'ms');
+  } finally {
+    if (previous === undefined) delete process.env.PAYROLLCHECK_TEST_DELAY_MS;
+    else process.env.PAYROLLCHECK_TEST_DELAY_MS = previous;
+  }
+});
+
 test('recheck DB error is 503, no data released', async () => {
   const { db, handler } = setup();
   db.recheckThrows = true;

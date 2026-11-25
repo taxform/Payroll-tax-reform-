@@ -423,7 +423,18 @@ export function createReportAccessHandler({
     // 9. Consent recheck immediately before release: fresh SELECTs in
     // the same READ COMMITTED transaction, so a concurrent revocation
     // is visible here. A stale decision never releases data.
-    let recheckOk = false;
+    // Staging-only test hook (PAYROLLCHECK_TEST_DELAY_MS): pause here, between the
+  // report load and the consent recheck, so a concurrent revoke can land mid-flight
+  // (M2 live acceptance item (g)). Unset or 0: no delay, no extra query, no log line.
+  const testDelayMs = Math.min(
+    Math.max(Number.parseInt(process.env.PAYROLLCHECK_TEST_DELAY_MS, 10) || 0, 0),
+    30000,
+  );
+  if (testDelayMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, testDelayMs));
+  }
+
+  let recheckOk = false;
     try {
       if (decision.path === 'business') {
         const recheck = await query(
