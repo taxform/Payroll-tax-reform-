@@ -20,9 +20,17 @@
 //   mfaVerify({ pendingBlob, factorId, code, ip }) — open the blob,
 //     challenge + verify the TOTP code, re-verify the new aal2 token
 //     (JWKS + Admin API + mapping), issue the session (aal2:true).
-//   mfaEnroll({ email, password, ip }) — re-authenticate, enroll a TOTP
-//     factor, return { factorId, qrCode, secret, uri, pendingBlob }.
-//     The secret is shown ONCE, by the caller; it is never stored here.
+//   mfaVerify intentionally accepts BOTH 'login' and 'enroll' pending blobs
+//   (the purpose is recorded as mfaEnrolled, it is not a gate): both blob types
+//   are issued only after password authentication of the same user and both
+//   still require the TOTP code. The enroll flow depends on this, so do not
+//   turn it into a purpose check.
+// mfaEnroll({ email, password, ip, sessionId }) — re-authenticate, enroll
+//   a TOTP factor, return { factorId, qrCode, secret, uri, pendingBlob }.
+//   The secret is shown ONCE, by the caller; it is never stored here. At most
+//   MAX_TOTP_FACTORS_PER_USER (3) factors per user: the first factor enrolls
+//   with password only; an additional factor requires an existing session for
+//   the same user (sessionId, validated through the session lookup).
 //   logout({ cookieHeader, csrfToken }) — revoke the session, clear the
 //     cookie. Idempotent when no session is presented.
 //   requestRecovery({ email, ip }) — step-4c recovery email; the client
@@ -112,6 +120,11 @@ function validAppUrl(value) {
   }
   return url.protocol === 'https:' && !url.search && !url.hash;
 }
+
+// Maximum TOTP factors per user (S9). The first factor enrolls with password
+// only; enrolling an additional factor requires an existing session for the
+// same user, and no user may hold more than this many factors.
+export const MAX_TOTP_FACTORS_PER_USER = 3;
 
 export function createPayrollcheckAuth({
   withTransaction,
@@ -385,7 +398,11 @@ export function createPayrollcheckAuth({
     ) {
       return { status: 400, body: { error: 'invalid_request' } };
     }
-    const pending = pendingOpen(pendingBlob);
+    // NOTE: the pending blob's purpose is intentionally NOT checked here.
+  // mfaVerify accepts both 'login' and 'enroll' blobs (see the module header):
+  // both are issued only after password authentication of the same user and
+  // both still require the TOTP code. The purpose only sets mfaEnrolled below.
+  const pending = pendingOpen(pendingBlob);
     if (!pending) {
       edgeLog(requestId, route, 401, 'invalid_pending_token');
       return { status: 401, body: { error: 'invalid_code' } };
@@ -501,15 +518,59 @@ export function createPayrollcheckAuth({
     };
   }
 
-  async function mfaEnroll({ email, password, ip, requestId: rawRequestId } = {}) {
+  async function mfaEnroll({ email, password, ip, sessionId, requestId: rawRequestId } = {}) {
     const requestId = requestIdFor(rawRequestId);
     const route = 'mfa_enroll';
     const gated = await passwordGate({ email, password, ip, requestId, route });
     if (!gated.ok) return gated;
     const { signIn } = gated;
     const authUserId = signIn.user.id;
-    const mapped = await confirmAndMap({ authUserId, requestId, route });
+  const mapped = await confirmAndMap({ authUserId, requestId, route });
     if (!mapped.ok) return mapped;
+    // S9: cap factors per user, and require an existing session to enroll an
+    // additional factor. The first factor is the password-only enrollment the
+    // login page runs when the user has no authenticator yet; a password alone
+    // must not be able to stack unlimited further factors onto the account.
+    let existingFactors;
+    try {
+    existingFactors = (await listMfaFactors({ accessToken: signIn.access_token })) ?? [];
+    } catch {
+    edgeLog(requestId, route, 503, 'unavailable');
+    return { status: 503, body: { error: 'unavailable' } };
+    }
+    if (!Array.isArray(existingFactors)) existingFactors = [];
+    if (existingFactors.length >= MAX_TOTP_FACTORS_PER_USER) {
+    edgeLog(requestId, route, 403, 'factor_limit_reached');
+    return { status: 403, body: { error: 'factor_limit_reached' } };
+    }
+    if (existingFactors.length > 0) {
+    // An existing session proves a factor was already verified for this
+    // user: sessions are only issued after MFA verification when factors
+    // exist. A password alone is not enough for a further factor.
+    let loaded = null;
+    try {
+      loaded = await withTransaction(async ({ query }) => {
+        const store = sessionStoreFactory({ query });
+        const sessionLookup = reportSessionLookupFactory({ store });
+        return typeof sessionId === 'string' && sessionId
+          ? await sessionLookup.getSession(sessionId)
+          : null;
+      });
+    } catch {
+      edgeLog(requestId, route, 503, 'unavailable');
+      return { status: 503, body: { error: 'unavailable' } };
+    }
+    // The session lookup returns the stored session record directly: its
+    // userId is the internal subject id and its authUserId is the auth user id.
+    // Either one matching proves the session belongs to the user enrolling.
+    const sessionMatches =
+      loaded &&
+      (loaded.userId === mapped.subjectId || loaded.authUserId === authUserId);
+    if (!sessionMatches) {
+      edgeLog(requestId, route, 403, 'additional_factor_requires_session');
+      return { status: 403, body: { error: 'additional_factor_requires_session' } };
+    }
+    }
     let factor;
     try {
       factor = await enrollTotpFactor({

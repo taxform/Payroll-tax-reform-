@@ -25,6 +25,13 @@ function positiveInt(value, fallback) {
   return Number.isSafeInteger(value) && value > 0 ? value : fallback;
 }
 
+// Log only an error code or name, never error.message: pg messages can
+// echo caller-supplied input values.
+function errorCode(error) {
+  if (error && typeof error === 'object') return error.code ?? error.name ?? 'unknown';
+  return 'unknown';
+}
+
 export function createServerSession({
   store,
   secret,
@@ -171,7 +178,7 @@ export function createServerSession({
         }
       }
     } catch (error) {
-      console.error('payrollcheck-server-session load read failed', error?.code, error?.message);
+      console.error('payrollcheck-server-session load read failed', errorCode(error));
       return {ok: false, reason: 'session_lookup_failed'};
     }
     if (!record) return {ok: false, reason: 'unknown_session'};
@@ -209,7 +216,7 @@ export function createServerSession({
         await store.set(current);
       }
     } catch (error) {
-      console.error('payrollcheck-server-session load write-back failed', error?.code, error?.message);
+      console.error('payrollcheck-server-session load write-back failed', errorCode(error));
       return {ok: false, reason: 'session_lookup_failed'};
     }
     const result = {

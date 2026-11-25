@@ -183,8 +183,11 @@ DO $$ BEGIN
 END $$;
 RESET ROLE;
 
--- Check 7: revocation takes effect immediately; a review_finding-only
+-- Check 7: revocation takes effect immediately; a review finding-only
 -- grant authorizes no report reads; restoring the grant restores access.
+-- Scopes are immutable on UPDATE (S6 trigger), so the review finding-only
+-- case is exercised with a separate grant created with those scopes, and
+-- the restore keeps grant ...0001's original scopes.
 UPDATE payrollcheck.client_grants SET status='revoked',revoked_by_subject='ownerA',revoked_at=now()
  WHERE grant_id='60000000-0000-4000-8000-000000000001';
 SET payrollcheck.current_subject_id = 'reviewerX';
@@ -194,14 +197,15 @@ DO $$ BEGIN
   IF (SELECT count(*) FROM payrollcheck.reports) <> 0 THEN RAISE EXCEPTION 'revocation isolation failed'; END IF;
 END $$;
 RESET ROLE;
-UPDATE payrollcheck.client_grants SET status='active',revoked_by_subject=NULL,revoked_at=NULL,scopes=ARRAY['review_finding']
- WHERE grant_id='60000000-0000-4000-8000-000000000001';
+INSERT INTO payrollcheck.client_grants(grant_id,firm_tenant_id,business_tenant_id,scopes,status,requested_by_subject,approved_by_subject,approved_at)
+ VALUES ('60000000-0000-4000-8000-000000000099','eccccccc-cccc-4ccc-8ccc-cccccccccccc','eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',ARRAY['review_finding'],'active','reviewerX','ownerA',now());
 SET ROLE payrollcheck_app;
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM payrollcheck.reports) THEN RAISE EXCEPTION 'review-only scope incorrectly authorized report'; END IF;
 END $$;
 RESET ROLE;
-UPDATE payrollcheck.client_grants SET status='active',scopes=ARRAY['view_report']
+DELETE FROM payrollcheck.client_grants WHERE grant_id='60000000-0000-4000-8000-000000000099';
+UPDATE payrollcheck.client_grants SET status='active',revoked_by_subject=NULL,revoked_at=NULL
  WHERE grant_id='60000000-0000-4000-8000-000000000001';
 SET ROLE payrollcheck_app;
 DO $$ BEGIN
@@ -467,6 +471,111 @@ DO $$ DECLARE before int; after int; BEGIN
   END;
 END $$;
 RESET ROLE;
+
+-- Check 16: grant scopes are immutable on UPDATE (S6). An approver cannot
+-- widen a grant's scopes in the same UPDATE that approves it. The RLS
+-- approve WITH CHECK does not bind scopes, so only the BEFORE UPDATE
+-- trigger (payrollcheck.prevent_client_grant_reassignment) stops this;
+-- without it the approve below would succeed with the wider scopes.
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    UPDATE payrollcheck.client_grants
+       SET status='active', approved_by_subject='ownerA', approved_at=now(),
+           scopes=ARRAY['view_report','review_finding']
+     WHERE grant_id='60000000-0000-4000-8000-000000000004';
+    RAISE EXCEPTION 'scope-widening approve was not refused with insufficient_privilege';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+DO $$ DECLARE s text; sc text[]; BEGIN
+  SELECT status, scopes INTO s, sc FROM payrollcheck.client_grants
+   WHERE grant_id='60000000-0000-4000-8000-000000000004';
+  IF s <> 'pending' OR sc <> ARRAY['view_report']::text[] THEN
+    RAISE EXCEPTION 'scope-widening approve changed grant 60000000-0000-4000-8000-000000000004';
+  END IF;
+END $$;
+
+-- Check 17: firm_tenant_id is immutable on UPDATE (S6). An approver cannot
+-- move a grant to another firm in the same UPDATE that approves it. The RLS
+-- approve WITH CHECK does not bind firm_tenant_id, so only the BEFORE
+-- UPDATE trigger stops this; without it the approve below would succeed
+-- with the grant moved to firm Y.
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    UPDATE payrollcheck.client_grants
+       SET status='active', approved_by_subject='ownerA', approved_at=now(),
+           firm_tenant_id='eddddddd-dddd-4ddd-8ddd-dddddddddddd'
+     WHERE grant_id='60000000-0000-4000-8000-000000000004';
+    RAISE EXCEPTION 'firm-reassignment approve was not refused with insufficient_privilege';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+DO $$ DECLARE s text; f uuid; BEGIN
+  SELECT status, firm_tenant_id INTO s, f FROM payrollcheck.client_grants
+   WHERE grant_id='60000000-0000-4000-8000-000000000004';
+  IF s <> 'pending' OR f <> 'eccccccc-cccc-4ccc-8ccc-cccccccccccc' THEN
+    RAISE EXCEPTION 'firm-reassignment approve changed grant 60000000-0000-4000-8000-000000000004';
+  END IF;
+END $$;
+
+-- Check 18: business_tenant_id is immutable on UPDATE (S6). An approver
+-- cannot move a grant to another business in the same UPDATE that approves
+-- it. The RLS approve WITH CHECK would also refuse a business the approver
+-- does not own (returning zero rows); the trigger is what makes the attempt
+-- fail loudly with insufficient_privilege instead.
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    UPDATE payrollcheck.client_grants
+       SET status='active', approved_by_subject='ownerA', approved_at=now(),
+           business_tenant_id='ebbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+     WHERE grant_id='60000000-0000-4000-8000-000000000004';
+    RAISE EXCEPTION 'business-reassignment approve was not refused with insufficient_privilege';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+DO $$ DECLARE s text; b uuid; BEGIN
+  SELECT status, business_tenant_id INTO s, b FROM payrollcheck.client_grants
+   WHERE grant_id='60000000-0000-4000-8000-000000000004';
+  IF s <> 'pending' OR b <> 'eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' THEN
+    RAISE EXCEPTION 'business-reassignment approve changed grant 60000000-0000-4000-8000-000000000004';
+  END IF;
+END $$;
+
+-- Check 19: a membership role is immutable on UPDATE (S6). A business owner
+-- cannot promote a member by editing the role in place. The memberships
+-- UPDATE policy permits any column change by the owner, so only the BEFORE
+-- UPDATE trigger (payrollcheck.prevent_membership_role_change) stops this;
+-- the active-flag flips in Check 12 still work.
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    UPDATE payrollcheck.memberships SET role='business_owner'
+     WHERE subject_id='newhire1';
+    RAISE EXCEPTION 'membership role change was not refused with insufficient_privilege';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+DO $$ DECLARE r text; BEGIN
+  SELECT role INTO r FROM payrollcheck.memberships WHERE subject_id='newhire1';
+  IF r <> 'accounting_reviewer' THEN
+    RAISE EXCEPTION 'membership role change altered newhire1';
+  END IF;
+END $$;
 
 RESET payrollcheck.current_subject_id;
 RESET payrollcheck.current_auth_user_id;

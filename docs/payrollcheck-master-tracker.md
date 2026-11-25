@@ -27,10 +27,10 @@
 
 ## Milestone 2 — Production identity and data isolation (NOT STARTED)
 - [x] Pure authorization-policy prototype and tests (not deployed enforcement).
-- [x] Pure client-consent approval/revocation prototype and tests (not persisted or wired to authenticated server requests).
-- [x] Trusted-context report-access boundary prototype and regression tests (not a deployed API, and session verification/database persistence not implemented).
-- [x] Trusted-record authorization adapter with unique-record and revoked-consent tests (not connected to a database or session provider).
-- [x] Privacy-minimized authorization audit event model and tests (no persistence or event delivery).
+- [x] Pure client-consent approval/revocation prototype and tests - removed in the step-10 follow-up (N4); it was never persisted or wired to authenticated server requests.
+- [x] Trusted-context report-access boundary prototypes and regression tests - removed in the step-10 follow-up (N4); they were never a deployed API, and session verification/database persistence was not implemented.
+- [x] Trusted-record authorization adapter with unique-record and revoked-consent tests - removed in the step-10 follow-up (N4); it was never connected to a database or session provider.
+- [x] Privacy-minimized authorization audit event model and tests - removed in the step-10 follow-up (N4); it had no persistence or event delivery.
 - [x] Unapplied deny-by-default PostgreSQL schema proposal and security review checklist (not an approved database design or migration).
 - [x] Static schema guard tests check all draft tables have forced RLS and no grant/policy statements; does not replace PostgreSQL integration tests.
 - [x] Pure OIDC-claims-to-session adapter and negative tests (assumes upstream cryptographic verification; not login or session service).
@@ -123,7 +123,7 @@
 - This is **not JWT verification or real login**. A production OIDC middleware must verify signatures, issuer/audience, algorithm, keys, expiry, token type, session revocation and MFA before using these helpers. Manual browser QA and database integration remain open.
 
 ## Authenticated-boundary prototype — 2026-11-15
-- Added an async composition boundary for already-verified identity claims and trusted report/membership/grant records, with fail-closed lookup tests (commits for `src/payrollcheck/authenticated-report-boundary.mjs` and `de1b7f9`).
+- Added an async composition boundary for already-verified identity claims and trusted report/membership/grant records, with fail-closed lookup tests (commits for `src/payrollcheck/authenticated-report-boundary.mjs` and `de1b7f9`). Module removed in the step-10 follow-up (N4); the live report-access path is `src/payrollcheck/payrollcheck-report-access.mjs`.
 - This is not an HTTP endpoint or cryptographic token verifier. The callback must be implemented against trusted server-side storage; no production session or database service exists.
 - Next: verify CI, select actual identity/backend/database stack, implement verified middleware and transaction-safe data access, and run manual browser QA.
 
