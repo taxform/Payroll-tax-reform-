@@ -93,6 +93,8 @@
 // security review can rule on; it is NOT done here.
 import { randomUUID } from 'node:crypto';
 import { createDashboardAccessHandler } from './payrollcheck-dashboard-access.mjs';
+import { createCompanyAccessHandler } from './payrollcheck-company-access.mjs';
+import { createCompanyLoader } from './payrollcheck-company.mjs';
 import { createDashboardLoader } from './payrollcheck-dashboard.mjs';
 
 const UUID_PATTERN =
@@ -141,6 +143,7 @@ export function createPayrollcheckAuth({
   sessionLayerFactory,
   reportHandlerFactory,
   dashboardHandlerFactory = createDashboardAccessHandler,
+  companyHandlerFactory = createCompanyAccessHandler,
   reportSessionLookupFactory,
   authorizeTenantSession,
   authLimits,
@@ -168,6 +171,7 @@ export function createPayrollcheckAuth({
   requireFn(sessionLayerFactory, 'session_layer_factory');
   requireFn(reportHandlerFactory, 'report_handler_factory');
   requireFn(dashboardHandlerFactory, 'dashboard_handler_factory');
+  requireFn(companyHandlerFactory, 'company_handler_factory');
   requireFn(reportSessionLookupFactory, 'report_session_lookup_factory');
   requireFn(authorizeTenantSession, 'authorize_tenant_session');
   requireFn(pendingSeal, 'pending_seal');
@@ -942,6 +946,113 @@ export function createPayrollcheckAuth({
     return { status: outcome.status, headers, body };
   }
 
+// Company profile (Slice 2): read or save the signed-in business's company
+// profile. Same preamble as getDashboard — session load, CSRF, RLS identity
+// in the step-7 order — then the company access handler decides what the
+// caller may see or change. The tenant id comes from the verified session's
+// memberships, never from the caller: a tenantId in the request only selects
+// among those memberships. The action is 'read' or 'write'.
+  async function handleCompany({ cookieHeader, csrfToken, tenantId, action, company, ip, requestId: rawRequestId } = {}) {
+    const requestId = requestIdFor(rawRequestId);
+  const route = 'company';
+  if (
+    (tenantId !== undefined &&
+      tenantId !== null &&
+      (typeof tenantId !== 'string' || !UUID_PATTERN.test(tenantId))) ||
+    (action !== 'read' && action !== 'write')
+  ) {
+    return { status: 400, body: { error: 'invalid_request' } };
+  }
+    let outcome;
+    try {
+      outcome = await withTransaction(async ({ query }) => {
+        const store = sessionStoreFactory({ query });
+        const layer = sessionLayerFactory({ store });
+        // Same RLS note as readReport: set the presented session id BEFORE
+        // load(), or the sessions-table RLS policy hides the row.
+        const presentedSessionId = layer.parseSessionId(cookieHeader);
+        if (presentedSessionId) {
+          await setRlsIdentity({ query, sessionId: presentedSessionId });
+        }
+        const loaded = await layer.load(cookieHeader);
+        if (!loaded || loaded.ok !== true) {
+          const reason = loaded && typeof loaded.reason === 'string' ? loaded.reason : 'no_session';
+          if (reason === 'session lookup failed') {
+            return { status: 503, body: { error: 'unavailable' }, reason };
+          }
+          return { status: 401, body: { error: 'invalid_session' }, reason };
+        }
+        const session = loaded.session;
+        // CSRF: verify against the PRESENTED id first (rotation grace window),
+        // then the current session id. Both ids are authenticated by load().
+        const presentedId = layer.parseSessionId(cookieHeader);
+        const csrfOk =
+          (typeof presentedId === 'string' && layer.verifyCsrf(presentedId, csrfToken) === true) ||
+          layer.verifyCsrf(session.sessionId, csrfToken) === true;
+        if (csrfOk !== true) {
+          return { status: 403, body: { error: 'forbidden' }, reason: 'csrf_failed' };
+        }
+        // Identity, in the step-7 order: auth-only first (the mapping path),
+        // then subject + auth + session for the company read or write.
+        await setRlsIdentity({ query, authUserId: session.authUserId });
+        const mapping = mappingFactory({ query });
+        const subjectId = await mapping.resolveInternalUserId(session.authUserId);
+        if (typeof subjectId !== 'string' || !subjectId) {
+          return { status: 401, body: { error: 'invalid_session' }, reason: 'subject_not_found' };
+        }
+        await setRlsIdentity({ query, subjectId, authUserId: session.authUserId, sessionId: session.sessionId });
+        const tenancy = tenancyFactory({ query });
+        const lookup = reportSessionLookupFactory({ store });
+        let verifiedUser;
+        const getVerifiedUser = async () => {
+          if (verifiedUser === undefined) verifiedUser = await fetchAdminUser(session.authUserId);
+          return verifiedUser;
+        };
+        const handler = companyHandlerFactory({
+          getVerifiedUser,
+          requireAal2: async () => session.aal2 === true,
+          resolveSubjectId: (authUserId) => mapping.resolveInternalUserId(authUserId),
+          recordAudit: (args) => tenancy.recordAccessAudit(args),
+          checkRateLimit: (args) => authLimits.checkRateLimit(args),
+          getSession: (id) => lookup.getSession(id),
+          generateId: () => requestId,
+          now: () => now(),
+    loadCompanyProfile: ({ subjectId: companySubjectId }) =>
+      createCompanyLoader({ query }).loadCompanyProfile({ subjectId: companySubjectId }),
+    saveCompany: (companyTenantId, companyProfile) =>
+      createCompanyLoader({ query }).saveCompany(companyTenantId, companyProfile),
+        });
+        const decision = await handler.handleCompanyAccess({
+          accessToken: session.sessionId,
+          sessionId: session.sessionId,
+          tenantId: tenantId ?? null,
+      action,
+      company,
+          requestId,
+          clientIp: validIp(ip) ? ip : undefined,
+        });
+        return {
+          status: decision.status,
+          body: decision.ok
+            ? { ok: true, company: decision.company, isSetUp: decision.isSetUp }
+            : { error: decision.reason },
+          reason: decision.ok ? 'allowed' : decision.reason,
+          rotatedCookie: loaded.rotated ? loaded.cookie : null,
+          rotatedCsrfToken: loaded.rotated ? loaded.csrfToken : null,
+        };
+      });
+    } catch (error) {
+      edgeLog(requestId, route, 'error', error instanceof Error ? error.message : 'unknown');
+      outcome = { status: 503, body: { error: 'unavailable' }, reason: 'unavailable' };
+    }
+    edgeLog(requestId, route, outcome.status, outcome.reason);
+    const headers = {};
+    if (outcome.rotatedCookie) headers['Set-Cookie'] = outcome.rotatedCookie;
+    const body = outcome.body;
+    if (outcome.rotatedCsrfToken) body.csrfToken = outcome.rotatedCsrfToken;
+    return { status: outcome.status, headers, body };
+  }
+
   async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId, actorSubjectId } = {}) {
     if (
       typeof tenantId !== 'string' ||
@@ -1000,6 +1111,7 @@ export function createPayrollcheckAuth({
     requestRecovery,
     readReport,
     getDashboard,
+    handleCompany,
     deactivateMembershipAndRevokeSessions,
   });
 }

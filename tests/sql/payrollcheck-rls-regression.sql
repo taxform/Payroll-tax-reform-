@@ -26,18 +26,18 @@
 -- exception. Rolls back at the end so no rows remain.
 BEGIN;
 
--- Structural guard: the seven tables have RLS enabled + forced, the 15
+-- Structural guard: the eight tables have RLS enabled + forced, the 18
 -- step-7/step-10 policies exist, and the app role exists without BYPASSRLS.
 DO $$
 DECLARE n int;
 BEGIN
   SELECT count(*) INTO n FROM pg_class c JOIN pg_namespace ns ON ns.oid = c.relnamespace
     WHERE ns.nspname = 'payrollcheck' AND c.relkind = 'r'
-    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits')
+    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits','payroll_companies')
     AND c.relrowsecurity AND c.relforcerowsecurity;
-  IF n <> 7 THEN RAISE EXCEPTION 'expected 7 tables with RLS enabled+forced, got %', n; END IF;
+  IF n <> 8 THEN RAISE EXCEPTION 'expected 8 tables with RLS enabled+forced, got %', n; END IF;
   SELECT count(*) INTO n FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname LIKE 'app\_%';
-  IF n <> 15 THEN RAISE EXCEPTION 'expected 15 app policies, got %', n; END IF;
+  IF n <> 18 THEN RAISE EXCEPTION 'expected 18 app policies, got %', n; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'payrollcheck_app' AND rolbypassrls = false) THEN
     RAISE EXCEPTION 'payrollcheck_app role missing or BYPASSRLS';
   END IF;
@@ -577,6 +577,170 @@ DO $$ DECLARE r text; BEGIN
   END IF;
 END $$;
 
+RESET payrollcheck.current_subject_id;
+RESET payrollcheck.current_auth_user_id;
+RESET payrollcheck.current_session_id;
+-- Check 20: company profile (Slice 2) — one row per tenant, business-owner-only.
+-- The owner of A saves and reads A's company; a plain second insert is refused
+-- by the one-row-per-tenant unique constraint, while an upsert updates in place.
+-- A non-owner member of A, an inactive owner of B, and a firm reviewer with an
+-- active view_report grant to A all see nothing and cannot write. The fixture's
+-- ownerB is deactivated (Check 3), so provision an active owner of B first.
+INSERT INTO payrollcheck.memberships
+  (membership_id, tenant_id, subject_id, role, active, auth_user_id)
+VALUES
+  ('10000000-0000-4000-8000-000000000010', 'ebbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+   'ownerB2', 'business_owner', true, '22222222-2222-4222-8222-222222222222');
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  INSERT INTO payrollcheck.payroll_companies
+    (tenant_id, legal_name, ein, address_line1, address_line2, city, state, postal_code, pay_schedule)
+  VALUES
+    ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Acme Widgets LLC', '123456789',
+     '1 Main St', 'Suite 100', 'Springfield', 'IL', '62701-1234', 'biweekly');
+END $$;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_companies;
+  IF n <> 1 THEN
+    RAISE EXCEPTION 'ownerA company insert: expected 1 visible row, got %', n;
+  END IF;
+END $$;
+-- A plain second insert for the same tenant is refused by the unique constraint.
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Acme Widgets LLC', '123456789',
+       '1 Main St', 'Springfield', 'IL', '62701', 'biweekly');
+    RAISE EXCEPTION 'second company row for tenant A unexpectedly succeeded';
+  EXCEPTION WHEN unique_violation THEN NULL;
+  END;
+END $$;
+-- An upsert updates the one row in place instead of adding another.
+DO $$ BEGIN
+  INSERT INTO payrollcheck.payroll_companies
+    (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+  VALUES
+    ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Acme Widgets LLC Updated', '123456789',
+     '1 Main St', 'Springfield', 'IL', '62701', 'biweekly')
+  ON CONFLICT (tenant_id) DO UPDATE
+    SET legal_name = EXCLUDED.legal_name, postal_code = EXCLUDED.postal_code, updated_at = now();
+END $$;
+DO $$ DECLARE n int; r text; BEGIN
+  SELECT count(*), max(legal_name) INTO n, r FROM payrollcheck.payroll_companies;
+  IF n <> 1 OR r <> 'Acme Widgets LLC Updated' THEN
+    RAISE EXCEPTION 'ownerA company upsert failed: % rows, legal_name %', n, r;
+  END IF;
+END $$;
+-- A bad EIN is refused by the CHECK constraint.
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Bad EIN LLC', '123',
+       '1 Main St', 'Springfield', 'IL', '62701', 'weekly');
+    RAISE EXCEPTION 'bad-EIN company insert unexpectedly succeeded';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- The active owner of B sees nothing of A and cannot write for A.
+SET payrollcheck.current_subject_id = 'ownerB2';
+SET payrollcheck.current_auth_user_id = '22222222-2222-4222-8222-222222222222';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_companies;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'ownerB2 sees % company rows of tenant A', n;
+  END IF;
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Hacked LLC', '111111111',
+       '9 Evil Way', 'Nowhere', 'XX', '00000', 'weekly');
+    RAISE EXCEPTION 'ownerB2 cross-tenant company insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- A non-owner member of A sees nothing and cannot write.
+SET payrollcheck.current_subject_id = 'staffA';
+SET payrollcheck.current_auth_user_id = '55555555-5555-4555-8555-555555555555';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_companies;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'staffA sees % company rows', n;
+  END IF;
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Member LLC', '111111111',
+       '3 Third St', 'Springfield', 'IL', '62701', 'monthly');
+    RAISE EXCEPTION 'staffA company insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- A firm reviewer with an active view_report grant to A sees nothing and cannot write.
+SET payrollcheck.current_subject_id = 'reviewerX';
+SET payrollcheck.current_auth_user_id = '33333333-3333-4333-8333-333333333333';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_companies;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'reviewerX sees % company rows', n;
+  END IF;
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Firm LLC', '111111111',
+       '4 Fourth St', 'Springfield', 'IL', '62701', 'monthly');
+    RAISE EXCEPTION 'reviewerX company insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- The inactive owner of B cannot write for B either.
+SET payrollcheck.current_subject_id = 'ownerB';
+SET payrollcheck.current_auth_user_id = '22222222-2222-4222-8222-222222222222';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_companies
+      (tenant_id, legal_name, ein, address_line1, city, state, postal_code, pay_schedule)
+    VALUES
+      ('ebbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Beta Bakery Inc', '987654321',
+       '2 Oak Ave', 'Shelbyville', 'IL', '62565', 'weekly');
+    RAISE EXCEPTION 'inactive ownerB company insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- The new audit actions are accepted by the access_audit check (written as the app role).
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+INSERT INTO payrollcheck.access_audit
+  (event_id, request_id, actor_subject_id, action, allowed, reason)
+VALUES
+  (gen_random_uuid(), 'req-company-read', 'ownerA', 'company_read', true, 'allowed'),
+  (gen_random_uuid(), 'req-company-write', 'ownerA', 'company_write', true, 'allowed');
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.access_audit
+  WHERE actor_subject_id = 'ownerA' AND action IN ('company_read', 'company_write');
+  IF n <> 2 THEN
+    RAISE EXCEPTION 'company audit rows: expected 2, got %', n;
+  END IF;
+END $$;
+RESET ROLE;
 RESET payrollcheck.current_subject_id;
 RESET payrollcheck.current_auth_user_id;
 RESET payrollcheck.current_session_id;

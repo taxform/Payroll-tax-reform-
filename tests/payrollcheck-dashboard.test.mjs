@@ -84,11 +84,13 @@ test('buildDashboardSummary: counts, totals and the module catalogue', () => {
   const compliance = summary.modules.find((m) => m.id === 'compliance-check');
   assert.equal(compliance.status, 'available');
   assert.match(compliance.note, /not proof from IRS records/);
-  const payroll = summary.modules.filter((m) => m.id !== 'compliance-check');
+  const company = summary.modules.find((m) => m.id === 'company');
+  assert.equal(company.status, 'available');
+  const payroll = summary.modules.filter((m) => m.id !== 'compliance-check' && m.id !== 'company');
   assert.ok(payroll.every((m) => m.status === 'coming_soon'));
   assert.deepEqual(
     payroll.map((m) => m.slice),
-    [2, 3, 4, 5, 6],
+    [3, 4, 5, 6],
   );
 });
 
@@ -100,6 +102,61 @@ test('buildDashboardSummary: a tenant with no reports counts zero, never another
   });
   assert.equal(summary.tenants[0].reportCount, 0);
   assert.deepEqual(summary.totals, { tenants: 1, reports: 0 });
+});
+
+const COMPANY_ROW_A = {
+  company_id: '11111111-1111-1111-1111-111111111111',
+  tenant_id: BUSINESS_A,
+  legal_name: 'Acme Widgets LLC',
+  ein: '123456789',
+  address_line1: '1 Main St',
+  address_line2: null,
+  city: 'Springfield',
+  state: 'IL',
+  postal_code: '62701',
+  pay_schedule: 'biweekly',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const COMPANY_ROW_B = {
+  company_id: '22222222-2222-2222-2222-222222222222',
+  tenant_id: BUSINESS_B,
+  legal_name: 'Beta Bakery Inc',
+  ein: '987654321',
+  address_line1: '2 Oak Ave',
+  address_line2: null,
+  city: 'Madison',
+  state: 'WI',
+  postal_code: '53703',
+  pay_schedule: 'monthly',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+
+test('buildDashboardSummary: a set-up company shows its name and masked EIN, never the full EIN', () => {
+  const summary = buildDashboardSummary({
+    memberships: [{ tenantId: BUSINESS_A, role: 'business_owner', tenantType: 'business' }],
+    reportCountsByTenant: {},
+    companiesByTenant: { [BUSINESS_A]: COMPANY_ROW_A },
+    selectedTenantId: BUSINESS_A,
+  });
+  assert.deepEqual(summary.company, { isSetUp: true, legalName: 'Acme Widgets LLC', einMasked: '***-**-6789', paySchedule: 'biweekly' });
+  assert.ok(!JSON.stringify(summary).includes('123456789'));
+});
+
+test('buildDashboardSummary: a company that is not set up is false, and another tenant company never leaks in', () => {
+  const summary = buildDashboardSummary({
+    memberships: [
+      { tenantId: BUSINESS_A, role: 'business_owner', tenantType: 'business' },
+      { tenantId: BUSINESS_B, role: 'business_owner', tenantType: 'business' },
+    ],
+    reportCountsByTenant: {},
+    companiesByTenant: { [BUSINESS_B]: COMPANY_ROW_B },
+    selectedTenantId: BUSINESS_A,
+  });
+  assert.deepEqual(summary.company, { isSetUp: false });
+  assert.ok(!JSON.stringify(summary).includes('Beta Bakery Inc'));
+  assert.ok(!JSON.stringify(summary).includes('987654321'));
 });
 
 test('PAYROLLCHECK_APP_MODULES: ids are unique and the catalogue is frozen', () => {
@@ -118,6 +175,7 @@ function makeQuery(rowsByKind) {
     if (sql.includes('FROM payrollcheck.memberships')) return { rows: rowsByKind.memberships };
     if (sql.includes('FROM payrollcheck.tenants')) return { rows: rowsByKind.tenants.shift() };
     if (sql.includes('FROM payrollcheck.reports')) return { rows: rowsByKind.counts.shift() };
+    if (sql.includes('FROM payrollcheck.payroll_companies')) return { rows: rowsByKind.companies.shift() };
     throw new Error(`unexpected query: ${sql}`);
   };
   return { query, calls };
@@ -131,6 +189,7 @@ test('createDashboardLoader: loads memberships, tenant types and counts in order
     ],
     tenants: [[{ tenant_type: 'business' }], [{ tenant_type: 'business' }]],
     counts: [[{ count: '2' }], [{ count: '1' }]],
+    companies: [[COMPANY_ROW_A], [COMPANY_ROW_B]],
   });
   const loader = createDashboardLoader({ query });
   const loaded = await loader.loadDashboard({ subjectId: SUBJECT });
@@ -140,11 +199,12 @@ test('createDashboardLoader: loads memberships, tenant types and counts in order
       { tenantId: BUSINESS_B, role: 'admin', tenantType: 'business' },
     ],
     reportCountsByTenant: { [BUSINESS_A]: 2, [BUSINESS_B]: 1 },
+    companiesByTenant: { [BUSINESS_A]: COMPANY_ROW_A, [BUSINESS_B]: COMPANY_ROW_B },
   });
   // Memberships first, then one tenant-type + one count per tenant, in order.
   assert.deepEqual(
     calls.map((c) => c.sql.match(/FROM payrollcheck\.(\w+)/)[1]),
-    ['memberships', 'tenants', 'reports', 'tenants', 'reports'],
+    ['memberships', 'tenants', 'reports', 'tenants', 'reports', 'payroll_companies', 'payroll_companies'],
   );
   // Every value travels as a parameter; no id is interpolated into the SQL.
   for (const { sql, params } of calls) {
