@@ -676,6 +676,7 @@ test('mfaVerify: an enroll blob verifies and reports mfaEnrolled:true', async ()
   assert.equal(res.status, 200);
   assert.equal(res.body.mfaEnrolled, true);
   assert.equal(store.rows.size, 1);
+});
 
 test('mfaVerify: accepts both login and enroll pending blobs (purpose is not a gate)', async () => {
   const { composition, factorsByToken } = makeSetup();
@@ -764,11 +765,14 @@ test('mfaEnroll: an additional factor with a session for another user is refused
     ip: '1.2.3.4',
   });
   assert.equal(firmLogin.status, 200);
+      // login() returns the session id only in the Set-Cookie header, not the body.
+      const firmSessionId = parseCookie(firmLogin.headers['Set-Cookie']);
+      assert.equal(typeof firmSessionId, 'string');
   const res = await composition.mfaEnroll({
     email: 'owner@example.com',
     password: 'correct horse',
     ip: '1.2.3.4',
-    sessionId: firmLogin.body.sessionId,
+    sessionId: firmSessionId,
   });
   assert.equal(res.status, 403);
   assert.equal(res.body.error, 'additional_factor_requires_session');
@@ -788,7 +792,6 @@ test('mfaEnroll: the per-user factor cap refuses enrollment at the cap', async (
   });
   assert.equal(res.status, 403);
   assert.equal(res.body.error, 'factor_limit_reached');
-});
 });
 
 test('mfaVerify: a tampered pending blob returns 401 and issues nothing', async () => {
