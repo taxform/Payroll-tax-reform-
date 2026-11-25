@@ -17,14 +17,6 @@
 // answers 503 { error: 'unavailable' } and logs only the VARIABLE NAME,
 // never a value. Nothing in this file logs a token, a password, an
 // email, a session id, or report content.
-//
-// STAGING LIMIT (do not carry into prod): the auth-limits store below
-// is an in-memory Map per function instance. Lockout and rate-limit
-// state therefore does not survive a cold start and is not shared
-// across instances. That is acceptable for staging (fabricated data,
-// a handful of test accounts) and NOT for production: step 10 must
-// back createAuthLimits with the Postgres auth_limits table (see the
-// step-9 design note) before any prod pilot.
 import pg from 'pg';
 import { createPayrollcheckRequestScope } from '../../src/payrollcheck/payrollcheck-request-scope.mjs';
 import { setRlsIdentity } from '../../src/payrollcheck/payrollcheck-rls-identity.mjs';
@@ -41,6 +33,7 @@ import { createReportAccessHandler } from '../../src/payrollcheck/payrollcheck-r
 import { createReportSessionLookup } from '../../src/payrollcheck/payrollcheck-report-session-lookup.mjs';
 import { authorizeSupabaseTenantSession } from '../../src/payrollcheck/supabase-session-membership.mjs';
 import { createAuthLimits } from '../../src/payrollcheck/payrollcheck-auth-limits.mjs';
+import { createPostgresAuthLimitsStore } from '../../src/payrollcheck/postgres-auth-limits-store.mjs';
 import {
   listMfaFactors,
   enrollTotpFactor,
@@ -64,21 +57,6 @@ function requiredEnv(name) {
     throw error;
   }
   return value;
-}
-
-function createInMemoryLimitsStore() {
-  // STAGING ONLY — see the file header. Same get/set/delete shape the
-  // step-4c module expects; values are plain attempt/rate records.
-  const data = new Map();
-  return {
-    get: async (key) => (data.has(key) ? data.get(key) : null),
-    set: async (key, value) => {
-      data.set(key, value);
-    },
-    delete: async (key) => {
-      data.delete(key);
-    },
-  };
 }
 
 let cached = null;
@@ -112,7 +90,10 @@ export function getAuthComposition() {
   const jwksVerifier = createSupabaseJwksVerifier({ issuer: `${supabaseUrl}/auth/v1` });
   const requireAal2 = createRequireAal2({ verifyAccessToken: jwksVerifier.verifyAccessToken });
   const pendingSealer = createPendingTokenSealer({ key: pendingKey });
-  const authLimits = createAuthLimits({ store: createInMemoryLimitsStore() });
+  const authLimitsStore = createPostgresAuthLimitsStore({
+    query: (sql, values) => pool.query(sql, values),
+  });
+  const authLimits = createAuthLimits({ store: authLimitsStore });
 
   const composition = createPayrollcheckAuth({
     withTransaction,

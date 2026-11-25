@@ -28,4 +28,16 @@ CREATE INDEX IF NOT EXISTS sessions_expiry ON payrollcheck.sessions(expires_at);
 ALTER TABLE payrollcheck.sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payrollcheck.sessions FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON payrollcheck.sessions FROM PUBLIC;
+
+-- Server-side login lockout and fixed-window rate-limit records.
+-- Pre-auth writes use the same least-privilege runtime role, before an
+-- internal subject or session identity exists.
+CREATE TABLE IF NOT EXISTS payrollcheck.auth_limits (
+  key text PRIMARY KEY,
+  value jsonb NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE payrollcheck.auth_limits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payrollcheck.auth_limits FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON payrollcheck.auth_limits FROM PUBLIC;
 COMMIT;

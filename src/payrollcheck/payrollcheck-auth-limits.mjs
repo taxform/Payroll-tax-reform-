@@ -53,9 +53,11 @@ export function createAuthLimits({
     !store ||
     typeof store.get !== 'function' ||
     typeof store.set !== 'function' ||
-    typeof store.delete !== 'function'
+    typeof store.delete !== 'function' ||
+    typeof store.incrementAttempts !== 'function' ||
+    typeof store.incrementRateLimit !== 'function'
   ) {
-    throw new Error('createAuthLimits requires a store with get/set/delete');
+    throw new Error('createAuthLimits requires a store with get/set/delete/incrementAttempts/incrementRateLimit');
   }
   if (!Number.isInteger(maxFailedAttempts) || maxFailedAttempts < 1) {
     throw new Error('maxFailedAttempts must be a positive integer');
@@ -79,31 +81,33 @@ export function createAuthLimits({
 
   async function checkRateLimitByKey(key) {
     const windowStartNow = now();
-    let record;
     try {
-      record = await store.get(rateKey(key));
+      const record = await store.incrementRateLimit({
+        key: rateKey(key),
+        now: windowStartNow,
+        windowMs: rateLimitWindowMs,
+        maxRequests: maxRequestsPerWindow,
+      });
+      if (!record) {
+        return { allowed: true, remaining: maxRequestsPerWindow, resetMs: rateLimitWindowMs, degraded: true };
+      }
+      if (record.count > maxRequestsPerWindow) {
+        return {
+          allowed: false,
+          remaining: 0,
+          resetMs: record.windowStart + rateLimitWindowMs - windowStartNow,
+        };
+      }
+      return {
+        allowed: true,
+        remaining: maxRequestsPerWindow - record.count,
+        resetMs: record.windowStart + rateLimitWindowMs - windowStartNow,
+      };
     } catch {
       // Fail open (documented): a rate-limit store outage must not lock
       // every user out. The caller can log `degraded: true`.
       return { allowed: true, remaining: maxRequestsPerWindow, resetMs: rateLimitWindowMs, degraded: true };
     }
-    if (!record || windowStartNow - record.windowStart >= rateLimitWindowMs) {
-      await store.set(rateKey(key), { count: 1, windowStart: windowStartNow });
-      return { allowed: true, remaining: maxRequestsPerWindow - 1, resetMs: rateLimitWindowMs };
-    }
-    if (record.count >= maxRequestsPerWindow) {
-      return {
-        allowed: false,
-        remaining: 0,
-        resetMs: record.windowStart + rateLimitWindowMs - windowStartNow,
-      };
-    }
-    await store.set(rateKey(key), { count: record.count + 1, windowStart: record.windowStart });
-    return {
-      allowed: true,
-      remaining: maxRequestsPerWindow - (record.count + 1),
-      resetMs: record.windowStart + rateLimitWindowMs - windowStartNow,
-    };
   }
 
   return {
@@ -154,29 +158,25 @@ export function createAuthLimits({
     async recordFailedLogin({ identifier }) {
       const normalizedIdentifier = normalizeIdentifier(identifier);
       const currentTime = now();
-      let attempts;
       try {
-        attempts = await readAttempts(normalizedIdentifier);
+        const record = await store.incrementAttempts({
+          key: attemptsKey(normalizedIdentifier),
+          now: currentTime,
+          maxFailedAttempts,
+          lockoutMs,
+        });
+        if (!record) {
+          return { recorded: false, lockedOut: false, storeError: true };
+        }
+        const count = record.count;
+        const lockedOut = count >= maxFailedAttempts;
+        if (lockedOut) {
+          return { recorded: true, lockedOut: true, retryAfterMs: lockoutMs };
+        }
+        return { recorded: true, lockedOut: false, remainingAttempts: maxFailedAttempts - count };
       } catch {
         return { recorded: false, lockedOut: false, storeError: true };
       }
-      const expired = attempts?.lockedUntil && currentTime >= attempts.lockedUntil;
-      const count = !attempts || expired ? 1 : attempts.count + 1;
-      const lockedOut = count >= maxFailedAttempts;
-      const record = {
-        count,
-        firstFailureAt: !attempts || expired ? currentTime : attempts.firstFailureAt,
-        lockedUntil: lockedOut ? currentTime + lockoutMs : 0,
-      };
-      try {
-        await store.set(attemptsKey(normalizedIdentifier), record);
-      } catch {
-        return { recorded: false, lockedOut: false, storeError: true };
-      }
-      if (lockedOut) {
-        return { recorded: true, lockedOut: true, retryAfterMs: lockoutMs };
-      }
-      return { recorded: true, lockedOut: false, remainingAttempts: maxFailedAttempts - count };
     },
 
     async recordSuccessfulLogin({ identifier }) {
