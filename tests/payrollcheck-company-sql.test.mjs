@@ -35,3 +35,26 @@ test('companies policies: business-owner-only select/insert/update, no delete, n
   assert.ok(!/IRS verif|verified by the IRS|\bTDS\b|\bIVES\b/i.test(migration));
   assert.ok(!/IRS verif|verified by the IRS|\bTDS\b|\bIVES\b/i.test(policies));
 });
+
+const reconciliation = readFileSync(
+  new URL('../docs/sql/payrollcheck-companies-reconciliation-migration.sql', import.meta.url),
+  'utf8'
+);
+
+test('companies reconciliation migration: backfills tenant_id from id, then adds a guarded unique constraint', () => {
+  // Regression guard for the production 42830 failure: prod tenants has
+  // its primary key on id and tenant_id is nullable with no unique
+  // constraint, so the companies schema (REFERENCES tenants(tenant_id))
+  // cannot apply until this migration runs. The file only reconciles
+  // tenants; it must not create the companies table or any policy.
+  assert.ok(reconciliation.includes('UPDATE payrollcheck.tenants'));
+  assert.ok(reconciliation.includes('SET tenant_id = id'));
+  assert.ok(reconciliation.includes('WHERE tenant_id IS NULL'));
+  assert.ok(reconciliation.includes('pg_constraint'));
+  assert.ok(reconciliation.includes('ADD CONSTRAINT tenants_tenant_id_key UNIQUE (tenant_id)'));
+  assert.ok(reconciliation.includes('DO $'));
+  assert.ok(reconciliation.includes('EXECUTE'));
+  assert.ok(!reconciliation.includes('CREATE TABLE payrollcheck.payroll_companies'));
+  assert.ok(!reconciliation.includes('CREATE POLICY'));
+  assert.ok(!/IRS verif|verified by the IRS/i.test(reconciliation));
+});
