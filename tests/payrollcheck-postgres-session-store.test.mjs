@@ -3,6 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createPostgresSessionStore} from '../src/payrollcheck/postgres-session-store.mjs';
+import {setRlsIdentity} from '../src/payrollcheck/payrollcheck-rls-identity.mjs';
 
 const SESSION_ID = 'sess-a-000000000000000000000000000001';
 const PREVIOUS_ID = 'sess-old-0000000000000000000000000001';
@@ -50,6 +51,52 @@ function storeFor(rows, calls = []) {
     return {rows};
   };
   return {calls, store: createPostgresSessionStore({query})};
+}
+
+// RLS mirror for payrollcheck.sessions — the write side only. It mirrors
+// docs/sql/payrollcheck-rls-policies.sql (confirmed live on
+// payrollcheck-360-dev on 2026-11-24): an INSERT ... ON CONFLICT DO UPDATE is
+// checked against BOTH app_sessions_insert WITH CHECK and app_sessions_update
+// WITH CHECK, and both require user_id = current_subject_id AND
+// auth_user_id = current_auth_user_id. A caller that only holds the presented
+// session id (the report path after PR #114) is therefore denied the upsert
+// unless the identity is completed from the row itself first (root cause #6).
+// Reads stay ungated here: the read side is covered by the #114 tests in
+// payrollcheck-auth-composition.test.mjs.
+function rlsMirroringQuery() {
+  const calls = [];
+  const identity = {subjectId: null, authUserId: null, sessionId: null};
+  async function query(sql, values = []) {
+    calls.push({sql, values});
+    if (sql.includes('set_config(')) {
+      // setRlsIdentity issues one SELECT with a set_config per supplied GUC,
+      // in subject, auth, session order; the values line up in that order.
+      const names = [];
+      for (const key of ['subject_id', 'auth_user_id', 'session_id']) {
+        if (sql.includes('current_' + key)) names.push(key);
+      }
+      names.forEach((name, index) => {
+        if (name === 'subject_id') identity.subjectId = values[index];
+        if (name === 'auth_user_id') identity.authUserId = values[index];
+        if (name === 'session_id') identity.sessionId = values[index];
+      });
+      return {rows: []};
+    }
+    if (sql.includes('INSERT INTO payrollcheck.sessions')) {
+      const userId = values[3];
+      const authUserId = values[4];
+      if (identity.subjectId !== userId || identity.authUserId !== authUserId) {
+        const error = new Error(
+          'new row violates row-level security policy "app_sessions_insert" for table "sessions"',
+        );
+        error.code = '42501';
+        throw error;
+      }
+      return {rows: []};
+    }
+    throw new Error('unexpected SQL in the RLS mirror: ' + sql);
+  }
+  return {query, calls, identity};
 }
 
 test('get returns the mapped record and converts timestamps to epoch seconds', async () => {
@@ -115,11 +162,16 @@ test('get propagates database errors', async () => {
 test('set upserts all eleven columns in order', async () => {
   const {store, calls} = storeFor([]);
   await store.set(record({previousSessionId: PREVIOUS_ID, graceUntil: T0 + 60}));
-  assert.equal(calls.length, 1);
-  assert.match(calls[0].sql, /INSERT INTO payrollcheck\.sessions/);
-  assert.match(calls[0].sql, /ON CONFLICT \(session_id\) DO UPDATE SET/);
-  assert.match(calls[0].sql, /last_seen_at = EXCLUDED\.last_seen_at/);
-  const values = calls[0].values;
+  // set() completes the RLS identity from the record first (root cause #6):
+  // the set_config call carries the record's own subject/auth/session, then
+  // the upsert runs.
+  assert.equal(calls.length, 2);
+  assert.ok(calls[0].sql.includes("set_config('payrollcheck.current_subject_id'"));
+  assert.deepEqual(calls[0].values, [USER_ID, AUTH_USER_ID, SESSION_ID]);
+  assert.match(calls[1].sql, /INSERT INTO payrollcheck\.sessions/);
+  assert.match(calls[1].sql, /ON CONFLICT \(session_id\) DO UPDATE SET/);
+  assert.match(calls[1].sql, /last_seen_at = EXCLUDED\.last_seen_at/);
+  const values = calls[1].values;
   assert.equal(values[0], SESSION_ID);
   assert.equal(values[1], PREVIOUS_ID);
   assert.ok(values[2] instanceof Date && values[2].getTime() === (T0 + 60) * 1000);
@@ -155,4 +207,44 @@ test('delete and deleteByUserId run parameterized deletes', async () => {
 test('rejects a bad factory config', () => {
   assert.throws(() => createPostgresSessionStore({}), TypeError);
   assert.throws(() => createPostgresSessionStore(), TypeError);
+});
+
+test('set completes the RLS identity from the record before the upsert (root cause #6)', async () => {
+  const fake = rlsMirroringQuery();
+  // The report path after PR #114: only the presented session id is set
+  // before load(), so the write-back runs under a session-only identity.
+  await setRlsIdentity({query: fake.query, sessionId: SESSION_ID});
+  const store = createPostgresSessionStore({query: fake.query});
+  await store.set(record());
+  // The upsert ran: under a session-only identity it is denied by RLS
+  // (42501) unless set() completes the identity from the record first.
+  const identityCall = fake.calls.find((call) => call.sql.includes("set_config('payrollcheck.current_subject_id'"));
+  assert.ok(identityCall, 'set() should complete the RLS identity before the upsert');
+  assert.deepEqual(identityCall.values, [USER_ID, AUTH_USER_ID, SESSION_ID]);
+  const upsert = fake.calls.find((call) => call.sql.includes('INSERT INTO payrollcheck.sessions'));
+  assert.ok(upsert, 'the upsert should run after the identity is completed');
+  assert.ok(fake.calls.indexOf(upsert) > fake.calls.indexOf(identityCall));
+  assert.equal(fake.identity.subjectId, USER_ID);
+  assert.equal(fake.identity.authUserId, AUTH_USER_ID);
+  assert.equal(fake.identity.sessionId, SESSION_ID);
+});
+
+test('set keeps working when the caller already set a full identity (sign-in path)', async () => {
+  const fake = rlsMirroringQuery();
+  await setRlsIdentity({query: fake.query, subjectId: USER_ID, authUserId: AUTH_USER_ID, sessionId: SESSION_ID});
+  const store = createPostgresSessionStore({query: fake.query});
+  await store.set(record());
+  assert.ok(fake.calls.some((call) => call.sql.includes('INSERT INTO payrollcheck.sessions')));
+});
+
+test('the RLS mirror denies the upsert under a session-only identity', async () => {
+  const fake = rlsMirroringQuery();
+  await setRlsIdentity({query: fake.query, sessionId: SESSION_ID});
+  await assert.rejects(
+    fake.query(
+      'INSERT INTO payrollcheck.sessions (session_id, previous_session_id, grace_until, user_id, auth_user_id, aal2, created_at, rotated_at, last_seen_at, expires_at, revoked) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (session_id) DO UPDATE SET last_seen_at = EXCLUDED.last_seen_at',
+      [SESSION_ID, null, null, USER_ID, AUTH_USER_ID, true, new Date(T0 * 1000), new Date(T0 * 1000), new Date(T0 * 1000), new Date((T0 + 43200) * 1000), false],
+    ),
+    (error) => error.code === '42501' && error.message.includes('app_sessions_insert'),
+  );
 });
