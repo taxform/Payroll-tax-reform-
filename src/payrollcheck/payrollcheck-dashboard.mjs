@@ -17,6 +17,8 @@
 // against the filing rules). It is NOT proof from IRS records. There is no
 // TDS/IVES access and no direct IRS channel, and none is claimed here.
 
+import { loadCompanyByTenant, maskEin } from './payrollcheck-company.mjs';
+
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -30,9 +32,9 @@ export const PAYROLLCHECK_APP_MODULES = Object.freeze([
     id: 'company',
     label: 'Company',
     href: '#company',
-    status: 'coming_soon',
+    status: 'available',
     slice: 2,
-    note: 'Company profile arrives in Slice 2.',
+    note: 'Set up your company profile — legal name, EIN, address and pay schedule.',
   }),
   Object.freeze({
     id: 'employees',
@@ -116,7 +118,7 @@ export function resolveDashboardTenant({ memberships, requestedTenantId }) {
 // tenant id to the number of compliance-check reports for that tenant (0 when
 // absent). Counts are the caller's own tenants only; no other tenant's data is
 // ever passed in, so none can leak out.
-export function buildDashboardSummary({ memberships, reportCountsByTenant, selectedTenantId }) {
+export function buildDashboardSummary({ memberships, reportCountsByTenant, companiesByTenant, selectedTenantId }) {
   const members = Array.isArray(memberships) ? memberships : [];
   const counts =
     reportCountsByTenant && typeof reportCountsByTenant === 'object'
@@ -130,8 +132,20 @@ export function buildDashboardSummary({ memberships, reportCountsByTenant, selec
   }));
   const selected =
     tenants.find((t) => t.tenantId === selectedTenantId) ?? tenants[0] ?? null;
+  const companies =
+    companiesByTenant && typeof companiesByTenant === 'object' ? companiesByTenant : {};
+  const companyRow = selected ? companies[selected.tenantId] ?? null : null;
+  const company = companyRow
+    ? {
+        isSetUp: true,
+        legalName: companyRow.legal_name,
+        einMasked: maskEin(companyRow.ein),
+        paySchedule: companyRow.pay_schedule,
+      }
+    : { isSetUp: false };
   return {
     selectedTenant: selected,
+    company,
     tenants,
     totals: {
       tenants: tenants.length,
@@ -188,7 +202,12 @@ export function createDashboardLoader({ query }) {
         membership.tenantId,
       );
     }
-    return { memberships, reportCountsByTenant };
+    const companiesByTenant = {};
+  for (const membership of memberships) {
+    const company = await loadCompanyByTenant(query, membership.tenantId);
+    if (company) companiesByTenant[membership.tenantId] = company;
+  }
+  return { memberships, reportCountsByTenant, companiesByTenant };
   }
 
   return { loadMemberships, loadTenantType, loadReportCount, loadDashboard };

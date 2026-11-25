@@ -164,6 +164,7 @@ GRANT USAGE ON SCHEMA payrollcheck TO payrollcheck_app;
 GRANT SELECT ON payrollcheck.tenants TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE ON payrollcheck.memberships TO payrollcheck_app;
 GRANT SELECT ON payrollcheck.reports TO payrollcheck_app;
+GRANT SELECT, INSERT, UPDATE ON payrollcheck.payroll_companies TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE ON payrollcheck.client_grants TO payrollcheck_app;
 GRANT SELECT, INSERT ON payrollcheck.access_audit TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON payrollcheck.sessions TO payrollcheck_app;
@@ -297,6 +298,30 @@ CREATE POLICY app_reports_select ON payrollcheck.reports
       )
     )
   );
+
+-- ------------------------------------------------------------ payroll_companies
+-- A business owner reads and writes only their own business's company
+-- profile. There is no firm-grant branch here: a firm reviewer with a
+-- view_report grant on a business never sees that business's company
+-- profile, and there is no DELETE policy (the app never deletes a profile).
+-- The owner branch calls is_business_owner_of (SECURITY DEFINER helper
+-- above), not a plain subquery: a subquery on memberships inside its own
+-- SELECT policy recurses infinitely.
+DROP POLICY IF EXISTS app_payroll_companies_select ON payrollcheck.payroll_companies;
+CREATE POLICY app_payroll_companies_select ON payrollcheck.payroll_companies
+  FOR SELECT TO payrollcheck_app
+  USING (payrollcheck.is_business_owner_of(nullif(current_setting('payrollcheck.current_subject_id', true), ''), tenant_id));
+
+DROP POLICY IF EXISTS app_payroll_companies_insert ON payrollcheck.payroll_companies;
+CREATE POLICY app_payroll_companies_insert ON payrollcheck.payroll_companies
+  FOR INSERT TO payrollcheck_app
+  WITH CHECK (payrollcheck.is_business_owner_of(nullif(current_setting('payrollcheck.current_subject_id', true), ''), tenant_id));
+
+DROP POLICY IF EXISTS app_payroll_companies_update ON payrollcheck.payroll_companies;
+CREATE POLICY app_payroll_companies_update ON payrollcheck.payroll_companies
+  FOR UPDATE TO payrollcheck_app
+  USING (payrollcheck.is_business_owner_of(nullif(current_setting('payrollcheck.current_subject_id', true), ''), tenant_id))
+  WITH CHECK (payrollcheck.is_business_owner_of(nullif(current_setting('payrollcheck.current_subject_id', true), ''), tenant_id));
 
 -- ----------------------------------------------------------- client_grants
 -- Read: either side of the grant (a member of the firm or the business).

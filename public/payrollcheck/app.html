@@ -36,6 +36,37 @@
     <select id="tenant-select"></select>
   </section>
 
+  <section class="card" id="company-section" hidden>
+    <h2>Company profile</h2>
+    <p id="company-status">Company profile not set up yet.</p>
+    <form id="company-form">
+      <label for="company-legal-name">Legal name:</label>
+      <input id="company-legal-name" name="legalName" type="text" autocomplete="organization" required>
+      <label for="company-ein">EIN:</label>
+      <input id="company-ein" name="ein" type="text" inputmode="numeric" autocomplete="off" placeholder="12-3456789">
+      <p>Your EIN is stored and only its last 4 digits are ever shown. Leave the EIN blank to keep the one already on file.</p>
+      <label for="company-address-line1">Address line 1:</label>
+      <input id="company-address-line1" name="addressLine1" type="text" autocomplete="address-line1" required>
+      <label for="company-address-line2">Address line 2 (optional):</label>
+      <input id="company-address-line2" name="addressLine2" type="text" autocomplete="address-line2">
+      <label for="company-city">City:</label>
+      <input id="company-city" name="city" type="text" autocomplete="address-level2" required>
+      <label for="company-state">State:</label>
+      <input id="company-state" name="state" type="text" maxlength="2" autocomplete="address-level1" required>
+      <label for="company-postal-code">Postal code:</label>
+      <input id="company-postal-code" name="postalCode" type="text" inputmode="numeric" autocomplete="postal-code" required>
+      <label for="company-pay-schedule">Pay schedule:</label>
+      <select id="company-pay-schedule" name="paySchedule">
+        <option value="weekly">Weekly</option>
+        <option value="biweekly">Every two weeks</option>
+        <option value="semi_monthly">Twice a month</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <button type="submit">Save company profile</button>
+    </form>
+    <p id="company-message" role="status"></p>
+  </section>
+
   <section id="modules-section" hidden>
     <h2>Modules</h2>
     <div class="modules" id="modules-list"></div>
@@ -109,15 +140,90 @@
       if (m.status === 'available') {
         var link = document.createElement('p');
         var a = document.createElement('a');
-        a.href = '/payrollcheck/login.html';
-        a.textContent = 'Open the compliance check (report reader)';
+          if (m.id === 'company') {
+            a.href = '#company-section';
+            a.textContent = 'Set up the company profile';
+          } else {
+            a.href = '/payrollcheck/login.html';
+            a.textContent = 'Open the compliance check (report reader)';
+          }
         link.appendChild(a);
         div.appendChild(link);
       }
       list.appendChild(div);
     });
+      renderCompany(dashboard);
     statusEl.textContent = 'Signed in. Your business data below is yours only.';
   }
+  // Company profile (Slice 2): the dashboard summary says whether the
+  // company is set up; the saved profile is loaded here to prefill the form.
+  // The EIN is never shown in full: the field stays empty and only the
+  // masked form is shown as placeholder text.
+  var PAY_SCHEDULE_LABELS = { weekly: 'Weekly', biweekly: 'Every two weeks', semi_monthly: 'Twice a month', monthly: 'Monthly' };
+  function renderCompany(dashboard) {
+    var status = document.getElementById('company-status');
+    var company = dashboard.company;
+    if (company && company.isSetUp) {
+      status.textContent = 'Company set up: ' + company.legalName + ' \u2014 EIN ending ' + company.einMasked.slice(-4) + ' \u2014 ' + (PAY_SCHEDULE_LABELS[company.paySchedule] || company.paySchedule) + '.';
+    } else {
+      status.textContent = 'Company profile not set up yet.';
+    }
+    loadCompany(dashboard.selectedTenant.tenantId);
+  }
+  function loadCompany(tenantId) {
+    post('/payrollcheck/api/company', { action: 'read', tenantId: tenantId })
+      .then(function (res) {
+        if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data || !data.ok || !data.company) return;
+        var c = data.company;
+        document.getElementById('company-legal-name').value = c.legalName || '';
+        document.getElementById('company-ein').value = '';
+        document.getElementById('company-ein').placeholder = c.einMasked || '12-3456789';
+        document.getElementById('company-address-line1').value = c.address.line1 || '';
+        document.getElementById('company-address-line2').value = c.address.line2 || '';
+        document.getElementById('company-city').value = c.address.city || '';
+        document.getElementById('company-state').value = c.address.state || '';
+        document.getElementById('company-postal-code').value = c.address.postalCode || '';
+        document.getElementById('company-pay-schedule').value = c.paySchedule || 'weekly';
+      })
+      .catch(function () {});
+  }
+  document.getElementById('company-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var message = document.getElementById('company-message');
+    message.textContent = 'Saving\u2026';
+    var tenantId = document.getElementById('tenant-select').value;
+    post('/payrollcheck/api/company', {
+      action: 'write',
+      tenantId: tenantId,
+      company: {
+        legalName: document.getElementById('company-legal-name').value,
+        ein: document.getElementById('company-ein').value,
+        addressLine1: document.getElementById('company-address-line1').value,
+        addressLine2: document.getElementById('company-address-line2').value,
+        city: document.getElementById('company-city').value,
+        state: document.getElementById('company-state').value,
+        postalCode: document.getElementById('company-postal-code').value,
+        paySchedule: document.getElementById('company-pay-schedule').value,
+      },
+    })
+      .then(function (res) {
+        if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data) return;
+        if (data.csrfToken) setCsrfToken(data.csrfToken);
+        if (!data.ok) { message.textContent = 'Could not save the company profile. Please check the form and try again.'; return; }
+        message.textContent = 'Company profile saved.';
+        document.getElementById('company-ein').value = '';
+        loadDashboard(tenantId);
+      })
+      .catch(function () { message.textContent = 'Could not save the company profile. Please try again.'; });
+  });
   function loadDashboard(tenantId) {
     statusEl.textContent = 'Loading your business dashboard…';
     post('/payrollcheck/api/dashboard', tenantId ? { tenantId: tenantId } : {})
