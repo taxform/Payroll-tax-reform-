@@ -95,29 +95,8 @@ export function getAuthComposition() {
   const appUrl = process.env.PAYROLLCHECK_APP_URL || 'https://payrolltaxreform.com';
 
   // One pool per function instance. The connection string must carry
-  // sslmode=require (Supabase Postgres requires TLS), but the Supabase
-  // transaction pooler presents a certificate chain Node's default CA
-  // store does not trust, so verification must be off: without
-  // rejectUnauthorized: false the pooler connection fails with
-  // "self-signed certificate in certificate chain" (diagnosed Nov 24,
-  // 2026). TLS still encrypts the connection; only chain verification
-  // is skipped. Staging only — step 10 should pin Supabase's CA
-  // certificate instead before any prod pilot.
-  const pool = new Pool({
-    connectionString: databaseUrl,
-    max: 5,
-    ssl: { rejectUnauthorized: false },
-  });
-  // TEMPORARY DEBUG — revert once the staging login 503 is diagnosed.
-  // Logs only whether the connection string carries sslmode=no-verify,
-  // never the URL or any credential.
-  console.info(
-    JSON.stringify({
-      source: 'payrollcheck-auth',
-      event: 'pool_config',
-      sslNoVerify: databaseUrl.includes('sslmode=no-verify'),
-    }),
-  );
+  // sslmode=require (Supabase Postgres requires TLS).
+  const pool = new Pool({ connectionString: databaseUrl, max: 5 });
   pool.on('error', (error) => {
     console.error('payrollcheck pool error:', error instanceof Error ? error.message : 'unknown');
   });
