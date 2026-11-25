@@ -858,3 +858,7 @@ textarea.snippet {
   color: #111827;
   background: var(--gold-hover);
 }
+/* PayrollCheck 360 call-to-action block: same dark panel and gold accent as .notice. */
+.payrollcheck-cta { background: #14233b; border-left: 4px solid var(--gold); padding: 22px; border-radius: 6px; margin: 28px 0; }
+.payrollcheck-cta h2 { margin-top: 0; }
+.payrollcheck-cta p:last-child { margin-bottom: 0; }
