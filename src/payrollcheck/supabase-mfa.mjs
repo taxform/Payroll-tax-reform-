@@ -169,10 +169,6 @@ export async function verifyMfaChallenge({
   if (typeof code !== 'string' || !/^\d{6}$/.test(code)) {
     throw new Error('code must be a 6-digit string');
   }
-    // The official client verifies a TOTP challenge at
-    // POST /factors/{factorId}/verify with { challenge_id, code }.
-    // The general /verify endpoint does not handle TOTP factor
-    // verification, so posting there rejects every correct code.
   return mfaRequest({
     baseUrl,
     ...rest,

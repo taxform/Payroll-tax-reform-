@@ -304,16 +304,27 @@
     message('report-message', genericError(result.status), true);
   });
 
-  document.getElementById('logout-button').addEventListener('click', async function () {
-    try {
-      await post('/payrollcheck/api/logout', {}, true);
-    } catch (e) { /* logout is best-effort from the UI side */ }
-    setCsrfToken('');
-    pendingBlob = null;
-    show('report-section', false);
-    show('login-section', true);
-    message('login-message', 'Signed out.');
-  });
+document.getElementById('logout-button').addEventListener('click', async function () {
+  var result;
+  try {
+    result = await post('/payrollcheck/api/logout', {}, true);
+  } catch (e) {
+    message('login-message', genericError(0), true);
+    return;
+  }
+  // Only claim "Signed out." once the server confirms the session was
+  // revoked. A refused logout leaves the session live, so keep the
+  // signed-in state and show an error instead.
+  if (result.status !== 200) {
+    message('login-message', result.status === 403 ? 'Sign-out was refused. You are still signed in.' : genericError(result.status), true);
+    return;
+  }
+  setCsrfToken('');
+  pendingBlob = null;
+  show('report-section', false);
+  show('login-section', true);
+  message('login-message', 'Signed out.');
+});
 
   document.getElementById('forgot-button').addEventListener('click', async function () {
     var email = document.querySelector('#login-form input[name="email"]').value.trim();
