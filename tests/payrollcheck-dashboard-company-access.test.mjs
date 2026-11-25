@@ -27,6 +27,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { createDashboardAccessHandler } from '../src/payrollcheck/payrollcheck-dashboard-access.mjs';
 import { createCompanyAccessHandler } from '../src/payrollcheck/payrollcheck-company-access.mjs';
+import { createDashboardLoader } from '../src/payrollcheck/payrollcheck-dashboard.mjs';
 
 const AUTH_USER_ID = '11111111-2222-3333-4444-555555555555';
 const TENANT_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
@@ -200,4 +201,45 @@ test('dashboard: an empty access token is still denied 401 invalid_session', asy
   });
   assert.equal(result.status, 401);
   assert.equal(result.reason, 'invalid_session');
+});
+// Regression: prod 2026-11-25 (Slice 2 smoke test) - the dashboard returned
+// 503 unavailable for a real signed-in AAL2 user because loadDashboard let
+// the company-profile lookup throw when payrollcheck.payroll_companies did
+// not exist yet in prod (Slice 2 migration not applied; PR #133: "No change
+// to prod ... databases", and PR #134: the companies schema "failed in
+// prod with ERROR 42830"). The company profile is optional, so the
+// dashboard must still load, with the company reported as not set up.
+test('dashboard: a failed company-profile lookup does not fail the dashboard', async () => {
+  const sessionId = newRealSessionId();
+  const query = async (sql) => {
+    if (sql.includes('FROM payrollcheck.payroll_companies')) {
+      throw new Error('relation "payrollcheck.payroll_companies" does not exist');
+    }
+    if (sql.includes('FROM payrollcheck.memberships')) {
+      return { rows: [{ subject_id: SUBJECT_ID, tenant_id: TENANT_ID, role: 'business_owner', active: true }] };
+    }
+    if (sql.includes('FROM payrollcheck.tenants')) {
+      return { rows: [{ tenant_id: TENANT_ID, tenant_type: 'business', created_at: '2026-01-01T00:00:00.000Z' }] };
+    }
+    if (sql.includes('FROM payrollcheck.reports')) {
+      return { rows: [{ count: '0' }] };
+    }
+    throw new Error('unexpected query in regression fixture: ' + sql);
+  };
+  const { handleDashboardAccess: handler } = createDashboardAccessHandler(baseDeps({}, {
+    loadDashboard: async ({ subjectId }) => createDashboardLoader({ query }).loadDashboard({ subjectId }),
+  }));
+  const result = await handler({
+    accessToken: sessionId,
+    sessionId,
+    tenantId: TENANT_ID,
+    requestId: 'req_regression_dashboard_company_lookup',
+    clientIp: '127.0.0.1',
+  });
+  assert.equal(result.status, 200, JSON.stringify(result));
+  assert.equal(result.ok, true);
+  assert.equal(result.reason, 'allowed');
+  assert.equal(result.dashboard.selectedTenant.tenantId, TENANT_ID);
+  assert.equal(result.dashboard.company.isSetUp, false);
+  assert.equal(result.dashboard.totals.reports, 0);
 });

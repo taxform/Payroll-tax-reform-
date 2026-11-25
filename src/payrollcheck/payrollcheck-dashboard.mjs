@@ -204,7 +204,19 @@ export function createDashboardLoader({ query }) {
     }
     const companiesByTenant = {};
   for (const membership of memberships) {
-    const company = await loadCompanyByTenant(query, membership.tenantId);
+    // The company profile is optional: a tenant with no saved profile has
+    // no row, and the profile table may not exist yet where the Slice 2
+    // migration has not been applied (prod, 2026-11-25: the dashboard
+    // returned 503 unavailable for every signed-in user because this
+    // lookup threw "relation payrollcheck.payroll_companies does not
+    // exist"). A failed company lookup must not take the whole dashboard
+    // down; treat it as "no company profile for this tenant".
+    let company = null;
+    try {
+      company = await loadCompanyByTenant(query, membership.tenantId);
+    } catch {
+      company = null;
+    }
     if (company) companiesByTenant[membership.tenantId] = company;
   }
   return { memberships, reportCountsByTenant, companiesByTenant };
