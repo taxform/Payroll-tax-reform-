@@ -813,6 +813,13 @@ test('report load throwing is 503 unavailable', async () => {
   const { db, handler } = setup();
   db.failReportLoad = true;
   const result = await handler.handleReportAccess({ ...BASE, accessToken: 'tok-owner-a' });
+  assert.equal(result.status, 503);
+  assert.equal(result.reason, 'unavailable');
+  // S3: the report-load failure is audited like every other decision.
+  assert.equal(db.auditRows.length, 1);
+  assert.equal(db.auditRows[0].reason, 'report_load_failed');
+  assert.equal(db.auditRows[0].allowed, false);
+});
 
 test('membership load throwing is 503 unavailable and audited', async () => {
   const { db, handler } = setup();
@@ -824,13 +831,6 @@ test('membership load throwing is 503 unavailable and audited', async () => {
   // S3: the membership/grant-load failure is audited like every other decision.
   assert.equal(db.auditRows.length, 1);
   assert.equal(db.auditRows[0].reason, 'membership_load_failed');
-  assert.equal(db.auditRows[0].allowed, false);
-});
-  assert.equal(result.status, 503);
-  assert.equal(result.reason, 'unavailable');
-  // S3: the report-load failure is audited like every other decision.
-  assert.equal(db.auditRows.length, 1);
-  assert.equal(db.auditRows[0].reason, 'report_load_failed');
   assert.equal(db.auditRows[0].allowed, false);
 });
 
