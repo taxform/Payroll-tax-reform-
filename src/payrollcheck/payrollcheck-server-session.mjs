@@ -170,7 +170,8 @@ export function createServerSession({
           record = null;
         }
       }
-    } catch {
+    } catch (error) {
+      console.error('payrollcheck-server-session load read failed', error?.code, error?.message);
       return {ok: false, reason: 'session_lookup_failed'};
     }
     if (!record) return {ok: false, reason: 'unknown_session'};
@@ -207,7 +208,8 @@ export function createServerSession({
         current = {...record, lastSeenAt: now};
         await store.set(current);
       }
-    } catch {
+    } catch (error) {
+      console.error('payrollcheck-server-session load write-back failed', error?.code, error?.message);
       return {ok: false, reason: 'session_lookup_failed'};
     }
     const result = {

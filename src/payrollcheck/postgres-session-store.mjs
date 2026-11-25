@@ -7,6 +7,8 @@
 // Times are stored as timestamptz and converted to/from epoch seconds.
 // Database errors propagate (the session layer fails closed on them); a
 // missing row returns null. Never log session ids or query results.
+import {setRlsIdentity} from './payrollcheck-rls-identity.mjs';
+
 const uuid = (x) =>
   typeof x === 'string' &&
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
@@ -131,6 +133,25 @@ export function createPostgresSessionStore({query} = {}) {
 
   async function set(record) {
     validateRecord(record);
+    // The upsert below is checked against BOTH app_sessions_insert WITH CHECK
+    // and app_sessions_update WITH CHECK; both require user_id =
+    // current_subject_id AND auth_user_id = current_auth_user_id. load()'s
+    // write-back runs under a session-only identity (PR #114 sets only the
+    // presented session id before load), so without this the write-back is
+    // denied by RLS and load() reports session_lookup_failed (root cause #6).
+    // Complete the identity from the record's own user_id, auth_user_id and
+    // session_id — the same values this upsert writes — before running it.
+    // The row was already authenticated by session_id on read, so this
+    // grants nothing new; it only satisfies the WITH CHECKs for that same
+    // row. Same-transaction SET LOCAL on the store's query client; callers
+    // that already set a full identity (sign-in) see the same values
+    // re-asserted.
+    await setRlsIdentity({
+      query,
+      subjectId: record.userId,
+      authUserId: record.authUserId,
+      sessionId: record.sessionId,
+    });
     const values = [
       record.sessionId,
       record.previousSessionId ?? null,

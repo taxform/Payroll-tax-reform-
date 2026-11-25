@@ -176,3 +176,53 @@ test('rejects a bad factory config', () => {
   assert.throws(() => createServerSession({store: {}, secret: SECRET}), TypeError);
   assert.throws(() => createServerSession({store, secret: SECRET, clock: 'not-a-function'}), TypeError);
 });
+
+// Root cause #6: load() swallowed the store error, so a denied write-back
+// surfaced only as a bare session_lookup_failed. Both catch blocks must log
+// the underlying error's code and message (never session values) so a future
+// RLS denial is diagnosable.
+test('load logs the underlying store error when the read fails', async () => {
+  const logged = [];
+  const originalError = console.error;
+  console.error = (...args) => { logged.push(args.map((arg) => String(arg)).join(' ')); };
+  try {
+    const s = setup();
+    const result = await issued(s);
+    s.store.get = async () => {
+      const error = new Error('new row violates row-level security policy "app_sessions_select" for table "sessions"');
+      error.code = '42501';
+      throw error;
+    };
+    const loaded = await s.sessions.load(result.cookie);
+    assert.deepEqual(loaded, {ok: false, reason: 'session_lookup_failed'});
+    assert.equal(logged.length, 1);
+    assert.match(logged[0], /42501/);
+    assert.match(logged[0], /app_sessions_select/);
+    assert.doesNotMatch(logged[0], /sess-/);
+  } finally {
+    console.error = originalError;
+  }
+});
+
+test('load logs the underlying store error when the write-back fails', async () => {
+  const logged = [];
+  const originalError = console.error;
+  console.error = (...args) => { logged.push(args.map((arg) => String(arg)).join(' ')); };
+  try {
+    const s = setup();
+    const result = await issued(s);
+    s.store.set = async () => {
+      const error = new Error('new row violates row-level security policy "app_sessions_insert" for table "sessions"');
+      error.code = '42501';
+      throw error;
+    };
+    const loaded = await s.sessions.load(result.cookie);
+    assert.deepEqual(loaded, {ok: false, reason: 'session_lookup_failed'});
+    assert.equal(logged.length, 1);
+    assert.match(logged[0], /42501/);
+    assert.match(logged[0], /app_sessions_insert/);
+    assert.doesNotMatch(logged[0], /sess-/);
+  } finally {
+    console.error = originalError;
+  }
+});
