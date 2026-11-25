@@ -14,6 +14,11 @@
   status = 301
 
 [[redirects]]
+  from = "/payrollcheck/app"
+  to = "/payrollcheck/app.html"
+  status = 200
+
+[[redirects]]
   from = "https://www.payrolltaxreform.com/*"
   to = "https://payrolltaxreform.com/:splat"
   status = 301
