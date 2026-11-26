@@ -163,6 +163,8 @@
     document.getElementById('company-section').hidden = false;
   var employeesSection = document.getElementById('employees-section');
   if (employeesSection) employeesSection.hidden = false;
+      var payRunsSection = document.getElementById('pay-runs-section');
+      if (payRunsSection) payRunsSection.hidden = false;
     document.getElementById('tenant-line').textContent =
       'Business tenant (' + (tenant.tenantType || 'unknown') + '), role ' + tenant.role + ' — ' + tenant.tenantId;
     document.getElementById('tenant-counts').textContent =
@@ -202,6 +204,9 @@
       } else if (m.id === 'employees') {
         a.href = '#employees-section';
         a.textContent = 'Add and manage employees';
+          } else if (m.id === 'pay-runs') {
+                a.href = '#pay-runs-section';
+                a.textContent = 'Open pay runs';
           } else {
             a.href = '/payrollcheck/login.html';
             a.textContent = 'Open the compliance check (report reader)';
