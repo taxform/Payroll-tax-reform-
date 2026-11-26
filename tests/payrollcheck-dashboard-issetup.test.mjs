@@ -29,8 +29,8 @@ function makeLoaded(companiesByTenant) {
 }
 
 function makeHandler(loadDashboard) {
-  return createDashboardAccessHandler({
-    getVerifiedUser: async () => ({ id: USER_ID, email: 'owner@acme.test' }),
+  const { handleDashboardAccess } = createDashboardAccessHandler({
+    getVerifiedUser: async () => ({ id: USER_ID, email: 'owner@acme.test', email_confirmed_at: '2026-01-01T00:00:00Z', is_anonymous: false }),
     requireAal2: async () => undefined,
     getSession: async () => ({ subject_id: USER_ID }),
     resolveSubjectId: async () => USER_ID,
@@ -40,6 +40,7 @@ function makeHandler(loadDashboard) {
     now: () => 1794000000,
     loadDashboard,
   });
+  return handleDashboardAccess;
 }
 
 test('dashboard reports a company as set up when a company row exists for the tenant', async () => {
