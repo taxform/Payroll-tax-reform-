@@ -107,6 +107,7 @@
     var tenant = dashboard.selectedTenant;
     document.getElementById('tenant-section').hidden = false;
     document.getElementById('modules-section').hidden = false;
+    document.getElementById('company-section').hidden = false;
     document.getElementById('tenant-line').textContent =
       'Business tenant (' + (tenant.tenantType || 'unknown') + '), role ' + tenant.role + ' — ' + tenant.tenantId;
     document.getElementById('tenant-counts').textContent =
