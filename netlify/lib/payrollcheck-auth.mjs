@@ -95,7 +95,11 @@ export function getAuthComposition() {
   // Employee SSNs (Slice 3) are sealed with AES-256-GCM by a dedicated sub-key
   // derived from the already-injected PAYROLLCHECK_PENDING_KEY (see
   // src/payrollcheck/payrollcheck-ssn.mjs). No new environment variable.
-  const ssnSealer = createSsnSealer({ key: pendingKey });
+    // PAYROLLCHECK_PENDING_KEY arrives as a base64 string, but
+    // createSsnSealer() requires the decoded 32-byte Buffer. Passing the
+    // raw string threw on every call and broke all PayrollCheck sign-ins.
+    const pendingKeyBytes = Buffer.from(pendingKey, 'base64');
+    const ssnSealer = createSsnSealer({ key: pendingKeyBytes });
   const authLimitsStore = createPostgresAuthLimitsStore({
     query: (sql, values) => pool.query(sql, values),
   });
