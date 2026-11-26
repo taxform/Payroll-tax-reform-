@@ -462,3 +462,17 @@ test('recordAccessAudit validates action, reason, actor, and request id', async 
   await assert.rejects(() => api.recordAccessAudit({ ...base, requestId: '' }), /request_id_must_be_a_non_empty_string/);
   await assert.rejects(() => api.recordAccessAudit({ ...base, allowed: 'yes' }), /allowed_must_be_a_boolean/);
 });
+
+test('recordAccessAudit accepts tax_center_read (Slice 5 Tax Center)', async () => {
+  const { api, calls } = setup(async () => ({ rows: [{}] }));
+  await api.recordAccessAudit({
+    requestId: 'req-1',
+    actorSubjectId: 'user-1',
+    reportId: null,
+    action: 'tax_center_read',
+    allowed: true,
+    reason: 'allowed',
+  });
+  const insert = findCall(calls, 'INSERT INTO payrollcheck.access_audit');
+  assert.equal(insert.values[4], 'tax_center_read');
+});
