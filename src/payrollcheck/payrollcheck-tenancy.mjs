@@ -53,7 +53,7 @@ const SUBJECT_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 const ROLES = ['business_owner', 'accounting_admin', 'accounting_reviewer'];
 const TENANT_TYPES = ['business', 'accounting_firm'];
 const GRANT_SCOPES = ['view_report', 'review_finding'];
-const AUDIT_ACTIONS = ['view_report', 'review_finding', 'dashboard_read', 'company_read', 'company_write', 'employee_read', 'employee_write', 'pay_run_read', 'pay_run_write'];
+const AUDIT_ACTIONS = ['view_report', 'review_finding', 'dashboard_read', 'company_read', 'company_write', 'employee_read', 'employee_write', 'pay_run_read', 'pay_run_write', 'tax_center_read'];
 
 function defaultGenerateSubjectId() {
   // 'usr_' + 21 chars from the base64url alphabet -> 25 chars, inside
