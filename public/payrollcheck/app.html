@@ -97,6 +97,29 @@
     <p id="employee-message" role="status"></p>
     <ul id="employees-list"></ul>
   </section>
+
+  <section class="card" id="pay-runs-section" hidden>
+    <h2>Pay runs</h2>
+    <p id="pay-runs-status">No pay runs yet.</p>
+    <form id="pay-run-form">
+      <label>Period start <input id="pay-run-period-start" type="date" required></label>
+      <label>Period end <input id="pay-run-period-end" type="date" required></label>
+      <label>Pay date <input id="pay-run-pay-date" type="date" required></label>
+      <label>Frequency
+        <select id="pay-run-frequency">
+          <option value="weekly">Weekly</option>
+          <option value="biweekly">Biweekly</option>
+          <option value="semimonthly">Semimonthly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </label>
+      <button type="button" id="pay-run-preview">Preview</button>
+      <button type="submit" id="pay-run-create">Create draft</button>
+    </form>
+    <p id="pay-run-preview-totals"></p>
+    <p id="pay-run-message" role="status"></p>
+    <ul id="pay-runs-list"></ul>
+  </section>
   <section id="modules-section" hidden>
     <h2>Modules</h2>
     <div class="modules" id="modules-list"></div>
@@ -190,6 +213,7 @@
     });
       renderCompany(dashboard);
   renderEmployees(dashboard);
+  renderPayRuns(dashboard);
     statusEl.textContent = 'Signed in. Your business data below is yours only.';
   }
   // Company profile (Slice 2): the dashboard summary says whether the
@@ -368,7 +392,168 @@ if (employeeForm) employeeForm.addEventListener('submit', function (event) {
 });
 var employeeCancel = document.getElementById('employee-cancel');
 if (employeeCancel) employeeCancel.addEventListener('click', function () { clearEmployeeEdit(); });
-  document.getElementById('company-form').addEventListener('submit', function (event) {
+  // Slice 4: Pay runs. Finalizing is irreversible, so the Finalize button asks
+// for confirmation first; a finalized run is read-only (no Finalize or
+// Delete button is rendered for it). Deleting a draft also asks first.
+function renderPayRuns(dashboard) {
+  var status = document.getElementById('pay-runs-status');
+  if (status) status.textContent = 'No pay runs yet.';
+  if (dashboard.selectedTenant) loadPayRuns(dashboard.selectedTenant.tenantId);
+}
+function payRunSummary(payRun) {
+  var totals = payRun.totals || {};
+  return payRun.payPeriodStart + ' to ' + payRun.payPeriodEnd + ' — pay date ' + payRun.payDate + ' — ' + payRun.status + ' — gross $' + totals.gross + ', federal $' + totals.federalWithholding + ', FICA $' + totals.fica + ', net $' + totals.net;
+}
+function loadPayRuns(tenantId) {
+  var list = document.getElementById('pay-runs-list');
+  post('/payrollcheck/api/pay-runs', { action: 'list', tenantId: tenantId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data || !data.ok || !Array.isArray(data.payRuns) || !list) return;
+      var status = document.getElementById('pay-runs-status');
+      if (status) status.textContent = data.payRuns.length === 0 ? 'No pay runs yet.' : data.payRuns.length + ' pay run' + (data.payRuns.length === 1 ? '' : 's') + '.';
+      list.innerHTML = '';
+      data.payRuns.forEach(function (payRun) {
+        var item = document.createElement('li');
+        item.textContent = payRunSummary(payRun);
+        var view = document.createElement('button');
+        view.type = 'button';
+        view.textContent = 'View';
+        view.addEventListener('click', function () { getPayRun(payRun.payRunId); });
+        item.appendChild(view);
+        if (payRun.status === 'draft') {
+          var finalize = document.createElement('button');
+          finalize.type = 'button';
+          finalize.textContent = 'Finalize';
+          finalize.addEventListener('click', function () { finalizePayRun(payRun.payRunId); });
+          item.appendChild(finalize);
+          var remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'Delete';
+          remove.addEventListener('click', function () { deletePayRun(payRun.payRunId); });
+          item.appendChild(remove);
+        }
+        list.appendChild(item);
+      });
+    })
+    .catch(function () {});
+}
+function getPayRun(payRunId) {
+  var tenantId = document.getElementById('tenant-select').value;
+  var message = document.getElementById('pay-run-message');
+  post('/payrollcheck/api/pay-runs', { action: 'get', tenantId: tenantId, payRunId: payRunId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data || !data.ok || !data.payRun) return;
+      if (message) message.textContent = payRunSummary(data.payRun) + '.';
+    })
+    .catch(function () {});
+}
+function finalizePayRun(payRunId) {
+  if (!confirm('Finalize this pay run? Finalizing is irreversible.')) return;
+  var tenantId = document.getElementById('tenant-select').value;
+  var message = document.getElementById('pay-run-message');
+  post('/payrollcheck/api/pay-runs', { action: 'finalize', tenantId: tenantId, payRunId: payRunId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (!data.ok) {
+        if (message) message.textContent = 'Could not finalize this pay run: ' + (data.error || 'unknown error') + '.';
+        return;
+      }
+      if (message) message.textContent = 'Pay run finalized.';
+      loadPayRuns(tenantId);
+    })
+    .catch(function () {
+      if (message) message.textContent = 'Could not finalize this pay run. Try again.';
+    });
+}
+function deletePayRun(payRunId) {
+  if (!confirm('Delete this draft pay run?')) return;
+  var tenantId = document.getElementById('tenant-select').value;
+  var message = document.getElementById('pay-run-message');
+  post('/payrollcheck/api/pay-runs', { action: 'delete', tenantId: tenantId, payRunId: payRunId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (!data.ok) {
+        if (message) message.textContent = 'Could not delete this pay run: ' + (data.error || 'unknown error') + '.';
+        return;
+      }
+      if (message) message.textContent = 'Pay run deleted.';
+      loadPayRuns(tenantId);
+    })
+    .catch(function () {
+      if (message) message.textContent = 'Could not delete this pay run. Try again.';
+    });
+}
+function readPayRunForm() {
+  return {
+    payPeriodStart: document.getElementById('pay-run-period-start').value,
+    payPeriodEnd: document.getElementById('pay-run-period-end').value,
+    payDate: document.getElementById('pay-run-pay-date').value,
+    frequency: document.getElementById('pay-run-frequency').value,
+  };
+}
+var payRunPreviewButton = document.getElementById('pay-run-preview');
+if (payRunPreviewButton) payRunPreviewButton.addEventListener('click', function () {
+  var tenantId = document.getElementById('tenant-select').value;
+  var totals = document.getElementById('pay-run-preview-totals');
+  if (totals) totals.textContent = 'Previewing\u2026';
+  post('/payrollcheck/api/pay-runs', { action: 'preview', tenantId: tenantId, payRun: readPayRunForm() })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data || !data.ok || !data.preview) {
+        if (totals) totals.textContent = 'Could not preview this pay run.';
+        return;
+      }
+      var previewTotals = (data.preview.totals || data.preview) || {};
+      if (totals) totals.textContent = 'Preview — gross $' + previewTotals.gross + ', federal $' + previewTotals.federalWithholding + ', FICA $' + previewTotals.fica + ', net $' + previewTotals.net + '.';
+    })
+    .catch(function () {
+      if (totals) totals.textContent = 'Could not preview this pay run. Try again.';
+    });
+});
+var payRunForm = document.getElementById('pay-run-form');
+if (payRunForm) payRunForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var tenantId = document.getElementById('tenant-select').value;
+  var message = document.getElementById('pay-run-message');
+  if (message) message.textContent = 'Creating\u2026';
+  post('/payrollcheck/api/pay-runs', { action: 'create', tenantId: tenantId, payRun: readPayRunForm() })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (!data.ok) {
+        if (message) message.textContent = 'Could not create this pay run: ' + (data.error || 'unknown error') + '.';
+        return;
+      }
+      if (message) message.textContent = 'Pay run created.';
+      loadPayRuns(tenantId);
+    })
+    .catch(function () {
+      if (message) message.textContent = 'Could not create this pay run. Try again.';
+    });
+});
+document.getElementById('company-form').addEventListener('submit', function (event) {
     event.preventDefault();
     var message = document.getElementById('company-message');
     message.textContent = 'Saving\u2026';

@@ -96,10 +96,14 @@ test('buildDashboardSummary: counts, totals and the module catalogue', () => {
   assert.equal(employees.status, 'available');
   assert.equal(employees.slice, 3);
   const payroll = summary.modules.filter((m) => m.id !== 'compliance-check' && m.id !== 'company' && m.id !== 'employees');
-  assert.ok(payroll.every((m) => m.status === 'coming_soon'));
+  const payRuns = payroll.find((m) => m.id === 'pay-runs');
+  assert.equal(payRuns.status, 'available');
+  assert.equal(payRuns.slice, 4);
+  const laterPayroll = payroll.filter((m) => m.id !== 'pay-runs');
+  assert.ok(laterPayroll.every((m) => m.status === 'coming_soon'));
   assert.deepEqual(
-    payroll.map((m) => m.slice),
-    [4, 5, 6],
+    laterPayroll.map((m) => m.slice),
+    [5, 6],
   );
 });
 
