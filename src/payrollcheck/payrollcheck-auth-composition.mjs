@@ -874,7 +874,7 @@ export function createPayrollcheckAuth({
         const loaded = await layer.load(cookieHeader);
         if (!loaded || loaded.ok !== true) {
           const reason = loaded && typeof loaded.reason === 'string' ? loaded.reason : 'no_session';
-          if (reason === 'session lookup failed') {
+          if (reason === 'session_lookup_failed') {
             return { status: 503, body: { error: 'unavailable' }, reason };
           }
           return { status: 401, body: { error: 'invalid_session' }, reason };
@@ -977,7 +977,7 @@ export function createPayrollcheckAuth({
         const loaded = await layer.load(cookieHeader);
         if (!loaded || loaded.ok !== true) {
           const reason = loaded && typeof loaded.reason === 'string' ? loaded.reason : 'no_session';
-          if (reason === 'session lookup failed') {
+          if (reason === 'session_lookup_failed') {
             return { status: 503, body: { error: 'unavailable' }, reason };
           }
           return { status: 401, body: { error: 'invalid_session' }, reason };
