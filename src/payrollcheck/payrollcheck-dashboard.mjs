@@ -48,10 +48,10 @@ export const PAYROLLCHECK_APP_MODULES = Object.freeze([
   Object.freeze({
     id: 'pay-runs',
     label: 'Pay runs',
-    href: '#pay-runs',
-    status: 'coming_soon',
+    href: '#pay-runs-section',
+    status: 'available',
     slice: 4,
-    note: 'Pay runs arrive in Slice 4.',
+    note: 'Preview, create, finalize and manage your pay runs.',
   }),
   Object.freeze({
     id: 'tax-center',
