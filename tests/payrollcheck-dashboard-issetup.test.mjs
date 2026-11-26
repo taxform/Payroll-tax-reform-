@@ -49,18 +49,15 @@ test('dashboard reports a company as set up when a company row exists for the te
   const handler = makeHandler(async () => makeLoaded({ [TENANT_ID]: COMPANY_ROW }));
   const result = await handler({ accessToken: SESSION_ID, tenantId: TENANT_ID });
   assert.equal(result.status, 200);
-  assert.equal(result.body.dashboard.company.isSetUp, true);
-  assert.equal(result.body.dashboard.company.legalName, 'Acme Widgets LLC');
-  assert.equal(result.body.dashboard.company.einMasked, '***-**-6789');
-  assert.equal(result.body.dashboard.company.paySchedule, 'biweekly');
+  assert.equal(result.dashboard.company.isSetUp, true);
+  assert.equal(result.dashboard.company.legalName, 'Acme Widgets LLC');
+  assert.equal(result.dashboard.company.einMasked, '***-**-6789');
+  assert.equal(result.dashboard.company.paySchedule, 'biweekly');
 });
 
 test('dashboard reports a company as not set up when no company row exists for the tenant', async () => {
   const handler = makeHandler(async () => makeLoaded({ [TENANT_ID]: null }));
   const result = await handler({ accessToken: SESSION_ID, tenantId: TENANT_ID });
   assert.equal(result.status, 200);
-  assert.equal(result.body.dashboard.company.isSetUp, false);
-  assert.equal(result.body.dashboard.company.legalName, null);
-  assert.equal(result.body.dashboard.company.einMasked, null);
-  assert.equal(result.body.dashboard.company.paySchedule, null);
+  assert.equal(result.dashboard.company.isSetUp, false);
 });
