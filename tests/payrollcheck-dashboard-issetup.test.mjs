@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { randomBytes } from 'node:crypto';
 import { createDashboardAccessHandler } from '../src/payrollcheck/payrollcheck-dashboard-access.mjs';
 
 const USER_ID = '223e4567-e89b-12d3-a456-426614174003';
 const TENANT_ID = '123e4567-e89b-12d3-a456-426614174002';
 const COMPANY_ID = '323e4567-e89b-12d3-a456-426614174004';
+const SESSION_ID = randomBytes(32).toString('base64url');
 
 const COMPANY_ROW = {
   tenant_id: TENANT_ID,
@@ -22,7 +24,7 @@ const COMPANY_ROW = {
 
 function makeLoaded(companiesByTenant) {
   return {
-    memberships: [{ tenant_id: TENANT_ID, tenant_name: 'Acme Corp', role: 'admin' }],
+    memberships: [{ tenantId: TENANT_ID, tenantName: 'Acme Corp', tenantType: 'business', role: 'business_owner' }],
     reportCountsByTenant: { [TENANT_ID]: 0 },
     companiesByTenant,
   };
@@ -31,8 +33,8 @@ function makeLoaded(companiesByTenant) {
 function makeHandler(loadDashboard) {
   const { handleDashboardAccess } = createDashboardAccessHandler({
     getVerifiedUser: async () => ({ id: USER_ID, email: 'owner@acme.test', email_confirmed_at: '2026-01-01T00:00:00Z', is_anonymous: false }),
-    requireAal2: async () => undefined,
-    getSession: async () => ({ subject_id: USER_ID }),
+    requireAal2: async () => true,
+    getSession: async (presentedSessionId) => ({ sessionId: presentedSessionId, authUserId: USER_ID }),
     resolveSubjectId: async () => USER_ID,
     recordAudit: async () => undefined,
     checkRateLimit: async () => ({ allowed: true, limit: 10, remaining: 9, resetAt: 1794000000 }),
@@ -45,7 +47,7 @@ function makeHandler(loadDashboard) {
 
 test('dashboard reports a company as set up when a company row exists for the tenant', async () => {
   const handler = makeHandler(async () => makeLoaded({ [TENANT_ID]: COMPANY_ROW }));
-  const result = await handler({ accessToken: 'access-token', tenantId: TENANT_ID });
+  const result = await handler({ accessToken: SESSION_ID, tenantId: TENANT_ID });
   assert.equal(result.status, 200);
   assert.equal(result.body.dashboard.company.isSetUp, true);
   assert.equal(result.body.dashboard.company.legalName, 'Acme Widgets LLC');
@@ -55,7 +57,7 @@ test('dashboard reports a company as set up when a company row exists for the te
 
 test('dashboard reports a company as not set up when no company row exists for the tenant', async () => {
   const handler = makeHandler(async () => makeLoaded({ [TENANT_ID]: null }));
-  const result = await handler({ accessToken: 'access-token', tenantId: TENANT_ID });
+  const result = await handler({ accessToken: SESSION_ID, tenantId: TENANT_ID });
   assert.equal(result.status, 200);
   assert.equal(result.body.dashboard.company.isSetUp, false);
   assert.equal(result.body.dashboard.company.legalName, null);
