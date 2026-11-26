@@ -30,7 +30,7 @@ function setTestEnv(pendingKey) {
 
 test('getAuthComposition rejects a PAYROLLCHECK_PENDING_KEY that does not decode to 32 bytes', () => {
   setTestEnv('not-a-32-byte-key');
-  assert.throws(() => getAuthComposition(), (error) => error.code === 'pending_key_must_be_32_bytes');
+    assert.throws(() => getAuthComposition(), /pending_key_must_be_32_bytes/);
 });
 
 test('getAuthComposition builds with a base64 PAYROLLCHECK_PENDING_KEY (production shape)', () => {
