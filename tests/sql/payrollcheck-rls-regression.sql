@@ -26,18 +26,18 @@
 -- exception. Rolls back at the end so no rows remain.
 BEGIN;
 
--- Structural guard: the eight tables have RLS enabled + forced, the 18
--- step-7/step-10 policies exist, and the app role exists without BYPASSRLS.
+-- Structural guard: the nine tables have RLS enabled + forced, the 21
+-- app policies exist, and the app role exists without BYPASSRLS.
 DO $$
 DECLARE n int;
 BEGIN
   SELECT count(*) INTO n FROM pg_class c JOIN pg_namespace ns ON ns.oid = c.relnamespace
     WHERE ns.nspname = 'payrollcheck' AND c.relkind = 'r'
-    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits','payroll_companies')
+    AND c.relname IN ('tenants','memberships','reports','client_grants','access_audit','sessions','auth_limits','payroll_companies','payroll_employees')
     AND c.relrowsecurity AND c.relforcerowsecurity;
-  IF n <> 8 THEN RAISE EXCEPTION 'expected 8 tables with RLS enabled+forced, got %', n; END IF;
+  IF n <> 9 THEN RAISE EXCEPTION 'expected 9 tables with RLS enabled+forced, got %', n; END IF;
   SELECT count(*) INTO n FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname LIKE 'app\_%';
-  IF n <> 18 THEN RAISE EXCEPTION 'expected 18 app policies, got %', n; END IF;
+  IF n <> 21 THEN RAISE EXCEPTION 'expected 21 app policies, got %', n; END IF;
 IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'payrollcheck' AND policyname IN ('app_tenants_all', 'app_reports_all', 'app_client_grants_delete', 'app_memberships_read')) THEN
   RAISE EXCEPTION 'non-canonical app policies present (app_tenants_all, app_reports_all, app_client_grants_delete, app_memberships_read); drop them with docs/sql/payrollcheck-policy-reconciliation-migration.sql';
 END IF;
@@ -730,6 +730,138 @@ DO $$ BEGIN
   END;
 END $$;
 RESET ROLE;
+-- Check 21: employees (Slice 3) - one row per employee, business-owner-only.
+-- The owner of A adds and reads A's employees; a bad filing status is refused
+-- by the CHECK constraint, and a delete is refused because no DELETE policy
+-- exists. A non-owner member of A, the active owner of B, and a firm reviewer
+-- with an active view-report grant to A all see nothing and cannot write.
+SET payrollcheck.current_subject_id = 'ownerA';
+SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  INSERT INTO payrollcheck.payroll_employees
+    (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+  VALUES
+    ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Ada', 'Lovelace', 'sealed-placeholder-a', '6789', 'single', 1, 0, 45.00, 'hourly'),
+    ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Grace', 'Hopper', 'sealed-placeholder-b', '4321', 'mfj', 2, 100.00, 95000.00, 'salary');
+END $$;
+DO $$ DECLARE n int; a int; BEGIN
+  SELECT count(*), count(*) FILTER (WHERE status = 'active') INTO n, a FROM payrollcheck.payroll_employees;
+  IF n <> 2 OR a <> 2 THEN
+    RAISE EXCEPTION 'ownerA employees insert: expected 2 active rows, got % total % active', n, a;
+  END IF;
+END $$;
+-- Deactivating one employee leaves it visible but inactive.
+DO $$ BEGIN
+  UPDATE payrollcheck.payroll_employees SET status = 'inactive'
+    WHERE tenant_id = 'eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' AND first_name = 'Grace';
+END $$;
+DO $$ DECLARE n int; a int; BEGIN
+  SELECT count(*), count(*) FILTER (WHERE status = 'active') INTO n, a FROM payrollcheck.payroll_employees;
+  IF n <> 2 OR a <> 1 THEN
+    RAISE EXCEPTION 'ownerA employee deactivate failed: % rows, % active', n, a;
+  END IF;
+END $$;
+-- A bad filing status is refused by the CHECK constraint.
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_employees
+      (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Bad', 'Status', 'sealed-placeholder-c', '0000', 'married', 0, 0, 10.00, 'hourly');
+    RAISE EXCEPTION 'bad-filing-status employee insert unexpectedly succeeded';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+END $$;
+-- A delete is refused: there is no DELETE policy for employees.
+DO $$ BEGIN
+  BEGIN
+    DELETE FROM payrollcheck.payroll_employees
+      WHERE tenant_id = 'eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' AND first_name = 'Ada';
+    RAISE EXCEPTION 'employee delete unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- The active owner of B sees nothing of A and cannot write for A.
+SET payrollcheck.current_subject_id = 'ownerB2';
+SET payrollcheck.current_auth_user_id = '22222222-2222-4222-8222-222222222222';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_employees;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'ownerB2 sees % employee rows of A', n;
+  END IF;
+END $$;
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_employees
+      (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Mallory', 'Cross', 'sealed-placeholder-d', '9999', 'single', 0, 0, 10.00, 'hourly');
+    RAISE EXCEPTION 'ownerB2 cross-tenant employee insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- A non-owner member of A sees nothing and cannot write.
+SET payrollcheck.current_subject_id = 'staffA';
+SET payrollcheck.current_auth_user_id = '55555555-5555-4555-8555-555555555555';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_employees;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'staffA sees % employee rows', n;
+  END IF;
+END $$;
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_employees
+      (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Member', 'Staff', 'sealed-placeholder-e', '1111', 'single', 0, 0, 10.00, 'hourly');
+    RAISE EXCEPTION 'staffA employee insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- A firm reviewer with an active view-report grant to A sees nothing and cannot write.
+SET payrollcheck.current_subject_id = 'reviewerX';
+SET payrollcheck.current_auth_user_id = '33333333-3333-4333-8333-333333333333';
+SET ROLE payrollcheck_app;
+DO $$ DECLARE n int; BEGIN
+  SELECT count(*) INTO n FROM payrollcheck.payroll_employees;
+  IF n <> 0 THEN
+    RAISE EXCEPTION 'reviewerX sees % employee rows of A', n;
+  END IF;
+END $$;
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_employees
+      (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+    VALUES
+      ('eaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Firm', 'Reviewer', 'sealed-placeholder-f', '2222', 'single', 0, 0, 10.00, 'hourly');
+    RAISE EXCEPTION 'reviewerX employee insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+-- The inactive owner of B cannot write for B either.
+SET payrollcheck.current_subject_id = 'ownerB';
+SET payrollcheck.current_auth_user_id = '22222222-2222-4222-8222-222222222222';
+SET ROLE payrollcheck_app;
+DO $$ BEGIN
+  BEGIN
+    INSERT INTO payrollcheck.payroll_employees
+      (tenant_id, first_name, last_name, ssn_encrypted, ssn_last_four, filing_status, allowances, extra_withholding, pay_rate, pay_type)
+    VALUES
+      ('ebbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Beta', 'Employee', 'sealed-placeholder-g', '3333', 'single', 0, 0, 10.00, 'hourly');
+    RAISE EXCEPTION 'inactive ownerB employee insert unexpectedly succeeded';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
+END $$;
+RESET ROLE;
+
 -- The new audit actions are accepted by the access_audit check (written as the app role).
 SET payrollcheck.current_subject_id = 'ownerA';
 SET payrollcheck.current_auth_user_id = '11111111-1111-4111-8111-111111111111';

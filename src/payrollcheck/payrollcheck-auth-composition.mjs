@@ -94,7 +94,9 @@
 import { randomUUID } from 'node:crypto';
 import { createDashboardAccessHandler } from './payrollcheck-dashboard-access.mjs';
 import { createCompanyAccessHandler } from './payrollcheck-company-access.mjs';
+import { createEmployeeAccessHandler } from './payrollcheck-employees-access.mjs';
 import { createCompanyLoader } from './payrollcheck-company.mjs';
+import { EMPLOYEE_ACTIONS, createEmployeeLoader } from './payrollcheck-employees.mjs';
 import { createDashboardLoader } from './payrollcheck-dashboard.mjs';
 
 const UUID_PATTERN =
@@ -144,6 +146,7 @@ export function createPayrollcheckAuth({
   reportHandlerFactory,
   dashboardHandlerFactory = createDashboardAccessHandler,
   companyHandlerFactory = createCompanyAccessHandler,
+  employeesHandlerFactory = createEmployeeAccessHandler,
   reportSessionLookupFactory,
   authorizeTenantSession,
   authLimits,
@@ -154,6 +157,7 @@ export function createPayrollcheckAuth({
   requestPasswordRecovery,
   pendingSeal,
   pendingOpen,
+  sealEmployeeSsn = null,
   appUrl,
   generateId = () => randomUUID(),
   now = () => Math.floor(Date.now() / 1000),
@@ -172,6 +176,7 @@ export function createPayrollcheckAuth({
   requireFn(reportHandlerFactory, 'report_handler_factory');
   requireFn(dashboardHandlerFactory, 'dashboard_handler_factory');
   requireFn(companyHandlerFactory, 'company_handler_factory');
+  requireFn(employeesHandlerFactory, 'employees_handler_factory');
   requireFn(reportSessionLookupFactory, 'report_session_lookup_factory');
   requireFn(authorizeTenantSession, 'authorize_tenant_session');
   requireFn(pendingSeal, 'pending_seal');
@@ -1053,6 +1058,120 @@ export function createPayrollcheckAuth({
     return { status: outcome.status, headers, body };
   }
 
+  async function handleEmployees({ cookieHeader, csrfToken, tenantId, action, employee, employeeId, ip, requestId: rawRequestId } = {}) {
+    const requestId = requestIdFor(rawRequestId);
+  const route = 'employees';
+  if (
+    (tenantId !== undefined &&
+      tenantId !== null &&
+      (typeof tenantId !== 'string' || !UUID_PATTERN.test(tenantId))) ||
+    !EMPLOYEE_ACTIONS.includes(action)
+  ) {
+    return { status: 400, body: { error: 'invalid_request' } };
+  }
+    let outcome;
+    try {
+      outcome = await withTransaction(async ({ query }) => {
+        const store = sessionStoreFactory({ query });
+        const layer = sessionLayerFactory({ store });
+        // Same RLS note as readReport: set the presented session id BEFORE
+        // load(), or the sessions-table RLS policy hides the row.
+        const presentedSessionId = layer.parseSessionId(cookieHeader);
+        if (presentedSessionId) {
+          await setRlsIdentity({ query, sessionId: presentedSessionId });
+        }
+        const loaded = await layer.load(cookieHeader);
+        if (!loaded || loaded.ok !== true) {
+          const reason = loaded && typeof loaded.reason === 'string' ? loaded.reason : 'no_session';
+          if (reason === 'session_lookup_failed') {
+            return { status: 503, body: { error: 'unavailable' }, reason };
+          }
+          return { status: 401, body: { error: 'invalid_session' }, reason };
+        }
+        const session = loaded.session;
+        // CSRF: verify against the PRESENTED id first (rotation grace window),
+        // then the current session id. Both ids are authenticated by load().
+        const presentedId = layer.parseSessionId(cookieHeader);
+        const csrfOk =
+          (typeof presentedId === 'string' && layer.verifyCsrf(presentedId, csrfToken) === true) ||
+          layer.verifyCsrf(session.sessionId, csrfToken) === true;
+        if (csrfOk !== true) {
+          return { status: 403, body: { error: 'forbidden' }, reason: 'csrf_failed' };
+        }
+        // Identity, in the step-7 order: auth-only first (the mapping path),
+        // then subject + auth + session for the employee list, create, update or deactivate.
+        await setRlsIdentity({ query, authUserId: session.authUserId });
+        const mapping = mappingFactory({ query });
+        const subjectId = await mapping.resolveInternalUserId(session.authUserId);
+        if (typeof subjectId !== 'string' || !subjectId) {
+          return { status: 401, body: { error: 'invalid_session' }, reason: 'subject_not_found' };
+        }
+        await setRlsIdentity({ query, subjectId, authUserId: session.authUserId, sessionId: session.sessionId });
+        const tenancy = tenancyFactory({ query });
+        const lookup = reportSessionLookupFactory({ store });
+        let verifiedUser;
+        const getVerifiedUser = async () => {
+          if (verifiedUser === undefined) verifiedUser = await fetchAdminUser(session.authUserId);
+          return verifiedUser;
+        };
+        const handler = employeesHandlerFactory({
+          getVerifiedUser,
+          requireAal2: async () => session.aal2 === true,
+          resolveSubjectId: (authUserId) => mapping.resolveInternalUserId(authUserId),
+          recordAudit: (args) => tenancy.recordAccessAudit(args),
+          checkRateLimit: (args) => authLimits.checkRateLimit(args),
+          getSession: (id) => lookup.getSession(id),
+          generateId: () => requestId,
+          now: () => now(),
+    loadMemberships: (subjectId) =>
+        createEmployeeLoader({ query, sealSsn: sealEmployeeSsn }).loadMemberships(subjectId),
+      listEmployees: (args) =>
+        createEmployeeLoader({ query, sealSsn: sealEmployeeSsn }).listEmployees(args),
+      createEmployee: (args) =>
+        createEmployeeLoader({ query, sealSsn: sealEmployeeSsn }).createEmployee(args),
+      updateEmployee: (args) =>
+        createEmployeeLoader({ query, sealSsn: sealEmployeeSsn }).updateEmployee(args),
+      deactivateEmployee: (args) =>
+        createEmployeeLoader({ query, sealSsn: sealEmployeeSsn }).deactivateEmployee(args),
+        });
+        const decision = await handler.handleEmployeeAccess({
+          accessToken: session.sessionId,
+          sessionId: session.sessionId,
+          tenantId: tenantId ?? null,
+      action,
+      employee,
+      employeeId: employeeId ?? null,
+          requestId,
+          clientIp: validIp(ip) ? ip : undefined,
+        });
+        const body = decision.ok ? { ok: true } : { error: decision.reason };
+
+        if (decision.ok && decision.employees !== undefined) body.employees = decision.employees;
+
+        if (decision.ok && decision.employee !== undefined) body.employee = decision.employee;
+
+        return {
+
+          status: decision.status,
+
+          body,
+          reason: decision.ok ? 'allowed' : decision.reason,
+          rotatedCookie: loaded.rotated ? loaded.cookie : null,
+          rotatedCsrfToken: loaded.rotated ? loaded.csrfToken : null,
+        };
+      });
+    } catch (error) {
+      edgeLog(requestId, route, 'error', error instanceof Error ? error.message : 'unknown');
+      outcome = { status: 503, body: { error: 'unavailable' }, reason: 'unavailable' };
+    }
+    edgeLog(requestId, route, outcome.status, outcome.reason);
+    const headers = {};
+    if (outcome.rotatedCookie) headers['Set-Cookie'] = outcome.rotatedCookie;
+    const body = outcome.body;
+    if (outcome.rotatedCsrfToken) body.csrfToken = outcome.rotatedCsrfToken;
+    return { status: outcome.status, headers, body };
+  }
+
   async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId, actorSubjectId } = {}) {
     if (
       typeof tenantId !== 'string' ||
@@ -1112,6 +1231,7 @@ export function createPayrollcheckAuth({
     readReport,
     getDashboard,
     handleCompany,
+    handleEmployees,
     deactivateMembershipAndRevokeSessions,
   });
 }

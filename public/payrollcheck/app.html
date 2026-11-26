@@ -67,6 +67,36 @@
     <p id="company-message" role="status"></p>
   </section>
 
+  <section class="card" id="employees-section" hidden>
+    <h2>Employees</h2>
+    <p id="employees-status">No employees yet.</p>
+    <form id="employee-form">
+      <label>First name <input id="employee-first-name" name="first-name" autocomplete="given-name" required></label>
+      <label>Last name <input id="employee-last-name" name="last-name" autocomplete="family-name" required></label>
+      <label>Social Security number <input id="employee-ssn" name="ssn" inputmode="numeric" autocomplete="off" placeholder="123-45-6789"></label>
+      <label>W-4 filing status
+        <select id="employee-filing-status" name="filing-status">
+          <option value="single">Single</option>
+          <option value="mfj">Married filing jointly</option>
+          <option value="hoh">Head of household</option>
+          <option value="mfs">Married filing separately</option>
+        </select>
+      </label>
+      <label>Allowances <input id="employee-allowances" name="allowances" type="number" min="0" max="99" step="1" value="0"></label>
+      <label>Extra withholding ($) <input id="employee-extra-withholding" name="extra-withholding" type="number" min="0" step="0.01" value="0.00"></label>
+      <label>Pay rate ($) <input id="employee-pay-rate" name="pay-rate" type="number" min="0.01" step="0.01" required></label>
+      <label>Pay type
+        <select id="employee-pay-type" name="pay-type">
+          <option value="hourly">Hourly</option>
+          <option value="salary">Salary</option>
+        </select>
+      </label>
+      <button type="submit" id="employee-submit">Add employee</button>
+      <button type="button" id="employee-cancel" hidden>Cancel edit</button>
+    </form>
+    <p id="employee-message" role="status"></p>
+    <ul id="employees-list"></ul>
+  </section>
   <section id="modules-section" hidden>
     <h2>Modules</h2>
     <div class="modules" id="modules-list"></div>
@@ -108,6 +138,8 @@
     document.getElementById('tenant-section').hidden = false;
     document.getElementById('modules-section').hidden = false;
     document.getElementById('company-section').hidden = false;
+  var employeesSection = document.getElementById('employees-section');
+  if (employeesSection) employeesSection.hidden = false;
     document.getElementById('tenant-line').textContent =
       'Business tenant (' + (tenant.tenantType || 'unknown') + '), role ' + tenant.role + ' — ' + tenant.tenantId;
     document.getElementById('tenant-counts').textContent =
@@ -144,6 +176,9 @@
           if (m.id === 'company') {
             a.href = '#company-section';
             a.textContent = 'Set up the company profile';
+      } else if (m.id === 'employees') {
+        a.href = '#employees-section';
+        a.textContent = 'Add and manage employees';
           } else {
             a.href = '/payrollcheck/login.html';
             a.textContent = 'Open the compliance check (report reader)';
@@ -154,6 +189,7 @@
       list.appendChild(div);
     });
       renderCompany(dashboard);
+  renderEmployees(dashboard);
     statusEl.textContent = 'Signed in. Your business data below is yours only.';
   }
   // Company profile (Slice 2): the dashboard summary says whether the
@@ -192,6 +228,146 @@
       })
       .catch(function () {});
   }
+// Slice 3: Employees. The SSN field is never prefilled with a real number:
+// on edit it stays blank and shows the masked value (***-**-6789) as its
+// placeholder, and the list shows only the masked value.
+var FILING_STATUS_LABELS = { single: 'Single', mfj: 'Married filing jointly', hoh: 'Head of household', mfs: 'Married filing separately' };
+var PAY_TYPE_LABELS = { hourly: 'Hourly', salary: 'Salary' };
+var editingEmployeeId = null;
+function renderEmployees(dashboard) {
+  var status = document.getElementById('employees-status');
+  var counts = dashboard.employees || { totalCount: 0, activeCount: 0 };
+  if (status) {
+    status.textContent = counts.totalCount === 0
+      ? 'No employees yet.'
+      : counts.activeCount + ' active employee' + (counts.activeCount === 1 ? '' : 's') + ' of ' + counts.totalCount + ' total.';
+  }
+  if (dashboard.selectedTenant) loadEmployees(dashboard.selectedTenant.tenantId);
+}
+function loadEmployees(tenantId) {
+  var list = document.getElementById('employees-list');
+  post('/payrollcheck/api/employees', { action: 'list', tenantId: tenantId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data || !data.ok || !Array.isArray(data.employees) || !list) return;
+      list.innerHTML = '';
+      data.employees.forEach(function (employee) {
+        var item = document.createElement('li');
+        item.textContent = employee.firstName + ' ' + employee.lastName + ' — SSN ' + employee.ssnMasked + ' — ' + (FILING_STATUS_LABELS[employee.filingStatus] || employee.filingStatus) + ', ' + employee.allowances + ' allowance' + (employee.allowances === 1 ? '' : 's') + ' — ' + (PAY_TYPE_LABELS[employee.payType] || employee.payType) + ' $' + employee.payRate + (employee.status === 'inactive' ? ' (inactive)' : '');
+        var edit = document.createElement('button');
+        edit.type = 'button';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', function () { startEmployeeEdit(employee); });
+        item.appendChild(edit);
+        if (employee.status === 'active') {
+          var deactivate = document.createElement('button');
+          deactivate.type = 'button';
+          deactivate.textContent = 'Deactivate';
+          deactivate.addEventListener('click', function () { deactivateEmployee(employee.employeeId); });
+          item.appendChild(deactivate);
+        }
+        list.appendChild(item);
+      });
+    })
+    .catch(function () {});
+}
+function startEmployeeEdit(employee) {
+  editingEmployeeId = employee.employeeId;
+  document.getElementById('employee-first-name').value = employee.firstName || '';
+  document.getElementById('employee-last-name').value = employee.lastName || '';
+  document.getElementById('employee-ssn').value = '';
+  document.getElementById('employee-ssn').placeholder = employee.ssnMasked || '123-45-6789';
+  document.getElementById('employee-filing-status').value = employee.filingStatus || 'single';
+  document.getElementById('employee-allowances').value = employee.allowances == null ? '0' : String(employee.allowances);
+  document.getElementById('employee-extra-withholding').value = employee.extraWithholding == null ? '0.00' : String(employee.extraWithholding);
+  document.getElementById('employee-pay-rate').value = employee.payRate == null ? '' : String(employee.payRate);
+  document.getElementById('employee-pay-type').value = employee.payType || 'hourly';
+  var submit = document.getElementById('employee-submit');
+  if (submit) submit.textContent = 'Save changes';
+  var cancel = document.getElementById('employee-cancel');
+  if (cancel) cancel.hidden = false;
+}
+function clearEmployeeEdit() {
+  editingEmployeeId = null;
+  document.getElementById('employee-first-name').value = '';
+  document.getElementById('employee-last-name').value = '';
+  document.getElementById('employee-ssn').value = '';
+  document.getElementById('employee-ssn').placeholder = '123-45-6789';
+  document.getElementById('employee-filing-status').value = 'single';
+  document.getElementById('employee-allowances').value = '0';
+  document.getElementById('employee-extra-withholding').value = '0.00';
+  document.getElementById('employee-pay-rate').value = '';
+  document.getElementById('employee-pay-type').value = 'hourly';
+  var submit = document.getElementById('employee-submit');
+  if (submit) submit.textContent = 'Add employee';
+  var cancel = document.getElementById('employee-cancel');
+  if (cancel) cancel.hidden = true;
+}
+function deactivateEmployee(employeeId) {
+  var message = document.getElementById('employee-message');
+  var tenantId = document.getElementById('tenant-select').value;
+  post('/payrollcheck/api/employees', { action: 'deactivate', tenantId: tenantId, employeeId: employeeId })
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (!data.ok) {
+        if (message) message.textContent = 'Could not deactivate this employee: ' + (data.error || 'unknown error') + '.';
+        return;
+      }
+      if (message) message.textContent = 'Employee deactivated.';
+      loadEmployees(tenantId);
+    })
+    .catch(function () {
+      if (message) message.textContent = 'Could not deactivate this employee. Try again.';
+    });
+}
+var employeeForm = document.getElementById('employee-form');
+if (employeeForm) employeeForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var message = document.getElementById('employee-message');
+  var tenantId = document.getElementById('tenant-select').value;
+  if (message) message.textContent = editingEmployeeId ? 'Saving…' : 'Adding…';
+  var employee = {
+    firstName: document.getElementById('employee-first-name').value,
+    lastName: document.getElementById('employee-last-name').value,
+    filingStatus: document.getElementById('employee-filing-status').value,
+    allowances: Number(document.getElementById('employee-allowances').value),
+    extraWithholding: document.getElementById('employee-extra-withholding').value,
+    payRate: document.getElementById('employee-pay-rate').value,
+    payType: document.getElementById('employee-pay-type').value
+  };
+  var ssn = document.getElementById('employee-ssn').value;
+  if (ssn) employee.ssn = ssn;
+  var body = editingEmployeeId
+    ? { action: 'update', tenantId: tenantId, employeeId: editingEmployeeId, employee: employee }
+    : { action: 'create', tenantId: tenantId, employee: employee };
+  post('/payrollcheck/api/employees', body)
+    .then(function (res) {
+      if (res.status === 401 || res.status === 403) { goLogin(); return null; }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (!data.ok) {
+        if (message) message.textContent = 'Could not save this employee: ' + (data.error || 'unknown error') + '.';
+        return;
+      }
+      if (message) message.textContent = editingEmployeeId ? 'Employee updated.' : 'Employee added.';
+      clearEmployeeEdit();
+      loadEmployees(tenantId);
+    })
+    .catch(function () {
+      if (message) message.textContent = 'Could not save this employee. Try again.';
+    });
+});
+var employeeCancel = document.getElementById('employee-cancel');
+if (employeeCancel) employeeCancel.addEventListener('click', function () { clearEmployeeEdit(); });
   document.getElementById('company-form').addEventListener('submit', function (event) {
     event.preventDefault();
     var message = document.getElementById('company-message');

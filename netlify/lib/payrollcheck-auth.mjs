@@ -43,6 +43,7 @@ import {
 } from '../../src/payrollcheck/supabase-mfa.mjs';
 import { requestPasswordRecovery } from '../../src/payrollcheck/payrollcheck-password-recovery.mjs';
 import { createPendingTokenSealer } from '../../src/payrollcheck/payrollcheck-pending-token.mjs';
+import { createSsnSealer } from '../../src/payrollcheck/payrollcheck-ssn.mjs';
 import { createPayrollcheckAuth } from '../../src/payrollcheck/payrollcheck-auth-composition.mjs';
 
 const { Pool } = pg;
@@ -91,6 +92,10 @@ export function getAuthComposition() {
   const jwksVerifier = createSupabaseJwksVerifier({ issuer: `${supabaseUrl}/auth/v1` });
   const requireAal2 = createRequireAal2({ verifyAccessToken: jwksVerifier.verifyAccessToken });
   const pendingSealer = createPendingTokenSealer({ key: pendingKey });
+  // Employee SSNs (Slice 3) are sealed with AES-256-GCM by a dedicated sub-key
+  // derived from the already-injected PAYROLLCHECK_PENDING_KEY (see
+  // src/payrollcheck/payrollcheck-ssn.mjs). No new environment variable.
+  const ssnSealer = createSsnSealer({ key: pendingKey });
   const authLimitsStore = createPostgresAuthLimitsStore({
     query: (sql, values) => pool.query(sql, values),
   });
@@ -120,6 +125,7 @@ export function getAuthComposition() {
       requestPasswordRecovery({ supabaseUrl, serviceRoleKey, ...args }),
     pendingSeal: (payload) => pendingSealer.seal(payload),
     pendingOpen: (blob) => pendingSealer.open(blob),
+    sealEmployeeSsn: (ssn) => ssnSealer.seal(ssn),
     appUrl,
     log: (event) => {
       // The composition's log events carry only { requestId, route,

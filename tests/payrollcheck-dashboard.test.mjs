@@ -22,6 +22,10 @@ const MEMBERSHIPS = [
   { tenantId: BUSINESS_B, tenantType: 'business', role: 'admin' },
 ];
 const COUNTS = { [BUSINESS_A]: 2, [BUSINESS_B]: 1 };
+const EMPLOYEE_COUNTS = {
+  [BUSINESS_A]: { total: 3, active: 2 },
+  [BUSINESS_B]: { total: 1, active: 1 },
+};
 
 // --- parseDashboardRequest ---------------------------------------------------
 test('parseDashboardRequest: an absent body selects no tenant', () => {
@@ -75,23 +79,44 @@ test('buildDashboardSummary: counts, totals and the module catalogue', () => {
   const summary = buildDashboardSummary({
     memberships: MEMBERSHIPS,
     reportCountsByTenant: COUNTS,
+    employeeCountsByTenant: EMPLOYEE_COUNTS,
     selectedTenantId: BUSINESS_B,
   });
   assert.equal(summary.selectedTenant.tenantId, BUSINESS_B);
   assert.equal(summary.selectedTenant.reportCount, 1);
   assert.deepEqual(summary.totals, { tenants: 2, reports: 3 });
+  assert.deepEqual(summary.employees, { totalCount: 1, activeCount: 1 });
   assert.equal(summary.modules.length, 6);
   const compliance = summary.modules.find((m) => m.id === 'compliance-check');
   assert.equal(compliance.status, 'available');
   assert.match(compliance.note, /not proof from IRS records/);
   const company = summary.modules.find((m) => m.id === 'company');
   assert.equal(company.status, 'available');
-  const payroll = summary.modules.filter((m) => m.id !== 'compliance-check' && m.id !== 'company');
+  const employees = summary.modules.find((m) => m.id === 'employees');
+  assert.equal(employees.status, 'available');
+  assert.equal(employees.slice, 3);
+  const payroll = summary.modules.filter((m) => m.id !== 'compliance-check' && m.id !== 'company' && m.id !== 'employees');
   assert.ok(payroll.every((m) => m.status === 'coming_soon'));
   assert.deepEqual(
     payroll.map((m) => m.slice),
-    [3, 4, 5, 6],
+    [4, 5, 6],
   );
+});
+
+test('buildDashboardSummary: employee counts come from the selected tenant only, and default to zero', () => {
+  const withCounts = buildDashboardSummary({
+    memberships: MEMBERSHIPS,
+    reportCountsByTenant: COUNTS,
+    employeeCountsByTenant: EMPLOYEE_COUNTS,
+    selectedTenantId: BUSINESS_A,
+  });
+  assert.deepEqual(withCounts.employees, { totalCount: 3, activeCount: 2 });
+  const withoutCounts = buildDashboardSummary({
+    memberships: MEMBERSHIPS,
+    reportCountsByTenant: COUNTS,
+    selectedTenantId: BUSINESS_A,
+  });
+  assert.deepEqual(withoutCounts.employees, { totalCount: 0, activeCount: 0 });
 });
 
 test('buildDashboardSummary: a tenant with no reports counts zero, never another tenant', () => {
@@ -176,6 +201,7 @@ function makeQuery(rowsByKind) {
     if (sql.includes('FROM payrollcheck.tenants')) return { rows: rowsByKind.tenants.shift() };
     if (sql.includes('FROM payrollcheck.reports')) return { rows: rowsByKind.counts.shift() };
     if (sql.includes('FROM payrollcheck.payroll_companies')) return { rows: rowsByKind.companies.shift() };
+    if (sql.includes('FROM payrollcheck.payroll_employees')) return { rows: rowsByKind.employees.shift() };
     throw new Error(`unexpected query: ${sql}`);
   };
   return { query, calls };
@@ -190,6 +216,7 @@ test('createDashboardLoader: loads memberships, tenant types and counts in order
     tenants: [[{ tenant_type: 'business' }], [{ tenant_type: 'business' }]],
     counts: [[{ count: '2' }], [{ count: '1' }]],
     companies: [[COMPANY_ROW_A], [COMPANY_ROW_B]],
+    employees: [[{ total: '3', active: '2' }], [{ total: '1', active: '1' }]],
   });
   const loader = createDashboardLoader({ query });
   const loaded = await loader.loadDashboard({ subjectId: SUBJECT });
@@ -200,11 +227,12 @@ test('createDashboardLoader: loads memberships, tenant types and counts in order
     ],
     reportCountsByTenant: { [BUSINESS_A]: 2, [BUSINESS_B]: 1 },
     companiesByTenant: { [BUSINESS_A]: COMPANY_ROW_A, [BUSINESS_B]: COMPANY_ROW_B },
+    employeeCountsByTenant: { [BUSINESS_A]: { total: 3, active: 2 }, [BUSINESS_B]: { total: 1, active: 1 } },
   });
   // Memberships first, then one tenant-type + one count per tenant, in order.
   assert.deepEqual(
     calls.map((c) => c.sql.match(/FROM payrollcheck\.(\w+)/)[1]),
-    ['memberships', 'tenants', 'reports', 'tenants', 'reports', 'payroll_companies', 'payroll_companies'],
+    ['memberships', 'tenants', 'reports', 'tenants', 'reports', 'payroll_companies', 'payroll_companies', 'payroll_employees', 'payroll_employees'],
   );
   // Every value travels as a parameter; no id is interpolated into the SQL.
   for (const { sql, params } of calls) {
@@ -212,6 +240,27 @@ test('createDashboardLoader: loads memberships, tenant types and counts in order
     assert.ok(params.length >= 1);
   }
   assert.deepEqual(calls[0].params, [SUBJECT]);
+});
+
+test('createDashboardLoader: a failing employees count degrades to zero instead of failing the load', async () => {
+  const { query } = makeQuery({
+    memberships: [
+      { tenant_id: BUSINESS_A, role: 'owner' },
+      { tenant_id: BUSINESS_B, role: 'admin' },
+    ],
+    tenants: [[{ tenant_type: 'business' }], [{ tenant_type: 'business' }]],
+    counts: [[{ count: '2' }], [{ count: '1' }]],
+    companies: [[COMPANY_ROW_A], [COMPANY_ROW_B]],
+    // No employees rows: the payroll_employees query fails (the Slice 3
+    // migration has not been applied), so the counts degrade to zero.
+  });
+  const loader = createDashboardLoader({ query });
+  const loaded = await loader.loadDashboard({ subjectId: SUBJECT });
+  assert.deepEqual(loaded.employeeCountsByTenant, {
+    [BUSINESS_A]: { total: 0, active: 0 },
+    [BUSINESS_B]: { total: 0, active: 0 },
+  });
+  assert.equal(loaded.companiesByTenant[BUSINESS_A], COMPANY_ROW_A);
 });
 
 test('createDashboardLoader: a missing tenant row fails the load (503 upstream)', async () => {

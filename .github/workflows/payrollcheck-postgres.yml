@@ -7,6 +7,7 @@ on:
       - 'docs/sql/payrollcheck-sessions-schema.sql'
       - 'docs/sql/payrollcheck-rls-policies.sql'
       - 'docs/sql/payrollcheck-companies-schema.sql'
+      - 'docs/sql/payrollcheck-employees-schema.sql'
       - 'tests/sql/payrollcheck-rls-smoke.sql'
       - 'tests/sql/payrollcheck-consent-constraints.sql'
       - 'tests/sql/payrollcheck-rls-regression.sql'
@@ -18,6 +19,7 @@ on:
       - 'docs/sql/payrollcheck-sessions-schema.sql'
       - 'docs/sql/payrollcheck-rls-policies.sql'
       - 'docs/sql/payrollcheck-companies-schema.sql'
+      - 'docs/sql/payrollcheck-employees-schema.sql'
       - 'tests/sql/payrollcheck-rls-smoke.sql'
       - 'tests/sql/payrollcheck-consent-constraints.sql'
       - 'tests/sql/payrollcheck-rls-regression.sql'
@@ -62,6 +64,8 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 -c "ALTER TABLE payrollcheck.memberships ADD COLUMN IF NOT EXISTS auth_user_id uuid;"
       - name: Apply company profile schema (Slice 2)
         run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-companies-schema.sql
+      - name: Apply employees schema (Slice 3)
+        run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-employees-schema.sql
 
       - name: Apply tenant-scoped RLS policies (M2 step 7)
         run: psql -X -v ON_ERROR_STOP=1 -f docs/sql/payrollcheck-rls-policies.sql
