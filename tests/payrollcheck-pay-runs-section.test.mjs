@@ -12,5 +12,8 @@ test('pay-runs section exposes preview, create, list, get, delete and finalize c
   assert.match(app, /action:\s*['"]create['"]/);
   assert.match(app, /action:\s*['"]finalize['"]/);
   assert.match(app, /action:\s*['"]delete['"]/);
-  assert.match(app, /confirm\(/);
+  assert.doesNotMatch(app, /confirm\(/);
+  assert.match(app, /id="pay-run-confirm-dialog"/);
+  assert.match(app, /id="pay-run-confirm-button"/);
+  assert.match(app, /id="pay-run-cancel-button"/);
 });

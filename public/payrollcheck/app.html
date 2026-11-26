@@ -118,7 +118,12 @@
     </form>
     <p id="pay-run-preview-totals"></p>
     <p id="pay-run-message" role="status"></p>
-    <ul id="pay-runs-list"></ul>
+        <ul id="pay-runs-list"></ul>
+    <div id="pay-run-confirm-dialog" hidden role="alertdialog" aria-modal="true" aria-describedby="pay-run-confirm-message">
+      <p id="pay-run-confirm-message"></p>
+      <button type="button" id="pay-run-confirm-button">Confirm</button>
+      <button type="button" id="pay-run-cancel-button">Cancel</button>
+    </div>
   </section>
   <section id="modules-section" hidden>
     <h2>Modules</h2>
@@ -460,8 +465,40 @@ function getPayRun(payRunId) {
     })
     .catch(function () {});
 }
+// In-page confirmation dialog for pay runs. The native prompt is
+// auto-dismissed in an automated browser, so Delete and Finalize ask here
+// instead: the action runs only when the user clicks Confirm in this
+// dialog, and Cancel sends no request.
+var pendingPayRunConfirm = null;
+function showPayRunConfirm(message, confirmLabel, action, payRunId) {
+  pendingPayRunConfirm = { action: action, payRunId: payRunId };
+  var dialog = document.getElementById('pay-run-confirm-dialog');
+  var messageEl = document.getElementById('pay-run-confirm-message');
+  var confirmButton = document.getElementById('pay-run-confirm-button');
+  if (messageEl) messageEl.textContent = message;
+  if (confirmButton) confirmButton.textContent = confirmLabel;
+  if (dialog) dialog.hidden = false;
+}
+function hidePayRunConfirm() {
+  pendingPayRunConfirm = null;
+  var dialog = document.getElementById('pay-run-confirm-dialog');
+  if (dialog) dialog.hidden = true;
+}
+function confirmPayRunAction() {
+  var pending = pendingPayRunConfirm;
+  hidePayRunConfirm();
+  if (!pending) return;
+  if (pending.action === 'delete') submitDeletePayRun(pending.payRunId);
+  else if (pending.action === 'finalize') submitFinalizePayRun(pending.payRunId);
+}
+var payRunConfirmButton = document.getElementById('pay-run-confirm-button');
+if (payRunConfirmButton) payRunConfirmButton.addEventListener('click', confirmPayRunAction);
+var payRunCancelButton = document.getElementById('pay-run-cancel-button');
+if (payRunCancelButton) payRunCancelButton.addEventListener('click', hidePayRunConfirm);
 function finalizePayRun(payRunId) {
-  if (!confirm('Finalize this pay run? Finalizing is irreversible.')) return;
+  showPayRunConfirm('Finalize this pay run? Finalizing is irreversible.', 'Finalize', 'finalize', payRunId);
+}
+function submitFinalizePayRun(payRunId) {
   var tenantId = document.getElementById('tenant-select').value;
   var message = document.getElementById('pay-run-message');
   post('/payrollcheck/api/pay-runs', { action: 'finalize', tenantId: tenantId, payRunId: payRunId })
@@ -483,7 +520,9 @@ function finalizePayRun(payRunId) {
     });
 }
 function deletePayRun(payRunId) {
-  if (!confirm('Delete this draft pay run?')) return;
+  showPayRunConfirm('Delete this draft pay run?', 'Delete', 'delete', payRunId);
+}
+function submitDeletePayRun(payRunId) {
   var tenantId = document.getElementById('tenant-select').value;
   var message = document.getElementById('pay-run-message');
   post('/payrollcheck/api/pay-runs', { action: 'delete', tenantId: tenantId, payRunId: payRunId })
