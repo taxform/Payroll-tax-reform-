@@ -58,7 +58,7 @@ ALTER TABLE payrollcheck.payroll_pay_run_lines FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE payrollcheck.payroll_pay_runs FROM PUBLIC;
 REVOKE ALL ON TABLE payrollcheck.payroll_pay_run_lines FROM PUBLIC;
 
-GRANT SELECT, INSERT, UPDATE ON payrollcheck.payroll_pay_runs TO payrollcheck_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON payrollcheck.payroll_pay_runs TO payrollcheck_app;
 GRANT SELECT, INSERT, UPDATE ON payrollcheck.payroll_pay_run_lines TO payrollcheck_app;
 
 DROP POLICY IF EXISTS app_payroll_pay_runs_select ON payrollcheck.payroll_pay_runs;
