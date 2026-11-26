@@ -110,7 +110,7 @@ test('pay-runs section becomes visible and its Modules card links to it when the
   // The pay-runs controls live inside #pay-runs-section in the markup, so unhiding the section is what makes them reachable.
   const start = appHtml.indexOf('id="pay-runs-section"');
   const sectionHtml = appHtml.slice(start, appHtml.indexOf('</section>', start));
-  for (const fieldId of ['pay-runs-status', 'pay-runs-list', 'pay-runs-form', 'pay-runs-period-start', 'pay-runs-period-end', 'pay-runs-message']) {
+    for (const fieldId of ['pay-runs-status', 'pay-runs-list', 'pay-run-form', 'pay-run-period-start', 'pay-run-period-end', 'pay-run-message']) {
     assert.ok(sectionHtml.includes(`id="${fieldId}"`), `${fieldId} should be inside #pay-runs-section`);
   }
   assert.equal(document.getElementById('pay-runs-status').textContent, 'No pay runs yet.', 'renderPayRuns() runs once the section is shown');
