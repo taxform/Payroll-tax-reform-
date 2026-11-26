@@ -32,7 +32,7 @@ export function parsePayRunInput(input) {
   if (!payPeriodEnd) return { ok: false, error: 'invalid_request', field: 'payPeriodEnd' };
   if (!payDate) return { ok: false, error: 'invalid_request', field: 'payDate' };
   if (!PAY_FREQUENCIES.includes(input.frequency)) return { ok: false, error: 'invalid_request', field: 'frequency' };
-  const lines = Array.isArray(input.lines) ? input.lines : null;
+  const lines = input.lines === undefined ? [] : Array.isArray(input.lines) ? input.lines : null;
   if (!lines) return { ok: false, error: 'invalid_request', field: 'lines' };
   return { ok: true, payRun: { payPeriodStart, payPeriodEnd, payDate, frequency: input.frequency, lines } };
 }

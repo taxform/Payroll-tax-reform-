@@ -115,3 +115,50 @@ test('pay-run loader requires injected query and performs tenant-scoped SQL', as
   assert.deepEqual(await loader.loadMemberships('subject-1'), [{ tenantId: A, role: 'business_owner' }]);
   assert.equal(await loader.getPayRun({ tenantId: A, payRunId: RUN }).then(Boolean), true);
 });
+
+
+test('pay-run preview accepts the UI request without lines and computes lines from employees', async () => {
+  const handler = createPayRunAccessHandler({
+    getVerifiedUser: async () => ({ id: 'auth-1', email_confirmed_at: '2026-01-01' }),
+    requireAal2: async () => true,
+    resolveSubjectId: async () => 'subject-1',
+    recordAudit: async () => undefined,
+    checkRateLimit: async () => ({ allowed: true }),
+    getSession: async () => ({ authUserId: 'auth-1' }),
+    generateId: () => 'req-1',
+    loadMemberships: async () => [{ tenantId: A, role: 'business_owner' }],
+    previewPayRun: async ({ payRun }) => calculatePayRunLines({
+      employees: [{ employee_id: EMP, pay_type: 'salary', pay_rate: '52000', pay_frequency: 'biweekly', filing_status: 'single' }],
+      lines: payRun.lines,
+      frequency: payRun.frequency,
+    }),
+    createPayRun: async () => null,
+    listPayRuns: async () => [],
+    getPayRun: async () => null,
+    deletePayRun: async () => null,
+    loadPayRunLines: async () => [],
+    finalizePayRun: async () => null,
+  });
+  const result = await handler.handlePayRunAccess({
+    accessToken: 'session',
+    sessionId: 'session',
+    tenantId: A,
+    requestId: 'r1',
+    action: 'preview',
+    payRun: {
+      payPeriodStart: '2026-11-09',
+      payPeriodEnd: '2026-11-22',
+      payDate: '2026-11-25',
+      frequency: 'biweekly',
+    },
+  });
+  assert.equal(result.status, 200);
+  assert.equal(result.ok, true);
+  assert.equal(result.preview.totals.gross, 2000);
+  assert.equal(result.preview.totals.federalWithholding, 156.15);
+  assert.equal(result.preview.totals.socialSecurity, 124);
+  assert.equal(result.preview.totals.medicare, 29);
+  assert.equal(result.preview.totals.net, 1690.85);
+  assert.equal(result.preview.lines.length, 1);
+  assert.equal(result.preview.lines[0].employeeId, EMP);
+});
