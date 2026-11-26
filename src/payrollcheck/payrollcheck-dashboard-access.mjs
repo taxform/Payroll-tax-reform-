@@ -248,6 +248,7 @@ export function createDashboardAccessHandler({
     const dashboard = buildDashboardSummary({
       memberships: resolved.memberships,
       reportCountsByTenant: loaded.reportCountsByTenant,
+      companiesByTenant: loaded.companiesByTenant,
       selectedTenantId: resolved.tenant.tenantId,
     });
 
