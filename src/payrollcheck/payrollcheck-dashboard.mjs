@@ -18,6 +18,7 @@
 // TDS/IVES access and no direct IRS channel, and none is claimed here.
 
 import { loadCompanyByTenant, maskEin } from './payrollcheck-company.mjs';
+import { countEmployeesByTenant } from './payrollcheck-employees.mjs';
 
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -40,9 +41,9 @@ export const PAYROLLCHECK_APP_MODULES = Object.freeze([
     id: 'employees',
     label: 'Employees',
     href: '#employees',
-    status: 'coming_soon',
+    status: 'available',
     slice: 3,
-    note: 'Employees arrive in Slice 3.',
+    note: 'Add and manage your employees — names, W-4 details, pay rate and pay type.',
   }),
   Object.freeze({
     id: 'pay-runs',
@@ -118,7 +119,7 @@ export function resolveDashboardTenant({ memberships, requestedTenantId }) {
 // tenant id to the number of compliance-check reports for that tenant (0 when
 // absent). Counts are the caller's own tenants only; no other tenant's data is
 // ever passed in, so none can leak out.
-export function buildDashboardSummary({ memberships, reportCountsByTenant, companiesByTenant, selectedTenantId }) {
+export function buildDashboardSummary({ memberships, reportCountsByTenant, companiesByTenant, employeeCountsByTenant = {}, selectedTenantId }) {
   const members = Array.isArray(memberships) ? memberships : [];
   const counts =
     reportCountsByTenant && typeof reportCountsByTenant === 'object'
@@ -143,9 +144,16 @@ export function buildDashboardSummary({ memberships, reportCountsByTenant, compa
         paySchedule: companyRow.pay_schedule,
       }
     : { isSetUp: false };
+  const employeeCountsByTenantSafe =
+    employeeCountsByTenant && typeof employeeCountsByTenant === 'object' ? employeeCountsByTenant : {};
+  const employeeCounts = selected
+    ? employeeCountsByTenantSafe[selected.tenantId] ?? { total: 0, active: 0 }
+    : { total: 0, active: 0 };
+  const employees = { totalCount: employeeCounts.total, activeCount: employeeCounts.active };
   return {
     selectedTenant: selected,
     company,
+    employees,
     tenants,
     totals: {
       tenants: tenants.length,
@@ -219,7 +227,20 @@ export function createDashboardLoader({ query }) {
     }
     if (company) companiesByTenant[membership.tenantId] = company;
   }
-  return { memberships, reportCountsByTenant, companiesByTenant };
+  const employeeCountsByTenant = {};
+  for (const membership of memberships) {
+    // Same degrade-to-zero rule as the company profile: the employees
+    // table may not exist yet where the Slice 3 migration has not been
+    // applied, and a failed count must not take the whole dashboard down.
+    let counts = { total: 0, active: 0 };
+    try {
+      counts = await countEmployeesByTenant(query, membership.tenantId);
+    } catch {
+      counts = { total: 0, active: 0 };
+    }
+    employeeCountsByTenant[membership.tenantId] = counts;
+  }
+  return { memberships, reportCountsByTenant, companiesByTenant, employeeCountsByTenant };
   }
 
   return { loadMemberships, loadTenantType, loadReportCount, loadDashboard };

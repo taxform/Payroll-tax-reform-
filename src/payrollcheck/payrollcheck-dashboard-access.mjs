@@ -249,6 +249,7 @@ export function createDashboardAccessHandler({
       memberships: resolved.memberships,
       reportCountsByTenant: loaded.reportCountsByTenant,
       companiesByTenant: loaded.companiesByTenant,
+      employeeCountsByTenant: loaded.employeeCountsByTenant,
       selectedTenantId: resolved.tenant.tenantId,
     });
 
