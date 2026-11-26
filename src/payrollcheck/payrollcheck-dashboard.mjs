@@ -57,9 +57,9 @@ export const PAYROLLCHECK_APP_MODULES = Object.freeze([
     id: 'tax-center',
     label: 'Tax center',
     href: '#tax-center',
-    status: 'coming_soon',
+    status: 'available',
     slice: 5,
-    note: 'The 941 / 940 tax center arrives in Slice 5.',
+    note: 'Quarterly 941 and annual 940 totals from your finalized pay runs, with deposit dates.',
   }),
   Object.freeze({
     id: 'filing',
