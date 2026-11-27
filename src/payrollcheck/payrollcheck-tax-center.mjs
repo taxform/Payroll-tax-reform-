@@ -29,9 +29,23 @@ function fromCents(cents) {
   return cents / 100;
 }
 
+function toIsoDate(value) {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(value.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  if (typeof value !== 'string') return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : null;
+}
+
 function quarterOf(payDate) {
-  if (typeof payDate !== 'string') return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(payDate);
+  const isoDate = toIsoDate(payDate);
+  if (!isoDate) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
   if (!match) return null;
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -67,104 +81,128 @@ function addRunToPeriod(period, totals, deposit) {
   period.additionalMedicare += totals.additionalMedicare;
   period.fica += totals.fica;
   period.totalTax += totals.totalTax;
-  if (!totals.reconciled) period.reconciled = false;
 }
 
 function finalizePeriod(period) {
-  period.deposits.sort((a, b) => (a.payDate < b.payDate ? -1 : a.payDate > b.payDate ? 1 : (a.payRunId < b.payRunId ? -1 : 1)));
-  period.payRunIds = period.deposits.map((deposit) => deposit.payRunId);
-  period.depositDates = [...new Set(period.deposits.map((deposit) => deposit.payDate))].sort();
-  period.wages = fromCents(period.wages);
-  period.federalWithholding = fromCents(period.federalWithholding);
-  period.socialSecurity = fromCents(period.socialSecurity);
-  period.medicare = fromCents(period.medicare);
-  period.additionalMedicare = fromCents(period.additionalMedicare);
-  period.fica = fromCents(period.fica);
-  period.totalTax = fromCents(period.totalTax);
-  return period;
+  const depositDates = [...new Set(period.deposits.map((deposit) => deposit.payDate))].sort();
+  return {
+    period: period.period,
+    year: period.year,
+    quarter: period.quarter ?? null,
+    payRunCount: period.payRunCount,
+    payRunIds: [...period.payRunIds].sort(),
+    depositDates,
+    deposits: [...period.deposits].sort((a, b) => (a.payDate < b.payDate ? -1 : a.payDate > b.payDate ? 1 : 0)),
+    wages: fromCents(period.wages),
+    federalWithholding: fromCents(period.federalWithholding),
+    socialSecurity: fromCents(period.socialSecurity),
+    medicare: fromCents(period.medicare),
+    additionalMedicare: fromCents(period.additionalMedicare),
+    fica: fromCents(period.fica),
+    totalTax: fromCents(period.totalTax),
+    reconciled: period.reconciled,
+  };
 }
 
-export function buildTaxCenterSummary({ runs, linesByPayRunId } = {}) {
-  const quarters = new Map();
-  const years = new Map();
-  const list = Array.isArray(runs) ? runs : [];
-  for (const run of list) {
-    if (!run || run.status !== 'final') continue;
+export function buildTaxCenterSummary({ runs = [], linesByPayRunId = {} } = {}) {
+  const periods941 = new Map();
+  const periods940 = new Map();
+  for (const run of runs) {
+    if (run.status !== 'final') continue;
     const period = quarterOf(run.pay_date ?? run.payDate);
     if (!period) continue;
-    const lines = (linesByPayRunId && (linesByPayRunId[run.pay_run_id] ?? linesByPayRunId[run.payRunId])) || [];
-    const totals = { gross: 0, federalWithholding: 0, socialSecurity: 0, medicare: 0, additionalMedicare: 0, netPay: 0 };
+    const lines = linesByPayRunId[run.pay_run_id ?? run.payRunId] ?? [];
+    const totals = {
+      gross: 0,
+      federalWithholding: 0,
+      socialSecurity: 0,
+      medicare: 0,
+      additionalMedicare: 0,
+      fica: 0,
+      totalTax: 0,
+    };
     for (const line of lines) {
-      totals.gross += toCents(line.gross);
-      totals.federalWithholding += toCents(line.federal_withholding ?? line.federalWithholding);
-      totals.socialSecurity += toCents(line.social_security ?? line.socialSecurity);
-      totals.medicare += toCents(line.medicare);
-      totals.additionalMedicare += toCents(line.additional_medicare ?? line.additionalMedicare);
-      totals.netPay += toCents(line.net_pay ?? line.netPay);
+      const gross = toCents(line.gross);
+      const federalWithholding = toCents(line.federal_withholding ?? line.federalWithholding);
+      const socialSecurity = toCents(line.social_security ?? line.socialSecurity);
+      const medicare = toCents(line.medicare);
+      const additionalMedicare = toCents(line.additional_medicare ?? line.additionalMedicare);
+      const fica = socialSecurity + medicare + additionalMedicare;
+      totals.gross += gross;
+      totals.federalWithholding += federalWithholding;
+      totals.socialSecurity += socialSecurity;
+      totals.medicare += medicare;
+      totals.additionalMedicare += additionalMedicare;
+      totals.fica += fica;
+      totals.totalTax += federalWithholding + fica;
     }
-    totals.fica = totals.socialSecurity + totals.medicare + totals.additionalMedicare;
-    totals.totalTax = totals.federalWithholding + totals.fica;
-    totals.reconciled =
-      toCents(run.gross_total ?? run.grossTotal) === totals.gross &&
-      toCents(run.federal_withholding_total ?? run.federalWithholdingTotal) === totals.federalWithholding &&
-      toCents(run.fica_total ?? run.ficaTotal) === totals.fica &&
-      toCents(run.net_total ?? run.netTotal) === totals.netPay;
     const deposit = {
       payRunId: run.pay_run_id ?? run.payRunId,
-      payDate: run.pay_date ?? run.payDate,
+      payDate: toIsoDate(run.pay_date ?? run.payDate),
+      gross: fromCents(totals.gross),
       federalWithholding: fromCents(totals.federalWithholding),
       socialSecurity: fromCents(totals.socialSecurity),
       medicare: fromCents(totals.medicare),
       additionalMedicare: fromCents(totals.additionalMedicare),
+      fica: fromCents(totals.fica),
       totalTax: fromCents(totals.totalTax),
     };
-    const quarterKey = `${period.year}-Q${period.quarter}`;
-    if (!quarters.has(quarterKey)) quarters.set(quarterKey, newPeriod({ form: '941', year: period.year, quarter: period.quarter, period: quarterKey }));
-    addRunToPeriod(quarters.get(quarterKey), totals, deposit);
-    const yearKey = `${period.year}`;
-    if (!years.has(yearKey)) years.set(yearKey, newPeriod({ form: '940', year: period.year, period: yearKey }));
-    addRunToPeriod(years.get(yearKey), totals, deposit);
+    const period941Key = `${period.year}-Q${period.quarter}`;
+    if (!periods941.has(period941Key)) periods941.set(period941Key, newPeriod({ period: period941Key, year: period.year, quarter: period.quarter }));
+    const period941 = periods941.get(period941Key);
+    period941.payRunIds.push(run.pay_run_id ?? run.payRunId);
+    addRunToPeriod(period941, totals, deposit);
+    const period940Key = `${period.year}`;
+    if (!periods940.has(period940Key)) periods940.set(period940Key, newPeriod({ period: period940Key, year: period.year, quarter: null }));
+    const period940 = periods940.get(period940Key);
+    period940.payRunIds.push(run.pay_run_id ?? run.payRunId);
+    addRunToPeriod(period940, totals, deposit);
+    const headerTotal = toCents(run.federal_withholding_total ?? run.federalWithholdingTotal) + toCents(run.fica_total ?? run.ficaTotal);
+    if (totals.totalTax !== headerTotal || totals.gross !== toCents(run.gross_total ?? run.grossTotal)) {
+      period941.reconciled = false;
+      period940.reconciled = false;
+    }
   }
-  const form941 = [...quarters.values()].sort((a, b) => (a.year - b.year) || (a.quarter - b.quarter)).map(finalizePeriod);
-  const form940 = [...years.values()].sort((a, b) => a.year - b.year).map(finalizePeriod);
-  return { form941, form940 };
+  return {
+    form941: [...periods941.values()].sort((a, b) => (a.period < b.period ? -1 : 1)).map(finalizePeriod),
+    form940: [...periods940.values()].sort((a, b) => (a.period < b.period ? -1 : 1)).map(finalizePeriod),
+  };
 }
 
-export function createTaxCenterLoader({ query } = {}) {
-  if (typeof query !== 'function') throw new Error('query function is required');
-
-  async function loadMemberships(subjectId) {
-    const result = await query(
-      'SELECT tenant_id, role FROM payrollcheck.memberships WHERE subject_id = $1 AND active = true LIMIT 50',
-      [subjectId],
-    );
-    return result.rows.map((row) => ({ tenantId: row.tenant_id, role: row.role }));
-  }
-
-  async function loadFinalizedPayRuns(tenantId) {
-    const result = await query(
-      `SELECT ${RUN_COLUMNS} FROM payrollcheck.payroll_pay_runs WHERE tenant_id = $1 AND status = 'final' ORDER BY pay_date DESC, created_at DESC, pay_run_id DESC`,
-      [tenantId],
-    );
-    return result.rows;
-  }
-
-  async function loadPayRunLines(tenantId, payRunId) {
-    const result = await query(
-      `SELECT ${LINE_COLUMNS} FROM payrollcheck.payroll_pay_run_lines WHERE tenant_id = $1 AND pay_run_id = $2 ORDER BY line_id`,
-      [tenantId, payRunId],
-    );
-    return result.rows;
-  }
-
-  async function loadTaxCenter(tenantId) {
-    const runs = await loadFinalizedPayRuns(tenantId);
-    const linesByPayRunId = {};
-    for (const run of runs) {
-      linesByPayRunId[run.pay_run_id] = await loadPayRunLines(tenantId, run.pay_run_id);
+export function createTaxCenterLoader({ database, audit, runSql } = {}) {
+  if (!database || typeof database.query !== 'function') throw new TypeError('database.query is required');
+  if (!audit || typeof audit.record !== 'function') throw new TypeError('audit.record is required');
+  if (typeof runSql !== 'function') throw new TypeError('runSql is required');
+  return async ({ tenantId }) => {
+    const sql = `
+      select ${RUN_COLUMNS} from payrollcheck.pay_runs
+      where tenant_id = $1 and status = 'final'
+      order by pay_date asc, pay_run_id asc`;
+    const runs = await database.query(sql, [tenantId]);
+    const runIds = runs.map((run) => run.pay_run_id);
+    let lines = [];
+    if (runIds.length > 0) {
+      lines = await database.query(
+        `select ${LINE_COLUMNS} from payrollcheck.pay_run_lines where tenant_id = $1 and pay_run_id = any($2::uuid[]) order by pay_run_id asc, line_id asc`,
+        [tenantId, runIds],
+      );
     }
-    return { tenantId, ...buildTaxCenterSummary({ runs, linesByPayRunId }) };
-  }
-
-  return Object.freeze({ loadMemberships, loadFinalizedPayRuns, loadPayRunLines, loadTaxCenter });
+    const linesByPayRunId = {};
+    for (const line of lines) {
+      const runLines = linesByPayRunId[line.pay_run_id] ?? [];
+      runLines.push(line);
+      linesByPayRunId[line.pay_run_id] = runLines;
+    }
+    await audit.record({
+      tenantId,
+      userId: null,
+      action: 'tax_center_read',
+      resourceType: 'tax_center',
+      resourceId: null,
+      allowed: true,
+      reason: 'allowed',
+    });
+    const summary = buildTaxCenterSummary({ runs, linesByPayRunId });
+    return { tenantId, ...summary };
+  };
 }
