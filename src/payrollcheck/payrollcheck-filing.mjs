@@ -18,7 +18,8 @@
 // address line 1, city, zip, business type, signing authority). validateFilingCompany
 // below requires every one of those fields before a filing can be submitted, and
 // buildTaxBandits941Payload includes them in the request.
-import { BUSINESS_TYPES, normalizeEin } from './payrollcheck-company.mjs';
+import { BUSINESS_TYPES, loadCompanyByTenant, normalizeEin } from './payrollcheck-company.mjs';
+import { createTaxCenterLoader } from './payrollcheck-tax-center.mjs';
 
 export const TAX_BANDITS_SANDBOX_BASE_URL = 'https://testapi.taxbandits.com';
 export const TAX_BANDITS_SANDBOX_API_BASE_URL = `${TAX_BANDITS_SANDBOX_BASE_URL}/v1`;
@@ -322,4 +323,186 @@ export function createTaxBanditsSandboxClient({ fetch: fetchImpl, getAccessToken
     return { ok: true, status: parsed.status, providerStatus: typeof body?.Status === 'string' ? body.Status : null };
   }
   return { submitFiling, refreshFilingStatus };
+
+// Filing loader (Slice 6). Runs inside the composition's transaction, behind the same tenancy and RLS as the rest of the app: every query is scoped to the tenant the access handler selected, and the tax_filings table enforces tenant_id = current_tenant_id() at the database level.
+  // The TaxBandits sandbox client is injected as a factory. Without one, submit-filing only queues the filing and refresh-status reports the service unavailable, so the queue works before any token exchange is wired and no filing leaves the repo without a configured sandbox client.
+  const FILING_ROW_COLUMNS = [
+      'filing_id',
+      'tenant_id',
+      'form_text',
+      'tax_year',
+      'quarter',
+      'status',
+      'sandbox_submission_id',
+      'total_tax',
+      'submitted_at',
+      'created_at',
+      'updated_at',
+    ].join(', ');
+
+  function toFilingResponse(row) {
+      if (!row || typeof row !== 'object') return null;
+      return {
+            filingId: row.filing_id ?? null,
+            tenantId: row.tenant_id ?? null,
+            form: row.form_text ?? null,
+            taxYear: row.tax_year ?? null,
+            quarter: row.quarter ?? null,
+            status: row.status ?? null,
+            sandboxSubmissionId: row.sandbox_submission_id ?? null,
+            totalTax:
+                    row.total_tax === null || row.total_tax === undefined
+              ? null
+                    : Number(row.total_tax),
+            environment: FILING_ENVIRONMENT,
+            feeNote: FILING_FEE_NOTE,
+            submittedAt: row.submitted_at ?? null,
+            createdAt: row.created_at ?? null,
+            updatedAt: row.updated_at ?? null,
+      };
+  }
+
+  function toFilingCompanyInput(row) {
+      return {
+            legalName: row.legal_name,
+            ein: row.ein,
+            addressLine1: row.address_line1,
+            addressLine2: row.address_line2,
+            city: row.city,
+            state: row.state,
+            postalCode: row.postal_code,
+            paySchedule: row.pay_schedule,
+            contactEmail: row.contact_email,
+            contactPhone: row.contact_phone,
+            businessType: row.business_type,
+            signingAuthority: row.signing_authority,
+      };
+  }
+
+  export function createFilingLoader({ query, createTaxBanditsClient = null, loadTaxCenter = null } = {}) {
+      if (typeof query !== 'function') throw new TypeError('query_required');
+      if (createTaxBanditsClient !== null && typeof createTaxBanditsClient !== 'function') {
+            throw new TypeError('create_tax_bandits_client_required');
+      }
+      if (loadTaxCenter !== null && typeof loadTaxCenter !== 'function') {
+            throw new TypeError('load_tax_center_required');
+      }
+      const loadTaxCenterForTenant =
+            loadTaxCenter ?? createTaxCenterLoader({ query }).loadTaxCenter;
+
+      function taxBanditsClient() {
+            if (typeof createTaxBanditsClient !== 'function') return null;
+            const client = createTaxBanditsClient();
+            if (!client || typeof client !== 'object') return null;
+            return client;
+      }
+
+      async function loadCompanyForFiling(tenantId) {
+            const row = await loadCompanyByTenant(query, tenantId);
+            if (!row) return { ok: false, status: 400, error: 'invalid_company' };
+            const validated = validateFilingCompany(toFilingCompanyInput(row));
+            if (!validated.ok) return { ok: false, status: 400, error: 'invalid_company' };
+            return { ok: true, company: validated.company };
+      }
+
+      async function loadQuarterTotals({ tenantId, taxYear, quarter }) {
+            const summary = await loadTaxCenterForTenant(tenantId);
+            const period = Array.isArray(summary?.form941)
+              ? summary.form941.find((entry) => entry.year === taxYear && entry.quarter === quarter)
+                    : undefined;
+            if (!period) return { ok: false, status: 404, error: 'filing_period_not_found' };
+            const computed = computeSandbox941Totals(period);
+            if (!computed.ok) return { ok: false, status: 404, error: 'filing_period_not_found' };
+            return { ok: true, totals: period, totalTax: computed.totalTax };
+      }
+
+      async function queueFilings(tenantId) {
+            const result = await query(
+                    `SELECT ${FILING_ROW_COLUMNS} FROM payrollcheck.tax_filings WHERE tenant_id = $1 ORDER BY created_at DESC, filing_id DESC`,
+                    [tenantId],
+                  );
+            return { ok: true, filings: result.rows.map((row) => toFilingResponse(row)) };
+      }
+
+      async function submitFiling({ tenantId, form, taxYear, quarter, pin }) {
+            if (form !== '941') return { ok: false, status: 400, error: 'unsupported_form' };
+            const company = await loadCompanyForFiling(tenantId);
+            if (!company.ok) return company;
+            const quarterTotals = await loadQuarterTotals({ tenantId, taxYear, quarter });
+            if (!quarterTotals.ok) return quarterTotals;
+            const built = buildTaxBandits941Payload({
+                    company: company.company,
+                    totals: quarterTotals.totals,
+                    taxYear,
+                    quarter,
+                    pin,
+            });
+            if (!built.ok) return { ok: false, status: 400, error: 'invalid_request' };
+            const inserted = await query(
+                    `INSERT INTO payrollcheck.tax_filings (tenant_id, form_text, tax_year, quarter, status, sandbox_submission_id, total_tax) VALUES ($1, $2, $3, $4, 'queued', NULL, $5) RETURNING ${FILING_ROW_COLUMNS}`,
+                    [tenantId, form, taxYear, quarter, quarterTotals.totalTax],
+                  );
+            const filingRow = inserted.rows[0];
+            if (!filingRow) return { ok: false, status: 503, error: 'unavailable' };
+            const client = taxBanditsClient();
+            if (!client) return { ok: true, filing: toFilingResponse(filingRow) };
+            let submitted;
+            try {
+                    submitted = await client.submitFiling({ form, payload: built.payload });
+            } catch {
+                    submitted = { ok: false, error: 'taxbandits_rejected' };
+            }
+            if (!submitted || submitted.ok !== true) {
+                    await query(
+                              `UPDATE payrollcheck.tax_filings SET status = 'failed', updated_at = NOW() WHERE filing_id = $1 AND tenant_id = $2`,
+                              [filingRow.filing_id, tenantId],
+                            );
+                    return { ok: false, status: 503, error: submitted?.error ?? 'taxbandits_rejected' };
+            }
+            const updated = await query(
+                    `UPDATE payrollcheck.tax_filings SET status = 'submitted', sandbox_submission_id = $1, submitted_at = NOW(), updated_at = NOW() WHERE filing_id = $2 AND tenant_id = $3 RETURNING ${FILING_ROW_COLUMNS}`,
+                    [submitted.submissionId, filingRow.filing_id, tenantId],
+                  );
+            return { ok: true, filing: toFilingResponse(updated.rows[0] ?? filingRow) };
+      }
+
+      async function refreshFilingStatus({ tenantId, filingId }) {
+            const found = await query(
+                    `SELECT ${FILING_ROW_COLUMNS} FROM payrollcheck.tax_filings WHERE tenant_id = $1 AND filing_id = $2`,
+                    [tenantId, filingId],
+                  );
+            const row = found.rows[0];
+            if (!row) return { ok: false, status: 404, error: 'filing_not_found' };
+            if (!row.sandbox_submission_id) return { ok: false, status: 409, error: 'filing_not_submitted' };
+            const client = taxBanditsClient();
+            if (!client) return { ok: false, status: 503, error: 'unavailable' };
+            let refreshed;
+            try {
+                    refreshed = await client.refreshFilingStatus({ form: row.form_text, submissionId: row.sandbox_submission_id });
+            } catch {
+                    refreshed = { ok: false, error: 'taxbandits_rejected' };
+            }
+            if (!refreshed || refreshed.ok !== true) {
+                    return { ok: false, status: 503, error: refreshed?.error ?? 'taxbandits_rejected' };
+            }
+            if (refreshed.status !== 'submitted' && refreshed.status !== 'accepted' && refreshed.status !== 'rejected') {
+                    return { ok: true, filing: toFilingResponse(row) };
+            }
+            const updated = await query(
+                    `UPDATE payrollcheck.tax_filings SET status = $1, updated_at = NOW() WHERE filing_id = $2 AND tenant_id = $3 RETURNING ${FILING_ROW_COLUMNS}`,
+                    [refreshed.status, filingId, tenantId],
+                  );
+            return { ok: true, filing: toFilingResponse(updated.rows[0] ?? row) };
+      }
+
+      async function loadFiling({ tenantId, action, form, taxYear, quarter, pin, filingId }) {
+            if (action === 'queue') return queueFilings(tenantId);
+            if (action === 'submit-filing') return submitFiling({ tenantId, form, taxYear, quarter, pin });
+            if (action === 'refresh-status') return refreshFilingStatus({ tenantId, filingId });
+            return { ok: false, status: 400, error: 'invalid_request' };
+      }
+
+      return Object.freeze({ loadFiling });
+  }
+  
 }
