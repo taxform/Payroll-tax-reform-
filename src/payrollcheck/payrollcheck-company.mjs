@@ -20,7 +20,11 @@ export const PAY_SCHEDULE_PERIODS_PER_YEAR = Object.freeze({
   biweekly: 26,
   semi_monthly: 24,
   monthly: 12,
+  
 });
+// Business types for a filing (Slice 6): the Nov 25 sandbox filing
+// failed validation without a business type.
+export const BUSINESS_TYPES = Object.freeze(['sole_proprietor', 'partnership', 'llc', 'corporation', 's_corporation', 'nonprofit']);
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EIN_PATTERN = /^[0-9]{9}$/;
