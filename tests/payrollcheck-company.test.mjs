@@ -35,6 +35,10 @@ const COMPANY_INPUT = {
   state: 'il',
   postalCode: '62701-1234',
   paySchedule: 'biweekly',
+    contactEmail: 'Payroll@Acme.example',
+    contactPhone: '(518) 555-0100',
+    businessType: 'llc',
+    signingAuthority: 'Jane Acme',
 };
 
 const COMPANY_ROW_A = {
@@ -48,6 +52,10 @@ const COMPANY_ROW_A = {
   state: 'IL',
   postal_code: '62701-1234',
   pay_schedule: 'biweekly',
+    contact_email: 'payroll@acme.example',
+    contact_phone: '5185550100',
+    business_type: 'llc',
+    signing_authority: 'Jane Acme',
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
 };
@@ -75,6 +83,10 @@ test('parseCompanyInput: a complete profile is accepted and normalized', () => {
     state: 'IL',
     postalCode: '62701-1234',
     paySchedule: 'biweekly',
+        contactEmail: 'payroll@acme.example',
+        contactPhone: '5185550100',
+        businessType: 'llc',
+        signingAuthority: 'Jane Acme',
   });
 });
 
@@ -97,6 +109,10 @@ test('parseCompanyInput: a bad EIN, state, postal code, pay schedule or missing 
     [{ ...COMPANY_INPUT, legalName: '  ' }, ['legalName']],
     [{ ...COMPANY_INPUT, addressLine1: '' }, ['addressLine1']],
     [{ ...COMPANY_INPUT, city: '' }, ['city']],
+        [{ ...COMPANY_INPUT, contactEmail: 'not-an-email' }, ['contactEmail']],
+        [{ ...COMPANY_INPUT, contactPhone: '123' }, ['contactPhone']],
+        [{ ...COMPANY_INPUT, businessType: 'trust' }, ['businessType']],
+        [{ ...COMPANY_INPUT, signingAuthority: 'A'.repeat(121) }, ['signingAuthority']],
     [null, ['company']],
   ];
   for (const [input, fields] of cases) {
@@ -105,6 +121,15 @@ test('parseCompanyInput: a bad EIN, state, postal code, pay schedule or missing 
     assert.equal(parsed.reason, 'invalid_request');
     assert.deepEqual(parsed.errors, fields);
   }
+});
+test('parseCompanyInput: the filing contact fields are optional and stay null when absent', () => {
+    const { contactEmail, contactPhone, businessType, signingAuthority, ...rest } = COMPANY_INPUT;
+    const parsed = parseCompanyInput(rest);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.company.contactEmail, null);
+    assert.equal(parsed.company.contactPhone, null);
+    assert.equal(parsed.company.businessType, null);
+    assert.equal(parsed.company.signingAuthority, null);
 });
 
 test('parseCompanyInput: a blank EIN is allowed only when a profile already exists', () => {
@@ -145,6 +170,10 @@ test('toCompanyResponse: the full EIN never leaves the server', () => {
     einLast4: '6789',
     address: { line1: '1 Main St', line2: 'Suite 100', city: 'Springfield', state: 'IL', postalCode: '62701-1234' },
     paySchedule: 'biweekly',
+        contactEmail: 'payroll@acme.example',
+        contactPhone: '5185550100',
+        businessType: 'llc',
+        signingAuthority: 'Jane Acme',
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z',
   });
@@ -234,13 +263,19 @@ test('saveCompany: one row per tenant via upsert, parameterized, returns the row
     state: 'IL',
     postalCode: '62701-1234',
     paySchedule: 'biweekly',
+        contactEmail: 'payroll@acme.example',
+        contactPhone: '5185550100',
+        businessType: 'llc',
+        signingAuthority: 'Jane Acme',
   });
   assert.deepEqual(saved, COMPANY_ROW_A);
   assert.equal(calls.length, 1);
   assert.ok(calls[0].sql.includes('INSERT INTO payrollcheck.payroll_companies'));
   assert.ok(calls[0].sql.includes('ON CONFLICT (tenant_id) DO UPDATE'));
   assert.ok(calls[0].sql.includes('RETURNING'));
-  assert.deepEqual(calls[0].params, [BUSINESS_A, 'Acme Widgets LLC', '123456789', '1 Main St', 'Suite 100', 'Springfield', 'IL', '62701-1234', 'biweekly']);
+    assert.ok(calls[0].sql.includes('contact_email, contact_phone, business_type, signing_authority'));
+    assert.ok(calls[0].sql.includes('($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)'));
+  assert.deepEqual(calls[0].params, [BUSINESS_A, 'Acme Widgets LLC', '123456789', '1 Main St', 'Suite 100', 'Springfield', 'IL', '62701-1234', 'biweekly', 'payroll@acme.example', '5185550100', 'llc', 'Jane Acme']);
 });
 
 // --- access handler --------------------------------------------------------
@@ -326,7 +361,7 @@ test('company write: a business saves its own profile, normalized, with one audi
   assert.equal(saves.length, 1);
   assert.deepEqual(saves[0], {
     tenantId: BUSINESS_A,
-    company: { legalName: 'Acme Widgets LLC', ein: '123456789', addressLine1: '1 Main St', addressLine2: 'Suite 100', city: 'Springfield', state: 'IL', postalCode: '62701-1234', paySchedule: 'biweekly' },
+    company: { legalName: 'Acme Widgets LLC', ein: '123456789', addressLine1: '1 Main St', addressLine2: 'Suite 100', city: 'Springfield', state: 'IL', postalCode: '62701-1234', paySchedule: 'biweekly', contactEmail: 'payroll@acme.example', contactPhone: '5185550100', businessType: 'llc', signingAuthority: 'Jane Acme' },
   });
   assert.equal(audits.length, 1);
   assert.deepEqual(audits[0], { requestId: 'req-1', actorSubjectId: SUBJECT_ID, reportId: null, action: 'company_write', allowed: true, reason: 'allowed' });
