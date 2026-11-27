@@ -99,6 +99,8 @@ import { createPayRunAccessHandler } from './payrollcheck-pay-runs-access.mjs';
 import { createPayRunLoader, PAY_RUN_ACTIONS } from './payrollcheck-pay-runs.mjs';
 import { createTaxCenterAccessHandler } from './payrollcheck-tax-center-access.mjs';
 import { TAX_CENTER_ACTIONS, createTaxCenterLoader } from './payrollcheck-tax-center.mjs';
+import { FILING_ACTIONS, createFilingAccessHandler } from './payrollcheck-filing-access.mjs';
+import { createFilingLoader } from './payrollcheck-filing.mjs';
 import { createCompanyLoader } from './payrollcheck-company.mjs';
 import { EMPLOYEE_ACTIONS, createEmployeeLoader } from './payrollcheck-employees.mjs';
 import { createDashboardLoader } from './payrollcheck-dashboard.mjs';
@@ -153,6 +155,9 @@ export function createPayrollcheckAuth({
   employeesHandlerFactory = createEmployeeAccessHandler,
   payRunsHandlerFactory = createPayRunAccessHandler,
   taxCenterHandlerFactory = createTaxCenterAccessHandler,
+    filingHandlerFactory = createFilingAccessHandler,
+    filingLoaderFactory = createFilingLoader,
+    filingClientFactory = null,
   reportSessionLookupFactory,
   authorizeTenantSession,
   authLimits,
@@ -185,6 +190,8 @@ export function createPayrollcheckAuth({
   requireFn(employeesHandlerFactory, 'employees_handler_factory');
   requireFn(payRunsHandlerFactory, 'pay_runs_handler_factory');
   requireFn(taxCenterHandlerFactory, 'tax_center_handler_factory');
+    requireFn(filingHandlerFactory, 'filing_handler_factory');
+    requireFn(filingLoaderFactory, 'filing_loader_factory');
   requireFn(reportSessionLookupFactory, 'report_session_lookup_factory');
   requireFn(authorizeTenantSession, 'authorize_tenant_session');
   requireFn(pendingSeal, 'pending_seal');
@@ -1353,6 +1360,92 @@ export function createPayrollcheckAuth({
   return { status: outcome.status, headers, body };
 }
 
+async function handleFiling({ cookieHeader, csrfToken, tenantId, action, form, taxYear, quarter, pin, filingId, ip, requestId: rawRequestId }) = {} {
+    const requestId = requestIdFor(rawRequestId);
+    const route = 'filing';
+    if (
+          (tenantId !== undefined && tenantId !== null && (typeof tenantId !== 'string' || !UUID_PATTERN.test(tenantId))) ||
+            !FILING_ACTIONS.includes(action)
+        ) {
+          return { status: 400, body: { error: 'invalid_request' } };
+    }
+    let outcome;
+    try {
+          outcome = await withTransaction(async ({ query }) => {
+                  const store = sessionStoreFactory({ query });
+                  const layer = sessionLayerFactory({ store });
+                  const presentedSessionId = layer.parseSessionId(cookieHeader);
+                  if (presentedSessionId) await setRlsIdentity({ query, sessionId: presentedSessionId });
+                  const loaded = await layer.load(cookieHeader);
+                  if (!loaded || loaded.ok !== true) {
+                            const reason = loaded && typeof loaded.reason === 'string' ? loaded.reason : 'no_session';
+                            if (reason === 'session_load_failed') return { status: 503, body: { error: 'unavailable' }, reason };
+                            return { status: 401, body: { error: 'invalid_session' }, reason };
+                  }
+                  const session = loaded.session;
+                  const presentedId = layer.parseSessionId(cookieHeader);
+                  const csrfOk = (typeof presentedId === 'string' && layer.verifyCsrf(presentedId, csrfToken) === true) || layer.verifyCsrf(session.sessionId, csrfToken) === true;
+                  if (!csrfOk) return { status: 403, body: { error: 'forbidden' }, reason: 'csrf_failed' };
+                  await setRlsIdentity({ query, authUserId: session.authUserId });
+                  const mapping = mappingFactory({ query });
+                  const subjectId = await mapping.resolveInternalUserId(session.authUserId);
+                  if (typeof subjectId !== 'string' || !subjectId) return { status: 401, body: { error: 'invalid_session' }, reason: 'subject_not_found' };
+                  await setRlsIdentity({ query, subjectId, authUserId: session.authUserId, sessionId: session.sessionId });
+                  const tenancy = tenancyFactory({ query });
+                  const lookup = reportSessionLookupFactory({ store });
+                  let verifiedUser;
+                  const getVerifiedUser = async () => {
+                            if (verifiedUser === undefined) verifiedUser = await fetchAdminUser(session.authUserId);
+                            return verifiedUser;
+                  };
+                  const taxCenterLoader = createTaxCenterLoader({ query });
+                  const loader = filingLoaderFactory({ query, createTaxBanditsClient: filingClientFactory });
+                  const handler = filingHandlerFactory({
+                            getVerifiedUser,
+                            requireAal2: async () => session.aal2 === true,
+                            resolveSubjectId: (authUserId) => mapping.resolveInternalUserId(authUserId),
+                            recordAudit: (args) => tenancy.recordAccessAudit(args),
+                            checkRateLimit: (args) => authLimits.checkRateLimit(args),
+                            getSession: (id) => lookup.getSession(id),
+                            generateId: () => requestId,
+                            loadMemberships: (subject) => taxCenterLoader.loadMemberships(subject),
+                            loadFiling: (args) => loader.loadFiling(args),
+                  });
+                  const decision = await handler.handleFilingAccess({
+                            accessToken: session.sessionId,
+                            sessionId: session.sessionId,
+                            tenantId: tenantId ?? null,
+                            action,
+                            requestId,
+                            clientIp: validIp(ip) ? ip : undefined,
+                            form,
+                            taxYear,
+                            quarter,
+                            pin,
+                            filingId,
+                  });
+                  const body = decision.ok ? { ok: true } : { error: decision.reason };
+                  if (decision.ok && decision.filing !== undefined) body.filing = decision.filing;
+                  if (decision.ok && decision.filings !== undefined) body.filings = decision.filings;
+                  return {
+                            status: decision.status,
+                            body,
+                            reason: decision.ok ? 'allowed' : decision.reason,
+                            rotatedCookie: loaded.rotated ? loaded.cookie : null,
+                            rotatedCsrfToken: loaded.rotated ? loaded.csrfToken : null,
+                  };
+          });
+    } catch (error) {
+          edgeLog(requestId, route, 'error', error instanceof Error ? error.message : 'unknown');
+          outcome = { status: 503, body: { error: 'unavailable' }, reason: 'unavailable' };
+    }
+    edgeLog(requestId, route, outcome.status, outcome.reason);
+    const headers = {};
+    if (outcome.rotatedCookie) headers['Set-Cookie'] = outcome.rotatedCookie;
+    const body = outcome.body;
+    if (outcome.rotatedCsrfToken) body.csrfToken = outcome.rotatedCsrfToken;
+    return { status: outcome.status, headers, body };
+}
 async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId, actorSubjectId } = {}) {
     if (
       typeof tenantId !== 'string' ||
@@ -1415,6 +1508,7 @@ async function deactivateMembershipAndRevokeSessions({ tenantId, subjectId, acto
     handleEmployees,
     handlePayRuns,
   handleTaxCenter,
+      handleFiling,
     deactivateMembershipAndRevokeSessions,
   });
 }
