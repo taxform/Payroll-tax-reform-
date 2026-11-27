@@ -29,9 +29,23 @@ function fromCents(cents) {
   return cents / 100;
 }
 
+function toIsoDate(value) {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(value.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  if (typeof value !== 'string') return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : null;
+}
+
 function quarterOf(payDate) {
-  if (typeof payDate !== 'string') return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(payDate);
+  const isoDate = toIsoDate(payDate);
+  if (!isoDate) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
   if (!match) return null;
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -111,7 +125,7 @@ export function buildTaxCenterSummary({ runs, linesByPayRunId } = {}) {
       toCents(run.net_total ?? run.netTotal) === totals.netPay;
     const deposit = {
       payRunId: run.pay_run_id ?? run.payRunId,
-      payDate: run.pay_date ?? run.payDate,
+      payDate: toIsoDate(run.pay_date ?? run.payDate),
       federalWithholding: fromCents(totals.federalWithholding),
       socialSecurity: fromCents(totals.socialSecurity),
       medicare: fromCents(totals.medicare),
