@@ -253,7 +253,7 @@ export function buildFilingQueueItem({ tenantId, form, taxYear, quarter, totalTa
 }
 
 // Sandbox endpoint paths, one per form. The client only ever calls these
-// against TAX_BANDITS_SANDBOX_API_BASE_URL.
+// against TAX_BANDITS_SANDBOX_BASE_URL.
 export function filingCreatePath(form) {
   if (!FILING_FORMS.includes(form)) throw new TypeError(`unsupported filing form: ${form}`);
   const resource = form === 'W-2' ? 'FormW2' : `Form${form}`;
@@ -290,7 +290,7 @@ function assertSandboxUrl(url) {
 // supplies the global fetch and the server-side access token, and this module
 // never sees a client id, secret or user token. The PIN travels in the request
 // body only and is never logged or stored by this client.
-export function createTaxBanditsSandboxClient({ fetch: fetchImpl, getAccessToken, baseUrl = TAX_BANDITS_SANDBOX_API_BASE_URL } = {}) {
+export function createTaxBanditsSandboxClient({ fetch: fetchImpl, getAccessToken, baseUrl = TAX_BANDITS_SANDBOX_BASE_URL } = {}) {
   if (typeof fetchImpl !== 'function') throw new TypeError('fetch is required');
   if (typeof getAccessToken !== 'function') throw new TypeError('getAccessToken is required');
   assertSandboxUrl(baseUrl);
