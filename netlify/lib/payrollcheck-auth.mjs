@@ -63,8 +63,8 @@ function requiredEnv(name) {
 
 let cached = null;
 
-export function getAuthComposition() {
-  if (cached) return cached;
+export function getAuthComposition({ filingClientFactory = null } = {}) {
+  if (cached && !filingClientFactory) return cached;
 
   const supabaseUrl = requiredEnv('PAYROLLCHECK_SUPABASE_URL');
   const anonKey = requiredEnv('PAYROLLCHECK_SUPABASE_ANON_KEY');
@@ -130,6 +130,7 @@ export function getAuthComposition() {
     pendingSeal: (payload) => pendingSealer.seal(payload),
     pendingOpen: (blob) => pendingSealer.open(blob),
     sealEmployeeSsn: (ssn) => ssnSealer.seal(ssn),
+    filingClientFactory,
     appUrl,
     log: (event) => {
       // The composition's log events carry only { requestId, route,
@@ -138,7 +139,7 @@ export function getAuthComposition() {
     },
   });
 
-  cached = composition;
+  if (!filingClientFactory) cached = composition;
   return composition;
 }
 
