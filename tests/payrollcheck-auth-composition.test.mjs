@@ -1437,3 +1437,193 @@ test('logout: revoking actually deletes the session row (identity set before rev
   });
   assert.equal(after.status, 401);
 });
+
+
+// --------------------------------------------------
+// handleFiling: the Slice 6 filing endpoint, behind the same
+// session, CSRF and RLS preamble as handleTaxCenter
+// --------------------------------------------------
+
+function makeFilingFakes() {
+    const filingHandlerDeps = [];
+    const filingLoaderDeps = [];
+    const filingCalls = [];
+    const filingLoaderArgs = [];
+    const filings = [
+      {
+              filingId: 'filing-1',
+              tenantId: BUSINESS_A,
+              form: '941',
+              taxYear: 2026,
+              quarter: 4,
+              status: 'queued',
+              totalTax: 462.15,
+              environment: 'sandbox',
+      },
+        ];
+    const filingHandlerFactory = (deps) => {
+          filingHandlerDeps.push(deps);
+          return {
+                  handleFilingAccess: async (args) => {
+                            filingCalls.push(args);
+                            const loaded = await deps.loadFiling(args);
+                            return { ok: true, status: 200, reason: 'allowed', ...loaded };
+                  },
+          };
+    };
+    const filingLoaderFactory = (deps) => {
+          filingLoaderDeps.push(deps);
+          return {
+                  loadFiling: async (args) => {
+                            filingLoaderArgs.push(args);
+                            return { ok: true, filings };
+                  },
+          };
+    };
+    return {
+          filingHandlerDeps,
+          filingLoaderDeps,
+          filingCalls,
+          filingLoaderArgs,
+          filings,
+          filingHandlerFactory,
+          filingLoaderFactory,
+    };
+}
+
+test('handleFiling is exposed on the composition', () => {
+    const { composition } = makeSetup();
+    assert.equal(typeof composition.handleFiling, 'function');
+});
+
+test('handleFiling: unknown action is rejected before any session work', async () => {
+    const { composition } = makeSetup();
+    const res = await composition.handleFiling({ action: 'bogus' });
+    assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'invalid_request');
+});
+
+test('handleFiling: no session is 401 invalid_session', async () => {
+    const { composition } = makeSetup();
+    const res = await composition.handleFiling({ action: 'queue' });
+    assert.equal(res.status, 401);
+    assert.equal(res.body.error, 'invalid_session');
+});
+
+test('handleFiling: wrong CSRF token is 403 forbidden', async () => {
+    const { composition, cookie } = await loggedInOwner();
+    const res = await composition.handleFiling({
+          cookieHeader: cookie,
+          csrfToken: 'wrong-token',
+          action: 'queue',
+    });
+    assert.equal(res.status, 403);
+    assert.equal(res.body.error, 'forbidden');
+});
+
+test('handleFiling: owner queues filings - 200, loader wired, identity in order', async () => {
+    const fakes = makeFilingFakes();
+    const {
+          composition,
+          cookie,
+          sessionId,
+          csrfToken,
+          statements,
+          setRlsCalls,
+          mappingCalls,
+    } = await loggedInOwner({
+          deps: (deps) => {
+                  deps.filingHandlerFactory = fakes.filingHandlerFactory;
+                  deps.filingLoaderFactory = fakes.filingLoaderFactory;
+          },
+    });
+    const res = await composition.handleFiling({
+          cookieHeader: cookie,
+          csrfToken,
+          tenantId: BUSINESS_A,
+          action: 'queue',
+    });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.ok, true);
+    assert.deepEqual(res.body.filings, fakes.filings);
+    assert.equal('csrfToken' in res.body, false, 'no rotation happened, so no new token is returned');
+    // The handler factory got the filing deps, wired to the loader.
+       assert.equal(fakes.filingHandlerDeps.length, 1);
+    const handlerDeps = fakes.filingHandlerDeps[0];
+    assert.equal(typeof handlerDeps.getVerifiedUser, 'function');
+    assert.equal(typeof handlerDeps.requireAal2, 'function');
+    assert.equal(typeof handlerDeps.resolveSubjectId, 'function');
+    assert.equal(typeof handlerDeps.recordAudit, 'function');
+    assert.equal(typeof handlerDeps.checkRateLimit, 'function');
+    assert.equal(typeof handlerDeps.getSession, 'function');
+    assert.equal(typeof handlerDeps.generateId, 'function');
+    assert.equal(typeof handlerDeps.loadMemberships, 'function');
+    assert.equal(typeof handlerDeps.loadFiling, 'function');
+    // The loader factory got the transaction query and no TaxBandits client:
+       // without a client factory the queue works and nothing leaves the repo.
+       assert.equal(fakes.filingLoaderDeps.length, 1);
+    assert.equal(typeof fakes.filingLoaderDeps[0].query, 'function');
+    assert.equal(fakes.filingLoaderDeps[0].createTaxBanditsClient, null);
+    // The decision reached the handler with the session binding, and the
+       // handler passed the filing request straight through to the loader.
+       assert.equal(fakes.filingCalls.length, 1);
+    const decisionArgs = fakes.filingCalls[0];
+    assert.equal(decisionArgs.accessToken, sessionId);
+    assert.equal(decisionArgs.sessionId, sessionId);
+    assert.equal(decisionArgs.tenantId, BUSINESS_A);
+    assert.equal(decisionArgs.action, 'queue');
+    assert.equal(decisionArgs.requestId, 'req-test-0001');
+    assert.equal(decisionArgs.clientIp, undefined);
+    assert.equal(fakes.filingLoaderArgs.length, 1);
+    assert.equal(fakes.filingLoaderArgs[0].tenantId, BUSINESS_A);
+    assert.equal(fakes.filingLoaderArgs[0].action, 'queue');
+    assert.deepEqual(
+          setRlsCalls.slice(-2).map((c) => ({ subject: c.subjectId, auth: c.authUserId,  session: c.sessionId})),
+          [
+            { subject: undefined, auth: OWNER_UUID, session: undefined},
+            { subject: OWNER_SUBJECT, auth: OWNER_UUID, session: sessionId},
+                ],
+        );
+    assert.deepEqual(
+          mappingCalls,
+          [OWNER_UUID, OWNER_UUID, OWNER_UUID],
+          'login maps, MFA maps, the filing call maps',
+        );
+    assert.equal(statements.some((s) => s.sql === 'COMMIT'), true);
+    assert.equal(statements.some((s) => s.sql === 'ROLLBACK'), false);
+});
+
+test('handleFiling: owner submits a filing - 200, request passed to the loader', async () => {
+    const fakes = makeFilingFakes();
+    const { composition, cookie, csrfToken} = await loggedInOwner({
+          deps: (deps) => {
+                  deps.filingHandlerFactory = fakes.filingHandlerFactory;
+                  deps.filingLoaderFactory = fakes.filingLoaderFactory;
+          },
+    });
+    const res = await composition.handleFiling({
+          cookieHeader: cookie,
+          csrfToken,
+          tenantId: BUSINESS_A,
+          action: 'submit-filing',
+          form: '941',
+          taxYear: 2026,
+          quarter: 4,
+          pin: '12345',
+    });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.ok, true);
+    assert.equal(fakes.filingCalls.length, 1);
+    const decisionArgs = fakes.filingCalls[0];
+    assert.equal(decisionArgs.action, 'submit-filing');
+    assert.equal(decisionArgs.form, '941');
+    assert.equal(decisionArgs.taxYear, 2026);
+    assert.equal(decisionArgs.quarter, 4);
+    assert.equal(decisionArgs.pin, '12345');
+    assert.equal(fakes.filingLoaderArgs.length, 1);
+    assert.equal(fakes.filingLoaderArgs[0].action, 'submit-filing');
+    assert.equal(fakes.filingLoaderArgs[0].form, '941');
+    assert.equal(fakes.filingLoaderArgs[0].taxYear, 2026);
+    assert.equal(fakes.filingLoaderArgs[0].quarter, 4);
+    assert.equal(fakes.filingLoaderArgs[0].pin, '12345');
+});
