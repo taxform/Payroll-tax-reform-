@@ -450,7 +450,7 @@ const loadTaxCenter = async (tenantId) => ({
 
 test('createFilingLoader: a query function is required', () => {
     assert.throws(() => createFilingLoader({}), /query_required/);
-    assert.throws(() => createFilingLoader({ query: async () => ({}), createTaxBanditsClient: 'nope' }), /create_taxbandits_client_required/);
+    assert.throws(() => createFilingLoader({ query: async () => ({}), createTaxBanditsClient: 'nope' }), /create_tax_bandits_client_required/);
     assert.throws(() => createFilingLoader({ query: async () => ({}), loadTaxCenter: 'nope' }), /load_tax_center_required/);
 });
 
