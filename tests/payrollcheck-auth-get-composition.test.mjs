@@ -39,3 +39,12 @@ test('getAuthComposition builds with a base64 PAYROLLCHECK_PENDING_KEY (producti
   assert.equal(typeof composition, 'object');
   assert.equal(typeof composition.login, 'function');
 });
+
+test('a filing client factory builds a fresh composition instead of reusing the cached one', () => {
+  const composition = getAuthComposition();
+  const filingClientFactory = () => ({});
+  const withFiling = getAuthComposition({ filingClientFactory });
+  assert.notEqual(withFiling, composition);
+  assert.equal(typeof withFiling.handleFiling, 'function');
+  assert.equal(getAuthComposition(), composition);
+});
