@@ -224,7 +224,7 @@ test('factory client submits Form 941 to the sandbox with the exchanged Bearer t
   const client = factory();
   const result = await client.submitFiling({ form: '941', payload: { Form941: { TaxYear: 2026 } } });
   assert.equal(result.ok, true);
-  assert.equal(result.submissionId, 'sandbox-submission');
+  assert.equal(result.submissionId, 'sub-1');
   assert.equal(result.status, 'submitted');
   assert.equal(calls.length, 2);
   assert.equal(calls[0].url, TAXBANDITS_SANDBOX_TOKEN_URL);
@@ -254,7 +254,7 @@ const COMPANY_ROW = Object.freeze({
   pay_schedule: 'biweekly',
   contact_email: 'filings@acme.example',
   contact_phone: '+1 (555) 010-1234',
-  business_type: 'LLC',
+  business_type: 'llc',
   signing_authority: 'Ada Lovelace, Owner',
 });
 const TAX_CENTER_PERIOD = Object.freeze({
