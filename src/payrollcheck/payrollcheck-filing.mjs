@@ -126,7 +126,7 @@ export function validateFilingCompany(company = {}) {
     ok: true,
     company: {
       legalName: company.legalName.trim(),
-      ein,
+      ein: ein.slice(0, 2) + '-' + ein.slice(2),
       addressLine1: company.addressLine1.trim(),
       addressLine2: isNonEmptyString(company.addressLine2) ? company.addressLine2.trim() : null,
       city: company.city.trim(),
