@@ -12,12 +12,18 @@ import {
   methodNotAllowed,
   unavailable,
 } from "../lib/payrollcheck-auth.mjs";
+import { createTaxBanditsSandboxFilingClientFactory } from "../../src/payrollcheck/payrollcheck-taxbandits-sandbox.mjs";
 
 export default async function handler(req: Request) {
   if (req.method !== "POST") return methodNotAllowed();
   try {
     const body = await readJsonBody(req);
-    const auth = getAuthComposition();
+// Live sandbox submission: the factory reads TAXBANDITS_SANDBOX_CLIENT_ID,
+// TAXBANDITS_SANDBOX_CLIENT_SECRET and TAXBANDITS_SANDBOX_USER_TOKEN from the
+// Netlify environment; it is null when any are missing, so the endpoint
+// stays queue-only until they are set.
+    const filingClientFactory = createTaxBanditsSandboxFilingClientFactory({ env: process.env }); 
+const auth = getAuthComposition({ filingClientFactory });
     const result = await auth.handleFiling({
       cookieHeader: req.headers.get("cookie") ?? "",
       csrfToken: req.headers.get("x-csrf-token") ?? undefined,
