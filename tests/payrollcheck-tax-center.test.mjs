@@ -206,3 +206,30 @@ test('tax center access allows the business owner and refuses other roles', asyn
   assert.equal(rateLimited.status, 429);
   assert.equal(rateLimited.reason, 'rate_limited');
 });
+
+
+test('tax center includes a finalized run whose pay_date is a JS Date object (pg date column)', () => {
+  const run = runRow(RUN2, new Date('2026-11-25T00:00:00.000Z'), 'final', '2000', '156.15', '153', '1690.85');
+  const summary = buildTaxCenterSummary({
+    runs: [run],
+    linesByPayRunId: { [RUN2]: [lineRow(RUN2, '2000', '156.15', '124', '29', '1690.85')] },
+  });
+  assert.equal(summary.form941.length, 1);
+  const q4 = summary.form941[0];
+  assert.equal(q4.period, '2026-Q4');
+  assert.equal(q4.year, 2026);
+  assert.equal(q4.quarter, 4);
+  assert.equal(q4.payRunCount, 1);
+  assert.deepEqual(q4.payRunIds, [RUN2]);
+  assert.equal(q4.wages, 2000);
+  assert.equal(q4.federalWithholding, 156.15);
+  assert.equal(q4.socialSecurity, 124);
+  assert.equal(q4.medicare, 29);
+  assert.equal(q4.fica, 153);
+  assert.equal(q4.totalTax, 309.15);
+  assert.equal(q4.reconciled, true);
+  assert.deepEqual(q4.depositDates, ['2026-11-25']);
+  assert.equal(summary.form940.length, 1);
+  assert.equal(summary.form940[0].wages, 2000);
+  assert.equal(summary.form940[0].totalTax, 309.15);
+});
