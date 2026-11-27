@@ -1360,7 +1360,7 @@ export function createPayrollcheckAuth({
   return { status: outcome.status, headers, body };
 }
 
-async function handleFiling({ cookieHeader, csrfToken, tenantId, action, form, taxYear, quarter, pin, filingId, ip, requestId: rawRequestId }) = {} {
+async function handleFiling({ cookieHeader, csrfToken, tenantId, action, form, taxYear, quarter, pin, filingId, ip, requestId: rawRequestId } = {}) {
     const requestId = requestIdFor(rawRequestId);
     const route = 'filing';
     if (
