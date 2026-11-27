@@ -297,7 +297,7 @@ test('sandbox client refuses a production host and reports a missing token', asy
   assert.deepEqual(await client.submitFiling({ form: '941', payload: {} }), { ok: false, error: 'taxbandits_not_configured' });
 });
 
-/ --------------------------------------------------
+// --------------------------------------------------
 // createFilingLoader: the filing queue, submit-filing and
 // refresh-status operations, behind the same tenant-scoped
 // queries as the rest of the app.
