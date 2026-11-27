@@ -323,6 +323,7 @@ export function createTaxBanditsSandboxClient({ fetch: fetchImpl, getAccessToken
     return { ok: true, status: parsed.status, providerStatus: typeof body?.Status === 'string' ? body.Status : null };
   }
   return { submitFiling, refreshFilingStatus };
+}
 
 // Filing loader (Slice 6). Runs inside the composition's transaction, behind the same tenancy and RLS as the rest of the app: every query is scoped to the tenant the access handler selected, and the tax_filings table enforces tenant_id = current_tenant_id() at the database level.
   // The TaxBandits sandbox client is injected as a factory. Without one, submit-filing only queues the filing and refresh-status reports the service unavailable, so the queue works before any token exchange is wired and no filing leaves the repo without a configured sandbox client.
@@ -502,7 +503,5 @@ export function createTaxBanditsSandboxClient({ fetch: fetchImpl, getAccessToken
             return { ok: false, status: 400, error: 'invalid_request' };
       }
 
-      return Object.freeze({ loadFiling });
+        return Object.freeze({ loadFiling });
   }
-  
-}
