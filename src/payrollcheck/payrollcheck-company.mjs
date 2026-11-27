@@ -30,9 +30,10 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const EIN_PATTERN = /^[0-9]{9}$/;
 const STATE_PATTERN = /^[A-Z]{2}$/;
 const POSTAL_CODE_PATTERN = /^[0-9]{5}(-[0-9]{4})?$/;
+const CONTACT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const COMPANY_COLUMNS =
-  'company_id, tenant_id, legal_name, ein, address_line1, address_line2, city, state, postal_code, pay_schedule, created_at, updated_at';
+  'company_id, tenant_id, legal_name, ein, address_line1, address_line2, city, state, postal_code, pay_schedule, contact_email, contact_phone, business_type, signing_authority, created_at, updated_at';
 
 export function normalizeEin(value) {
   return String(value ?? '').replace(/\D/g, '');
@@ -73,6 +74,26 @@ export function parseCompanyInput(input, { einRequired = true } = {}) {
   const postalCode = typeof input.postalCode === 'string' ? input.postalCode.trim() : '';
   if (!POSTAL_CODE_PATTERN.test(postalCode)) errors.push('postalCode');
   if (!PAY_SCHEDULES.includes(input.paySchedule)) errors.push('paySchedule');
+  let contactEmail = null;
+    if (input.contactEmail !== undefined && input.contactEmail !== null && String(input.contactEmail).trim() !== '') {
+          contactEmail = String(input.contactEmail).trim().toLowerCase();
+          if (contactEmail.length > 254 || !CONTACT_EMAIL_PATTERN.test(contactEmail)) errors.push('contactEmail');
+    }
+    let contactPhone = null;
+    if (input.contactPhone !== undefined && input.contactPhone !== null && String(input.contactPhone).trim() !== '') {
+          contactPhone = String(input.contactPhone).replace(/\D/g, '');
+          if (contactPhone.length < 7 || contactPhone.length > 15) errors.push('contactPhone');
+    }
+    let businessType = null;
+    if (input.businessType !== undefined && input.businessType !== null && String(input.businessType).trim() !== '') {
+          businessType = String(input.businessType).trim();
+          if (!BUSINESS_TYPES.includes(businessType)) errors.push('businessType');
+    }
+    let signingAuthority = null;
+    if (input.signingAuthority !== undefined && input.signingAuthority !== null && String(input.signingAuthority).trim() !== '') {
+          signingAuthority = textField(input.signingAuthority, { max: 120 });
+          if (signingAuthority === null) errors.push('signingAuthority');
+    }
   let ein = null;
   const einDigits = normalizeEin(input.ein);
   if (einDigits === '') {
@@ -85,7 +106,7 @@ export function parseCompanyInput(input, { einRequired = true } = {}) {
   if (errors.length > 0) return { ok: false, reason: 'invalid_request', errors };
   return {
     ok: true,
-    company: { legalName, ein, addressLine1, addressLine2, city, state, postalCode, paySchedule: input.paySchedule },
+    company: { legalName, ein, addressLine1, addressLine2, city, state, postalCode, paySchedule: input.paySchedule, contactEmail, contactPhone, businessType, signingAuthority },
   };
 }
 
@@ -123,6 +144,10 @@ export function toCompanyResponse(row) {
       postalCode: row.postal_code,
     },
     paySchedule: row.pay_schedule,
+        contactEmail: row.contact_email ?? null,
+        contactPhone: row.contact_phone ?? null,
+        businessType: row.business_type ?? null,
+        signingAuthority: row.signing_authority ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -168,8 +193,8 @@ export function createCompanyLoader({ query } = {}) {
   // the stored EIN, the handler fills it in from the existing row first).
   async function saveCompany(tenantId, company) {
     const result = await query(
-      `INSERT INTO payrollcheck.payroll_companies (tenant_id, legal_name, ein, address_line1, address_line2, city, state, postal_code, pay_schedule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (tenant_id) DO UPDATE SET legal_name = EXCLUDED.legal_name, ein = EXCLUDED.ein, address_line1 = EXCLUDED.address_line1, address_line2 = EXCLUDED.address_line2, city = EXCLUDED.city, state = EXCLUDED.state, postal_code = EXCLUDED.postal_code, pay_schedule = EXCLUDED.pay_schedule, updated_at = now() RETURNING ${COMPANY_COLUMNS}`,
-      [tenantId, company.legalName, company.ein, company.addressLine1, company.addressLine2, company.city, company.state, company.postalCode, company.paySchedule],
+      `INSERT INTO payrollcheck.payroll_companies (tenant_id, legal_name, ein, address_line1, address_line2, city, state, postal_code, pay_schedule, contact_email, contact_phone, business_type, signing_authority) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (tenant_id) DO UPDATE SET legal_name = EXCLUDED.legal_name, ein = EXCLUDED.ein, address_line1 = EXCLUDED.address_line1, address_line2 = EXCLUDED.address_line2, city = EXCLUDED.city, state = EXCLUDED.state, postal_code = EXCLUDED.postal_code, pay_schedule = EXCLUDED.pay_schedule, contact_email = EXCLUDED.contact_email, contact_phone = EXCLUDED.contact_phone, business_type = EXCLUDED.business_type, signing_authority = EXCLUDED.signing_authority, updated_at = now() RETURNING ${COMPANY_COLUMNS}`,
+      [tenantId, company.legalName, company.ein, company.addressLine1, company.addressLine2, company.city, company.state, company.postalCode, company.paySchedule, company.contactEmail ?? null, company.contactPhone ?? null, company.businessType ?? null, company.signingAuthority ?? null],
     );
     return result.rows[0] ?? null;
   }
